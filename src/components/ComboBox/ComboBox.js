@@ -1,5 +1,6 @@
 import {useState} from 'react';
 import classes from './ComboBox.module.css';
+import Opciones from './Opciones';
 const ComboBox = props =>{
 const [active,setActive]=useState(false);
 
@@ -15,7 +16,8 @@ const clickHandler = () =>{
                 </div>
                 <div className={classes.buttom}>\/</div>
             </div>
-            <div className={classes.options}></div>
+
+            {active&&<Opciones opciones={[{title:"Soy la opcion 1"},{title:"Soy la opcion 2"}]}/>}
         </div>
     );
 }
