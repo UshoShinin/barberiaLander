@@ -1,0 +1,33 @@
+* {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  padding: 0;
+  margin: 0;
+  font-family: 'Staatliches';
+}
+
+:root {
+  --clr-neon-blue: #0375eb;
+  --clr-neon-red:#fa1a52;
+  --clr-neon-white: #dadada/*efefef*/;
+  --clr-inActive: #737373; /*#c6c6c6;*/
+  --clr-neon-placeholder: #cacaca;
+  --clr-neon-invalid:#cc3b3b;
+  --clr-background:#14141b;
+}
+.App {
+  text-align: center;
+  background-color: var(--clr-background);
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+}
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
