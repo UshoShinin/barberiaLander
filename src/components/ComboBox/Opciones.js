@@ -1,8 +1,20 @@
-import classes from "./Opciones.module.css";
-import Opcion from './Opcion';
+import "./Opciones.css";
+import Opcion from "./Opcion";
 const Opciones = (props) => {
-  return <div className={`${classes.opciones} ${classes.active}`}>
-      {props.opciones.map((opcion) => <Opcion data={opcion}/>)}
-  </div>;
+  const classes = [
+    "opciones",
+    props.show === "entering"
+      ? "abrirOpciones"
+      : props.show === "exiting"
+      ? "cerrarOpciones"
+      : null,
+  ];
+  return (
+    <div className={classes.join(" ")}>
+      {props.opciones.map((opcion) => (
+        <Opcion onClick={props.mostrar} key={opcion.id} data={opcion} />
+      ))}
+    </div>
+  );
 };
 export default Opciones;

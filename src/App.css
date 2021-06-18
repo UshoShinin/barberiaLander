@@ -18,13 +18,18 @@
   --clr-neon-placeholder: #cacaca;
   --clr-neon-invalid:#cc3b3b;
   --clr-background:#14141b;
+  --clr-footer:#060609;
+  --clr-neon-green:#0ad21d;
+
 }
 .App {
   text-align: center;
+  background-size: cover;
   background-color: var(--clr-background);
   min-height: 100vh;
-  display: grid;
-  place-items: center;
+  width: 100%;
+  /* display: flex; */
+  /* place-items: center; */
 }
 *,
 *::before,
