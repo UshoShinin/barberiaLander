@@ -6,6 +6,8 @@ import ComboBox from './components/ComboBox/ComboBox';
 import Switch from './components/Switch/Switch';
 import LoaddingSpinner from "./components/LoaddingSpinner/LoaddingSpinner";
 import Footer from './components/Footer/Footer';
+import Expenses from "./components/Lista/Expenses";
+
 const inputReducer = (state, action) => {
   if (action.type === "USER_INPUT") {
     return { value: action.value, isValid: state.isValid };
@@ -107,5 +109,14 @@ function App() {
     </div>
   );
 }
+
+//<Expenses items={expenses} />
+//const initialExpenses = [
+//  { id: "e1", title: "Producto1", amount: 200},
+//  { id: "e2", title: "Producto2", amount: 300},
+//  { id: "e3", title: "Producto3", amount: 20},
+//  { id: "e4", title: "Producto4", amount: 500},
+//];
+
 
 export default App;
