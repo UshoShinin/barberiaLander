@@ -1,6 +1,6 @@
-import ExpenseItem from "./ExpenseItem";
-import Card from './Card'
-import "./ItemLista.css";
+/* import ExpenseItem from "./ExpenseItem";
+import Card from '../Card'
+import "./Expenses.css";
 
 function ItemLista(props) {
   return (
@@ -16,4 +16,4 @@ function ItemLista(props) {
   );
 }
 
-export default ItemLista;
+export default ItemLista; */

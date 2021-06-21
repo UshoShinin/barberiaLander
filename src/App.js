@@ -7,6 +7,8 @@ import Switch from './components/Switch/Switch';
 import LoaddingSpinner from "./components/LoaddingSpinner/LoaddingSpinner";
 import Footer from './components/Footer/Footer';
 import Expenses from "./components/Lista/Expenses";
+import Modal from './components/UI/Modal/Modal';
+import Backdrop from './components/UI/Backdrop/Backdrop'
 
 const inputReducer = (state, action) => {
   if (action.type === "USER_INPUT") {
@@ -24,10 +26,12 @@ const inputReducer = (state, action) => {
 function App() {
   const [formIsValid, setFormIsValid] = useState(false);
   const [mySwitch,setMySwitch] = useState(false);
+  const [showModal,setShowModal] = useState(false);
   const [inputState, dispatchInput] = useReducer(inputReducer, {
     value: "",
     isValid: null,
   });
+
   const inputRef = useRef();
 
   const { isValid: inputIsValid } = inputState; //Le asigno un alias a la variable de isValid del State del input.
@@ -60,12 +64,22 @@ function App() {
     if (formIsValid) {
       console.log("Soy Válido :D");
     } else {
-      inputRef.current.focus();
+      if(!showModal){
+        inputRef.current.focus();
+      }
     }
   };
   const alertaloca = () => {
     console.log("Alerta loca");
   };
+
+  const openModal = () => {
+    setShowModal(true);
+  }
+
+  const closeModal = () => {
+    setShowModal(false);
+  }
 
   const DUMMY_COMBOBOX = [
     {id:1, title: "Soy la opcion 1" },
@@ -82,8 +96,9 @@ function App() {
   ]
   return (
     <div className="App">
-      <form onSubmit={submitHandler} style={{display:'block'}}>
-        {/* <Input
+      <form onSubmit={submitHandler} className='fill-window'>
+        <div style={{display:'flex',placeItems:'center',alignItems:'center',justifyContent: 'center',height:'100%'}}>
+          {/* <Input
           ref={inputRef}
           isValid={inputIsValid}
           input={{
@@ -96,15 +111,18 @@ function App() {
             onFocus:resetIsValid,
           }}
         />
-        <Button type="submit" action={alertaloca} color={""}>
+         */}
+        
+        <Button type="submit" action={openModal} color={""}>
           Aceptar
         </Button> 
-        
-        */}
-        <ComboBox opciones={DUMMY_COMBOBOX}/>
-        {/* <Switch active={mySwitch}onCheck={switchHandler}/> */}
-        {/* <LoaddingSpinner/> */}
+        {/* <ComboBox opciones={DUMMY_COMBOBOX}/>
+        <Switch active={mySwitch}onCheck={switchHandler}/>
+        <LoaddingSpinner/> */}
+        </div>
       </form>
+      <Modal show={showModal} closed={closeModal}/>
+      {showModal&& <Backdrop show={showModal}/>}
       <Footer/>
     </div>
   );
