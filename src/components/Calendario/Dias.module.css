@@ -1,0 +1,26 @@
+.Lun{
+    grid-column-start:1;
+}
+.Mar{
+    grid-column-start:2;
+}
+.Mie{
+    grid-column-start:3;
+}
+.Jue{
+    grid-column-start:4;
+}
+.Vie{
+    grid-column-start:5;
+}
+.Sab{
+    grid-column-start:6;
+}
+.Dom{
+    grid-column-start:7;
+}
+
+.invalid{
+    background-color: red;
+    color:var(--clr-inActive);
+}

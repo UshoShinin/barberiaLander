@@ -1,0 +1,29 @@
+
+.container {
+  box-sizing: border-box;
+  color: var(--clr-neon-white);
+  margin:0 auto;
+  width: 20em;
+  border: 0.08em solid var(--clr-neon-white);
+  border-radius: 0.8em;
+  padding: 1em;
+  box-shadow: 0 0 0.6em 0 var(--clr-neon-blue), inset 0 0 0.6em 0 var(--clr-neon-blue);
+  display: flow-root;
+}
+.calendario {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  border: 0.1em solid var(--clr-inActive);
+}
+
+li{
+    /* border: 0.08em solid var(--clr-inActive); */
+    list-style-type: none;
+}
+
+.day{
+    background-color: var(--clr-background-calendario);
+    padding:0.15em 0;
+    border-bottom: 0.1em solid var(--clr-inActive);
+    border-left: 0.1em solid var(--clr-inActive);
+}

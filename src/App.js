@@ -9,6 +9,7 @@ import Footer from './components/Footer/Footer';
 import Expenses from "./components/Lista/Expenses";
 import Modal from './components/UI/Modal/Modal';
 import Backdrop from './components/UI/Backdrop/Backdrop'
+import Calendario from "./components/Calendario/Calendario";
 
 const inputReducer = (state, action) => {
   if (action.type === "USER_INPUT") {
@@ -96,9 +97,9 @@ function App() {
   ]
   return (
     <div className="App">
-      <form onSubmit={submitHandler} className='fill-window'>
+      {/* <form onSubmit={submitHandler} className='fill-window'>
         <div style={{display:'flex',placeItems:'center',alignItems:'center',justifyContent: 'center',height:'100%'}}>
-          {/* <Input
+          <Input
           ref={inputRef}
           isValid={inputIsValid}
           input={{
@@ -111,19 +112,19 @@ function App() {
             onFocus:resetIsValid,
           }}
         />
-         */}
-        
-        <Button type="submit" action={openModal} color={""}>
+         <Button type="submit" action={openModal} color={""}>
           Aceptar
         </Button> 
-        {/* <ComboBox opciones={DUMMY_COMBOBOX}/>
+        
+        <ComboBox opciones={DUMMY_COMBOBOX}/>
         <Switch active={mySwitch}onCheck={switchHandler}/>
-        <LoaddingSpinner/> */}
+        <LoaddingSpinner/> 
         </div>
       </form>
       <Modal show={showModal} closed={closeModal}/>
-      {showModal&& <Backdrop show={showModal}/>}
-      <Footer/>
+      {showModal&& <Backdrop show={showModal}/>} */}
+      <Calendario/>
+      {/* <Footer/> */}
     </div>
   );
 }
