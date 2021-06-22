@@ -9,6 +9,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Redes from "./RedesSociales/Redes";
 
+import { NavLink } from "react-router-dom";
+
 const Footer = () => {
   return (
     <footer>
