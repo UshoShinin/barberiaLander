@@ -14,10 +14,10 @@ import React, { useState } from 'react';
 
 const ContextUsuario = React.createContext({
     cerrarSesion: () => { },
-    iniciarSesion: (cedula, contra) => { },
+    iniciarSesion: (cedula, rol) => { },
     estaLogueado: false,
     cedula: '',
-    rol: 'invitado'
+    rol: 'Invitado'
 });
 
 export const ContextUsuarioProvider = (props) => {
