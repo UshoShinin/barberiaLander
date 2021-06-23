@@ -1,16 +1,31 @@
 import { useState, useReducer, useRef, useEffect } from "react";
-import { NavLink, Route } from "react-router-dom";
+//import { NavLink, Route } from "react-router-dom";
 import "./App.css";
 import Button from "./components/Button";
 import Input from "./components/Input";
-import ComboBox from './components/ComboBox/ComboBox';
-import Switch from './components/Switch/Switch';
+import ComboBox from "./components/ComboBox/ComboBox";
+//import Switch from "./components/Switch/Switch";
 import LoaddingSpinner from "./components/LoaddingSpinner/LoaddingSpinner";
-import Footer from './components/Footer/Footer';
+import Footer from "./components/Footer/Footer";
 import Expenses from "./components/Lista/Expenses";
-import Modal from './components/UI/Modal/Modal';
-import Backdrop from './components/UI/Backdrop/Backdrop'
+import Modal from "./components/UI/Modal/Modal";
+import Backdrop from "./components/UI/Backdrop/Backdrop";
 import Calendario from "./components/Calendario/Calendario";
+import Navbar from "./components/Navbar";
+import { faHome } from "@fortawesome/free-solid-svg-icons";
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Route,
+  Redirect,
+  Swich,
+  Switch,
+} from "react-router-dom";
+import About from "./paginasHeader/About/About";
+import Contact from "./paginasHeader/Contact/Contact";
+import Home from "./paginasHeader/Home/Home";
+import Services from "./paginasHeader/Services/Services";
+import Testimonial from "./paginasHeader/Testimonial/Testimonial";
 
 const inputReducer = (state, action) => {
   if (action.type === "USER_INPUT") {
@@ -51,17 +66,15 @@ function App() {
   };
 
   const resetIsValid = () => {
-    dispatchInput({ type: 'RESET_IS_VALID' });
-  }
+    dispatchInput({ type: "RESET_IS_VALID" });
+  };
 
   const switchHandler = () => {
-    setMySwitch(prevState => {
+    setMySwitch((prevState) => {
       console.log(!prevState);
-      return !prevState
-    }
-    );
-
-  }
+      return !prevState;
+    });
+  };
   const submitHandler = (event) => {
     event.preventDefault();
     if (formIsValid) {
@@ -78,11 +91,11 @@ function App() {
 
   const openModal = () => {
     setShowModal(true);
-  }
+  };
 
   const closeModal = () => {
     setShowModal(false);
-  }
+  };
 
   const DUMMY_COMBOBOX = [
     { id: 1, title: "Soy la opcion 1" },
@@ -96,15 +109,15 @@ function App() {
     { id: 9, title: "Soy la opcion 9" },
     { id: 10, title: "Soy la opcion 10" },
     { id: 11, title: "Soy la opcion 11" },
-  ]
+  ];
 
   const initialExpenses = [
-    { id: "e1", title: "Producto1", amount: 200},
-      { id: "e2", title: "Producto2", amount: 300},
-    { id: "e3", title: "Producto3", amount: 20},
-    { id: "e4", title: "Producto4", amount: 500},
+    { id: "e1", title: "Producto1", amount: 200 },
+    { id: "e2", title: "Producto2", amount: 300 },
+    { id: "e3", title: "Producto3", amount: 20 },
+    { id: "e4", title: "Producto4", amount: 500 },
   ];
-  
+
   return (
     <div className="App">
       {/* <form onSubmit={submitHandler} className='fill-window'>
@@ -132,15 +145,37 @@ function App() {
         </div>
       </form>
       <Modal show={showModal} closed={closeModal}/>
-      {showModal&& <Backdrop show={showModal}/>} */}
-      <Calendario/>
+      {showModal&& <Backdrop show={showModal}/>} 
+      
+       */}
+      <Router>
+        <main>
+          <Navbar />
+          <Switch>
+            <Route path="/" exact>
+              <Home />
+            </Route>
+            <Route path="/about" exact>
+              <About />
+            </Route>
+            <Route path="/contact" exact>
+              <Contact />
+            </Route>
+            <Route path="/services" exact>
+              <Services />
+            </Route>
+            <Route path="/testimonial" exact>
+              <Testimonial />
+            </Route>
+
+            <Redirect to="/" />
+          </Switch>
+        </main>
+      </Router>
+
       {/* <Footer/> */}
     </div>
   );
 }
-
-
-
-
 
 export default App;
