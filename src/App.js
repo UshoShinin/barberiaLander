@@ -97,6 +97,14 @@ function App() {
     { id: 10, title: "Soy la opcion 10" },
     { id: 11, title: "Soy la opcion 11" },
   ]
+
+  const initialExpenses = [
+    { id: "e1", title: "Producto1", amount: 200},
+      { id: "e2", title: "Producto2", amount: 300},
+    { id: "e3", title: "Producto3", amount: 20},
+    { id: "e4", title: "Producto4", amount: 500},
+  ];
+  
   return (
     <div className="App">
       {/* <form onSubmit={submitHandler} className='fill-window'>
@@ -131,13 +139,8 @@ function App() {
   );
 }
 
-//<Expenses items={expenses} />
-//const initialExpenses = [
-//  { id: "e1", title: "Producto1", amount: 200},
-//  { id: "e2", title: "Producto2", amount: 300},
-//  { id: "e3", title: "Producto3", amount: 20},
-//  { id: "e4", title: "Producto4", amount: 500},
-//];
+
+
 
 
 export default App;

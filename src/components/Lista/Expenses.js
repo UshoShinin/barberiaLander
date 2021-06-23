@@ -2,14 +2,14 @@
 import Card from '../Card'
 import "./Expenses.css";
 
-function ItemLista(props) {
+function Expenses(props) {
   return (
-    <Card className="itemLista">
-      {props.items.map((itemLista)=>(
-        <Lista
-        key={itemLista.id}
-        title={itemLista.title}   
-        amount={expense.amount}     
+    <Card className="expenses">
+      {props.items.map((expense)=>(
+        <ExpenseItem
+        key={expense.id}
+        title={expense.title}
+        amount={expense.amount}
       />
       ))}         
     </Card>
