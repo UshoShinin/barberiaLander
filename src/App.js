@@ -36,11 +36,6 @@ import {
   Swich,
   Switch,
 } from "react-router-dom";
-import About from "./paginasHeader/About/About";
-import Contact from "./paginasHeader/Contact/Contact";
-import Home from "./paginasHeader/Home/Home";
-import Services from "./paginasHeader/Services/Services";
-import Testimonial from "./paginasHeader/Testimonial/Testimonial";
 
 const inputReducer = (state, action) => {
   if (action.type === "USER_INPUT") {
@@ -144,6 +139,9 @@ function App() {
   return (
     <div className="App">
       {/*ESTAS SON LAS RUTAS POSIBLES A GRANDES RASGOS*/}
+      <Router>
+       <main>
+       <Navbar />      
       <Switch>
         <Route path="/" exact>
           <Redirect to="/inicio" />
@@ -154,109 +152,49 @@ function App() {
         <Route path="/administracion">
           <Administracion />
         </Route>
-        <Route path="/administracion/cuponeras" exact>
+        <Route path="/cuponeras" exact>
           <Cuponeras />
         </Route>
-        <Route path="/administracion/empleados" exact>
+        <Route path="/empleados" exact>
           <Empleados />
         </Route>
-        <Route path="/administracion/productos" exact>
+        <Route path="/productos" exact>
           <Productos />
         </Route>
-        <Route path="/administracion/slider" exact>
+        <Route path="/slider" exact>
           <Slider />
         </Route>
-        <Route path="/administracion/agenda/crearagenda" exact>
+        <Route path="/agenda/crearagenda" exact>
           <CrearAgenda />
         </Route>
-        <Route path="/administracion/agenda/preagendas" exact>
+        <Route path="/agenda/preagendas" exact>
           <PreAgendas />
         </Route>
-        <Route path="/administracion/agenda/visualagendas" exact>
+        <Route path="/agenda/visualagendas" exact>
           <VisualAgendas />
         </Route>
-        <Route path="/administracion/caja/aperturacierre" exact>
+        <Route path="/caja/aperturacierre" exact>
           <AperturaCierre />
         </Route>
-        <Route path="/administracion/caja/calculojornal" exact>
+        <Route path="/caja/calculojornal" exact>
           <CalculoJornal />
         </Route>
-        <Route path="/administracion/caja/historial" exact>
+        <Route path="/caja/historial" exact>
           <Historial />
         </Route>
-        <Route path="/administracion/caja/movimientocaja" exact>
+        <Route path="/caja/movimientocaja" exact>
           <MovimientoCaja />
         </Route>
         <Route path="*">
           <NoEncontrado />
         </Route>
       </Switch>
-
-      {/*ESTA ES LA LISTA QUE HAY DE LOS LINKS CON LOS CONTROLES*/}
-      <ul>
-        <li>
-          <NavLink to="/inicio">Inicio</NavLink>
-        </li>
-        {!estaLogueado && (
-          <li>Iniciar sesion</li>
-        )}
-        {estaLogueado && (rol == "Administrador" || rol == "Encargado" || rol == "Empleado") && (
-            <div>
-              <li>
-                <NavLink to="/administracion">Administracion</NavLink>
-              </li>
-              <li>
-                <NavLink to="/administracion/agenda/visualagendas">
-                  Visualizar Agendas
-                </NavLink>
-              </li>
-              <li>
-                <NavLink to="/administracion/agenda/crearagenda">
-                  Crear Agenda
-                </NavLink>
-              </li>
-              <li>
-                <NavLink to="/administracion/caja/movimientocaja">
-                  Movimiento de Caja
-                </NavLink>
-              </li>
-            </div>
-        )}
-        {estaLogueado && rol == "Encargado" && (
-          <div>
-            <li>
-              <NavLink to="/administracion/cuponeras">Cuponeras</NavLink>
-            </li>
-            <li>
-              <NavLink to="/administracion/empleados">Empleados</NavLink>
-            </li>
-            <li>
-              <NavLink to="/administracion/slider">Slider</NavLink>
-            </li>
-            <li>
-              <NavLink to="/administracion/agenda/preagendas">
-                Pre Agendas
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to="/administracion/caja/aperturacierre">
-                Abrir/Cerra Caja
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to="/administracion/caja/calculojornal">
-                Calcular Jornal
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to="/administracion/caja/historial">
-                Historial de Cajas
-              </NavLink>
-            </li>
-          </div>
-        )}
-      </ul>
-
+      </main>
+      </Router>
+      {/*ESTA ES LA LISTA QUE HAY DE LOS LINKS*/}
+      
+        
+    
       {/* <form onSubmit={submitHandler} className='fill-window'>
         <div style={{display:'flex',placeItems:'center',alignItems:'center',justifyContent: 'center',height:'100%'}}>
           <Input
@@ -284,11 +222,11 @@ function App() {
       <Modal show={showModal} closed={closeModal}/>
       {showModal&& <Backdrop show={showModal}/>} 
       
-       */}
-      <Router>
-        <main>
-          <Navbar />
-          <Switch>
+      
+      {showModal&& <Backdrop show={showModal}/>} */}
+ 
+     
+          {/* <Switch>
             <Route path="/" exact>
               <Home />
             </Route>
@@ -307,11 +245,7 @@ function App() {
 
             <Redirect to="/" />
           </Switch>
-        </main>
-      </Router>
-
-      {showModal&& <Backdrop show={showModal}/>} */}
-      <Calendario />
+    */}
       {/* <Footer/> */}
     </div>
   );

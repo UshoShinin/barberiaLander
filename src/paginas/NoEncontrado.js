@@ -1,9 +1,11 @@
 const NoEncontrado = () => {
     return (
-        <div>
-            <h1>Pagina no encontrada</h1>
-        </div>
-    );
+        <div className="container">
+        <h1 className="text-center" style= {{paddingTop: "%30"}}>
+        Pagina no encontrada
+        </h1>
+    </div>
+    )    
 };
 
 export default NoEncontrado;
