@@ -1,0 +1,7 @@
+.diasCalendario {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  flex-shrink: 0;
+  width: 18em;
+  margin-right: 1em;
+}

@@ -5,9 +5,11 @@
   border-radius: 0.25em;
   max-height: 10em;
   overflow: auto;
-  z-index: 1;
   width: 100%;
   transition: all 300ms ease-out;
+  background-color: var(--clr-background);
+  position:relative;
+  z-index: 50;
 
 }
 .abrirOpciones{

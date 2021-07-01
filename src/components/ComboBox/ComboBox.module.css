@@ -1,5 +1,5 @@
 .title{
-  font-size:1.4em;
+  font-size:1em;
   color: var(--clr-inActive);
   transition: color 300ms linear;
 }
@@ -9,7 +9,7 @@
 }
 .ComboBox {
   font-size: 1rem;
-  width: 20em;
+  width: 100%;
   position: relative;
   color: var(--clr-neon-white);
   box-sizing: border-box;
@@ -51,39 +51,13 @@
 .select.active::before{
   clip-path: polygon(100% 0, 0 0, 100% 100%);
 }
-
-.buttom{
-  right:5%;
-  width: 1em;
-  height: 1em;
-  position: absolute;  
+.button{
+  transform:rotate(90deg);
+  color:var(--clr-inActive);
+  transition: color 300ms linear;
 }
-.buttom::before,
-.buttom::after{
-  position: inherit;
-  content:'';
-  background-color: var(--clr-inActive);
-  width: 60%;
-  height: 60%;
-  top:30%;
-  box-shadow: 0 0 0.1em 0 var(--clr-inActive);
-  transition:background-color 300ms linear,box-shadow 300ms linear;
-
-}
-
-.buttom.active::before,
-.buttom.active::after{
-  background-color: var(--clr-neon-white);
-  box-shadow: 0 0 0.8em 0 var(--clr-neon-white);
-}
-.buttom::before{
-  left:50%;
-  transform: skew(0, -35deg);
-}
-
-.buttom::after{
-  right:50%;
-  transform: skew(0, 35deg);
+.button.active{
+  color:var(--clr-neon-white);
 }
 
 .select:hover,

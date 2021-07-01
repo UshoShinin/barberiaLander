@@ -1,4 +1,140 @@
+.container {
+  display: flex;
+  position: relative;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  z-index: 20;
+  place-items: center;
+}
 .title {
-    text-align: center;
-    color:var(--clr-neon-white);
+  text-align: center;
+  color: var(--clr-neon-white);
+  font-size: 1.2em;
+}
+
+.Enero,
+.Febrero,
+.Marzo,
+.Abril,
+.Mayo,
+.Junio,
+.Julio,
+.Agosto,
+.Septiembre,
+.Octubre,
+.Noviembre,
+.Diciembre{
+  text-align: center;
+  overflow: hidden;
+  transition: all 200ms linear;
+  display: flex;
+  justify-content: center;
+}
+.Enero{
+  width:20%;
+}
+.Febrero{
+  width: 26.5%;
+}
+.Marzo{
+  width: 21.5%;
+}
+.Abril{
+  width: 19.5%;
+}
+.Mayo{
+  width: 18%;
+}
+.Junio{
+  width: 20%;
+}
+.Julio{
+  width: 19.5%;
+}
+.Agosto{
+  width: 23%;
+}
+.Septiembre{
+  width: 35%;
+}
+.Octubre{
+  width: 27%;
+}
+.Noviembre{
+  width: 32.5%;
+}
+.Diciembre{
+  width: 31%;
+}
+
+.titleClose{
+  width: 0%;
+}
+
+.flecha {
+  font-size: 1em;
+  cursor: pointer;
+}
+
+.inactive{
+  color:var(--clr-inActive);
+  cursor: default;
+}
+.arrowCont {
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  height: 24px;
+  border-top: 0px solid var(--clr-neon-white);
+  border-bottom: 0px solid var(--clr-neon-white);
+  transition: height 1000ms linear, border-top 1000ms linear,
+    border-bottom 1000ms linear;
+}
+
+.Open {
+  height: 24px;
+  border-top: 0px solid var(--clr-neon-white);
+  border-bottom: 0px solid var(--clr-neon-white);
+  animation: openA 300ms linear forwards;
+}
+.Close {
+  height: 0px;
+  border-top: 1px solid var(--clr-neon-white);
+  border-bottom: 1px solid var(--clr-neon-white);
+  animation: closeA 300ms linear forwards;
+}
+@keyframes openA {
+  0% {
+    height: 0px;
+    border-top: 1px solid var(--clr-neon-white);
+    border-bottom: 1px solid var(--clr-neon-white);
   }
+  30%{
+    border-top: 0px solid var(--clr-neon-white);
+    border-bottom: 0px solid var(--clr-neon-white);
+  }
+  100% {
+    height: 24px;
+    border-top: 0px solid var(--clr-neon-white);
+    border-bottom: 0px solid var(--clr-neon-white);
+  }
+}
+@keyframes closeA {
+  0% {
+    height: 24px;
+    border-top: 0px solid var(--clr-neon-white);
+    border-bottom: 0px solid var(--clr-neon-white);
+  }
+  70%{
+    border-top: 0px solid var(--clr-neon-white);
+    border-bottom: 0px solid var(--clr-neon-white);
+  }
+  100% {
+    height: 0px;
+    border-top: 1px solid var(--clr-neon-white);
+    border-bottom: 1px solid var(--clr-neon-white);
+  }
+}
+
+

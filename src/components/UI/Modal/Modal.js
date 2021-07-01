@@ -23,7 +23,7 @@ const modal = (props) => {
       }}
     >
       <div className={"Modal"}>
-        <h1>Mi modal</h1>
+        <h1 className={classes.myH1}>Mi modal</h1>
         <Button type="button" action={props.closed} color={"red"}>
           Salir
         </Button> 

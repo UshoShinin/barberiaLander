@@ -1,5 +1,6 @@
 import { useState, useReducer, useRef, useEffect, useContext } from "react";
 import "./App.css";
+/* import { NavLink, Route } from "react-router-dom";
 import Button from "./components/Button";
 import Input from "./components/Input";
 import ComboBox from "./components/ComboBox/ComboBox";
@@ -10,6 +11,10 @@ import Expenses from "./components/Lista/Expenses";
 import Modal from "./components/UI/Modal/Modal";
 import Backdrop from "./components/UI/Backdrop/Backdrop";
 import Calendario from "./components/Calendario/Calendario";
+import doggo from "./recursos/DogoDeFondo.png";
+import one from "./recursos/1.png";
+import two from "./recursos/2.png";
+import three from "./recursos/3.png";
 import ContextUsuario from "./context/contextUsuario";
 //IMPORTS PARA LAS PAGINAS
 import Inicio from "./paginas/Inicio";
@@ -51,6 +56,8 @@ const inputReducer = (state, action) => {
 };
 
 function App() {
+  /*
+  console.log("APP Cargada");
   const [formIsValid, setFormIsValid] = useState(false);
   const [mySwitch, setMySwitch] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -63,11 +70,11 @@ function App() {
 
   const { isValid: inputIsValid } = inputState; //Le asigno un alias a la variable de isValid del State del input.
 
-  useEffect(() => {
+   useEffect(() => {
     setFormIsValid(inputIsValid);
-  }, [inputIsValid]);
+  }, [inputIsValid]); */
 
-  const inputChangeHandler = (event) => {
+  /* const inputChangeHandler = (event) => {
     dispatchInput({ type: "USER_INPUT", value: event.target.value });
   };
 
@@ -119,6 +126,14 @@ function App() {
     { id: 9, title: "Soy la opcion 9" },
     { id: 10, title: "Soy la opcion 10" },
     { id: 11, title: "Soy la opcion 11" },
+  ];
+  */
+  const DUMMY_FOTOS = [
+    { id: 1, title: "Perrujo trujo", foto: doggo },
+    { id: 2, title: "One", foto: one },
+    { id: 3, title: "Two", foto: two },
+    { id: 4, title: "Three", foto: three }
+  ];
   ];
 
   const initialExpenses = [
@@ -246,9 +261,18 @@ function App() {
             <Redirect to="/" />
           </Switch>
     */}
+      <Calendario fotos={DUMMY_FOTOS} />
       {/* <Footer/> */}
     </div>
   );
 }
+
+//<Expenses items={expenses} />
+//const initialExpenses = [
+//  { id: "e1", title: "Producto1", amount: 200},
+//  { id: "e2", title: "Producto2", amount: 300},
+//  { id: "e3", title: "Producto3", amount: 20},
+//  { id: "e4", title: "Producto4", amount: 500},
+//];
 
 export default App;
