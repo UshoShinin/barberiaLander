@@ -206,8 +206,7 @@ function App() {
       </Switch>
       </main>
       </Router>
-      {/*ESTA ES LA LISTA QUE HAY DE LOS LINKS*/}
-      
+
         
     
       {/* <form onSubmit={submitHandler} className='fill-window'>
