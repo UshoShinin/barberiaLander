@@ -1,7 +1,7 @@
 import { counter } from "@fortawesome/fontawesome-svg-core";
 import { getMonthValue } from "./FunctionsDias";
 import { horariosDisponibilidad } from './../FuncionesAuxiliares';
-export let DaysGenerator = (diaActual, month, year, dayIndex,fechas) => {
+export let DaysGenerator = (diaActual, month, year, dayIndex,fechas,timeNeed) => {
   let diasTotales = 30;
   let diasMostrar = [];
   let diasAuxiliares = [];
@@ -29,7 +29,7 @@ export let DaysGenerator = (diaActual, month, year, dayIndex,fechas) => {
     diaSemana = diaSemana > 7 ? 1 : diaSemana;
     diasAuxiliares.push({
       num: diaAuxiliar,
-      disponibilidad: horariosDisponibilidad(diaSemana, diasTotales,i,fechas, myMonth+idMonth),
+      disponibilidad: horariosDisponibilidad(diaSemana, diasTotales,i, myMonth+idMonth,fechas,timeNeed),
     });
     diaAuxiliar++;
     diaSemana++;
@@ -49,7 +49,7 @@ export let DaysGenerator = (diaActual, month, year, dayIndex,fechas) => {
       diaSemana = diaSemana > 7 ? 1 : diaSemana;
       diasAuxiliares.push({
         num: i,
-        disponibilidad: horariosDisponibilidad(diaSemana, diasTotales,i,fechas, myMonth+idMonth),
+        disponibilidad: horariosDisponibilidad(diaSemana, diasTotales,i, myMonth+idMonth,fechas,timeNeed),
       });
       diaSemana++;
       diasTotales--;

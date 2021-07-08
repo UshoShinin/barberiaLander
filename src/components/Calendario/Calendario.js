@@ -5,13 +5,14 @@ import Fotos from "./Fotos";
 import { useState } from "react";
 import { days } from "./ContenidoCalendario/ContenidoCalendario";
 import {extraerFotos} from './FuncionesAuxiliares';
-import {transformStringNumber} from './FuncionesAuxiliares';
 const Calendario = (props) => {
-  console.log(transformStringNumber('12:59'));
   const [currentEmployee, setCurrentEmployee] = useState(0);
-  const { cantidadMeses, content } = days(props.empleados[currentEmployee].fechas);
   const [currentCalendar, setCurrentCalendar] = useState(0);
   const empleadosFotos = extraerFotos(props.empleados);
+  // Como no tenemos todo pronto en la base de datos voya tener que armar unos tiempos y servicios y tiempos provicionales
+  const timeNeed = calcularTiempo(currentEmployee,props.servicios);
+  console.log(timeNeed);
+  const { cantidadMeses, content } = days(props.empleados[currentEmployee].fechas,timeNeed);
 
   const prevCalendar = () => {
     if (currentCalendar > 0) {
@@ -54,3 +55,14 @@ const Calendario = (props) => {
   );
 };
 export default Calendario;
+
+
+const calcularTiempo = (empleado,serv) => {
+  let total = 0;
+  switch (empleado) {
+    case 0:
+      if (serv.barba) total+=15;
+      if(serv.)
+    default:
+  }
+}

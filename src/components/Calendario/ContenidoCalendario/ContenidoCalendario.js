@@ -2,7 +2,7 @@ import Dias from "../Dias/Dias";
 import { DaysGenerator } from "../Dias/GeneradorDias";
 import { getMonthChart, getDayIndex } from "../Dias/FunctionsDias";
 import classes from './ContenidoCalendario.module.css';
-export const days = (fechas) => {
+export const days = (fechas,timeNeed) => {
   let cantidadMeses;
   let diasMostrar;
     const oldDate = new Date();
@@ -26,7 +26,8 @@ export const days = (fechas) => {
       month,
       Day.getFullYear(),
       dayIndex,
-      fechas
+      fechas,
+      timeNeed
     );
     cantidadMeses=diasMostrar.length;
     let content = diasMostrar.map((meses) => {
