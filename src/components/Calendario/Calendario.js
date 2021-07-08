@@ -61,8 +61,15 @@ const calcularTiempo = (empleado,serv) => {
   let total = 0;
   switch (empleado) {
     case 0:
-      if (serv.barba) total+=15;
-      if(serv.)
+      if (serv.corte) total+=30;
+      if( serv.maquina) total+=20;
+      if(serv.barba)total+=15;
+      if(serv.laciado)total+=30;
+      if(serv.decoloracion)total+=15;
+      if(serv.tinta)total+=15;
+      
+
+      
     default:
   }
 }

@@ -284,7 +284,7 @@ function App() {
             <Redirect to="/" />
           </Switch>
     */}
-      <Calendario empleados={DUMMY_HORARIOS_EMPLEADOS} servicios={{pelo:true,barba:false,laciado:true}}/>
+      <Calendario empleados={DUMMY_HORARIOS_EMPLEADOS} servicios={{corte:true,maquina:false,barba:false,laciado:true,decoloracion:false,tinta:true}}/>
       {/* <Footer/> */}
     </div>
   );
