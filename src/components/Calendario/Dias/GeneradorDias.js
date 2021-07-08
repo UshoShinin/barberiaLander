@@ -1,11 +1,7 @@
 import { counter } from "@fortawesome/fontawesome-svg-core";
 import { getMonthValue } from "./FunctionsDias";
-export let DaysGenerator = (diaActual, month, year, dayIndex) => {
-  const diaValido = (diaSemana, diasTotales) => {
-    if (diaSemana !== 7 && diasTotales > 0) return true;
-    return false;
-  };
-
+import { horariosDisponibilidad } from './../FuncionesAuxiliares';
+export let DaysGenerator = (diaActual, month, year, dayIndex,fechas) => {
   let diasTotales = 30;
   let diasMostrar = [];
   let diasAuxiliares = [];
@@ -20,7 +16,7 @@ export let DaysGenerator = (diaActual, month, year, dayIndex) => {
   for (let i = 1; i < diaActual; i++) {
     diasAuxiliares.push({
       num: i,
-      valido: false,
+      disponibilidad:{valido:false,horarios:[]},
     });
   }
 
@@ -33,14 +29,13 @@ export let DaysGenerator = (diaActual, month, year, dayIndex) => {
     diaSemana = diaSemana > 7 ? 1 : diaSemana;
     diasAuxiliares.push({
       num: diaAuxiliar,
-      valido: diaValido(diaSemana, diasTotales),
+      disponibilidad: horariosDisponibilidad(diaSemana, diasTotales,i,fechas, myMonth+idMonth),
     });
     diaAuxiliar++;
     diaSemana++;
     diasTotales--;
   }
   diasMostrar.push({id:idMonth,dias:[...diasAuxiliares]});
-  console.log(diasMostrar);
   while (diasTotales > 0) {
     idMonth++;
     diasAuxiliares = [];
@@ -54,7 +49,7 @@ export let DaysGenerator = (diaActual, month, year, dayIndex) => {
       diaSemana = diaSemana > 7 ? 1 : diaSemana;
       diasAuxiliares.push({
         num: i,
-        valido: diaValido(diaSemana, diasTotales),
+        disponibilidad: horariosDisponibilidad(diaSemana, diasTotales,i,fechas, myMonth+idMonth),
       });
       diaSemana++;
       diasTotales--;
@@ -62,6 +57,5 @@ export let DaysGenerator = (diaActual, month, year, dayIndex) => {
     monthCounter++;
     diasMostrar.push({id:idMonth,dias:[...diasAuxiliares]});
   }
-  console.log(diasMostrar);
   return diasMostrar;
 };

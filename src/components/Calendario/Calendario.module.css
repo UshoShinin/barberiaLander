@@ -16,7 +16,9 @@
 .calendario{
   display: grid;
   grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 0;
 }
+
 .contenidoCalendario{
   display:flex;
   overflow-x:hidden;

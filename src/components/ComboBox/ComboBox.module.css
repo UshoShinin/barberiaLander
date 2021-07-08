@@ -2,6 +2,7 @@
   font-size:1em;
   color: var(--clr-inActive);
   transition: color 300ms linear;
+  margin:0;
 }
 .select:hover div .title,
 .title.titleActive{

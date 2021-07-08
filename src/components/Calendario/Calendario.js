@@ -4,9 +4,15 @@ import Mes from "./Mes";
 import Fotos from "./Fotos";
 import { useState } from "react";
 import { days } from "./ContenidoCalendario/ContenidoCalendario";
+import {extraerFotos} from './FuncionesAuxiliares';
+import {transformStringNumber} from './FuncionesAuxiliares';
 const Calendario = (props) => {
-  const { cantidadMeses, content } = days();
+  console.log(transformStringNumber('12:59'));
+  const [currentEmployee, setCurrentEmployee] = useState(0);
+  const { cantidadMeses, content } = days(props.empleados[currentEmployee].fechas);
   const [currentCalendar, setCurrentCalendar] = useState(0);
+  const empleadosFotos = extraerFotos(props.empleados);
+
   const prevCalendar = () => {
     if (currentCalendar > 0) {
       setCurrentCalendar((state) => state - 1);
@@ -17,11 +23,9 @@ const Calendario = (props) => {
       setCurrentCalendar((state) => state + 1);
     }
   };
-  console.log(currentCalendar);
-  console.log(cantidadMeses);
   return (
     <div className={classes.container}>
-      <Fotos fotos={props.fotos} />
+      <Fotos fotos={empleadosFotos} changeEmployee = {setCurrentEmployee}/>
       <Mes
         month={new Date().getMonth()}
         prev={prevCalendar}

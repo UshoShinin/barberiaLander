@@ -52,12 +52,12 @@ const Fotos = (props) => {
   const comboChangeHandler = (id) => {
     dispatch({ type: "change", payload: { id: index } });
     setIndex(id);
+    props.changeEmployee(id-1);
   };
   return (
     <>
       <div className={classes.container}>
         <div className={classes.marco}>
-          {/* <img className={`${classes.foto}`} src={misFotos[index].foto}/> */}
           <div className={classes.marcoIntermedio}>{imagenes}</div>
         </div>
         <div style={{ width: "60%", margin: "0 auto" }}>

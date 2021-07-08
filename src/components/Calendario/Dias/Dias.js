@@ -40,7 +40,7 @@ const Dias = (props) => {
   primerDia = props.diasMostrar[0];
   diasAuxiliares = props.diasMostrar.filter((dia)=>(dia.num!==1));
   contenido = diasAuxiliares.map((dia) => {
-    const classLi = !dia.valido ? classes.invalid : classes.dia;
+    const classLi = !dia.disponibilidad.valido ? classes.invalid : classes.dia;
     return (
       <li key={dia.num}>
         <p className={classLi}>{dia.num}</p>
@@ -49,7 +49,7 @@ const Dias = (props) => {
   });
   return (
     <>
-      <li className={classFirstDay}><p className={primerDia.valido?classes.dia:classes.invalid}>{primerDia.num}</p></li>
+      <li className={classFirstDay}><p className={primerDia.disponibilidad.valido?classes.dia:classes.invalid}>{primerDia.num}</p></li>
       {contenido}
     </>
   );

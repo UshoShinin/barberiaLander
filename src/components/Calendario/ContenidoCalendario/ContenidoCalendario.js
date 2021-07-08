@@ -2,14 +2,14 @@ import Dias from "../Dias/Dias";
 import { DaysGenerator } from "../Dias/GeneradorDias";
 import { getMonthChart, getDayIndex } from "../Dias/FunctionsDias";
 import classes from './ContenidoCalendario.module.css';
-export const days = () => {
+export const days = (fechas) => {
   let cantidadMeses;
   let diasMostrar;
     const oldDate = new Date();
     const Day = new Date(
       oldDate.getFullYear(),
-      oldDate.getMonth() /* -5 para 31 enero*/,
-      oldDate.getDate() /* +5 */
+      oldDate.getMonth(),
+      oldDate.getDate()
     );
     const diaActual = Day.getDate();
     const month = Day.getMonth() + 1;
@@ -25,7 +25,8 @@ export const days = () => {
       diaActual,
       month,
       Day.getFullYear(),
-      dayIndex
+      dayIndex,
+      fechas
     );
     cantidadMeses=diasMostrar.length;
     let content = diasMostrar.map((meses) => {
