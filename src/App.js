@@ -224,9 +224,7 @@ function App() {
             onFocus:resetIsValid,
           }}
         />
-         <Button type="submit" action={openModal} color={""}>
-          Aceptar
-        </Button> 
+          
         
         <ComboBox opciones={DUMMY_COMBOBOX}/>
         <Switch active={mySwitch}onCheck={switchHandler}/>
@@ -260,7 +258,10 @@ function App() {
             <Redirect to="/" />
           </Switch>
     */}
-      <Calendario fotos={DUMMY_FOTOS} />
+      <Calendario empleados={DUMMY_HORARIOS_EMPLEADOS} servicios={{pelo:true,barba:false,laciado:true}}/>
+      <Button type="submit" color={""}>
+          Aceptar
+        </Button>
       {/* <Footer/> */}
     </div>
   );
