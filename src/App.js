@@ -1,6 +1,5 @@
 import { useState, useReducer, useRef, useEffect, useContext } from "react";
 import "./App.css";
-/* import { NavLink, Route } from "react-router-dom";
 import Button from "./components/Button";
 import Input from "./components/Input";
 import ComboBox from "./components/ComboBox/ComboBox";
@@ -40,6 +39,7 @@ import {
   Redirect,
   Swich,
   Switch,
+  NavLink,
 } from "react-router-dom";
 
 const inputReducer = (state, action) => {
@@ -55,7 +55,7 @@ const inputReducer = (state, action) => {
   return { value: "", isValid: false };
 };
 
-function App() {
+const App =()=>{
   /*
   console.log("APP Cargada");
   const [formIsValid, setFormIsValid] = useState(false);
@@ -128,12 +128,38 @@ function App() {
     { id: 11, title: "Soy la opcion 11" },
   ];
   */
-  const DUMMY_FOTOS = [
-    { id: 1, title: "Perrujo trujo", foto: doggo },
+
+  const DUMMY_HORARIOS_EMPLEADOS = [
+    {
+      id: 1,
+      title: "Perrujo trujo",
+      foto: doggo,
+      fechas: [
+        {
+          dia: 22,
+          mes:7,
+          horarios: [
+            { i: "10:00", f: "12:00" },//Una hora libre
+            { i: "13:00", f: "15:00" },
+            { i: "15:00", f: "16:30" },//Dos horas
+            { i: "18:30", f: "19:00" },//Una hora
+            { i: "20:00", f: "22:00" }
+          ],
+        },
+        {
+          dia: 23,
+          mes : 7,
+          horarios: [
+            { i: "15:00", f: "16:30" },//Dos horas
+            { i: "18:30", f: "19:00" },//Una hora
+            { i: "20:00", f: "22:00" }
+          ],
+        },
+      ],
+    },
     { id: 2, title: "One", foto: one },
     { id: 3, title: "Two", foto: two },
-    { id: 4, title: "Three", foto: three }
-  ];
+    { id: 4, title: "Three", foto: three },
   ];
 
   const initialExpenses = [
@@ -155,60 +181,59 @@ function App() {
     <div className="App">
       {/*ESTAS SON LAS RUTAS POSIBLES A GRANDES RASGOS*/}
       <Router>
-       <main>
-       <Navbar />      
-      <Switch>
-        <Route path="/" exact>
-          <Redirect to="/inicio" />
-        </Route>
-        <Route path="/inicio">
-          <Inicio />
-        </Route>
-        <Route path="/administracion">
-          <Administracion />
-        </Route>
-        <Route path="/cuponeras" exact>
-          <Cuponeras />
-        </Route>
-        <Route path="/empleados" exact>
-          <Empleados />
-        </Route>
-        <Route path="/productos" exact>
-          <Productos />
-        </Route>
-        <Route path="/slider" exact>
-          <Slider />
-        </Route>
-        <Route path="/agenda/crearagenda" exact>
-          <CrearAgenda />
-        </Route>
-        <Route path="/agenda/preagendas" exact>
-          <PreAgendas />
-        </Route>
-        <Route path="/agenda/visualagendas" exact>
-          <VisualAgendas />
-        </Route>
-        <Route path="/caja/aperturacierre" exact>
-          <AperturaCierre />
-        </Route>
-        <Route path="/caja/calculojornal" exact>
-          <CalculoJornal />
-        </Route>
-        <Route path="/caja/historial" exact>
-          <Historial />
-        </Route>
-        <Route path="/caja/movimientocaja" exact>
-          <MovimientoCaja />
-        </Route>
-        <Route path="*">
-          <NoEncontrado />
-        </Route>
-      </Switch>
-      </main>
+        <main>
+          <Navbar />
+          <Switch>
+            <Route path="/" exact>
+              <Redirect to="/inicio" />
+            </Route>
+            <Route path="/inicio">
+              <Inicio />
+            </Route>
+            <Route path="/administracion">
+              <Administracion />
+            </Route>
+            <Route path="/cuponeras" exact>
+              <Cuponeras />
+            </Route>
+            <Route path="/empleados" exact>
+              <Empleados />
+            </Route>
+            <Route path="/productos" exact>
+              <Productos />
+            </Route>
+            <Route path="/slider" exact>
+              <Slider />
+            </Route>
+            <Route path="/agenda/crearagenda" exact>
+              <CrearAgenda />
+            </Route>
+            <Route path="/agenda/preagendas" exact>
+              <PreAgendas />
+            </Route>
+            <Route path="/agenda/visualagendas" exact>
+              <VisualAgendas />
+            </Route>
+            <Route path="/caja/aperturacierre" exact>
+              <AperturaCierre />
+            </Route>
+            <Route path="/caja/calculojornal" exact>
+              <CalculoJornal />
+            </Route>
+            <Route path="/caja/historial" exact>
+              <Historial />
+            </Route>
+            <Route path="/caja/movimientocaja" exact>
+              <MovimientoCaja />
+            </Route>
+            <Route path="*">
+              <NoEncontrado />
+            </Route>
+          </Switch>
+        </main>
       </Router>
+      {/*ESTA ES LA LISTA QUE HAY DE LOS LINKS*/}
 
-        
-    
       {/* <form onSubmit={submitHandler} className='fill-window'>
         <div style={{display:'flex',placeItems:'center',alignItems:'center',justifyContent: 'center',height:'100%'}}>
           <Input
@@ -224,7 +249,9 @@ function App() {
             onFocus:resetIsValid,
           }}
         />
-          
+         <Button type="submit" action={openModal} color={""}>
+          Aceptar
+        </Button> 
         
         <ComboBox opciones={DUMMY_COMBOBOX}/>
         <Switch active={mySwitch}onCheck={switchHandler}/>
@@ -236,9 +263,8 @@ function App() {
       
       
       {showModal&& <Backdrop show={showModal}/>} */}
- 
-     
-          {/* <Switch>
+
+      {/* <Switch>
             <Route path="/" exact>
               <Home />
             </Route>
@@ -258,10 +284,7 @@ function App() {
             <Redirect to="/" />
           </Switch>
     */}
-      <Calendario empleados={DUMMY_HORARIOS_EMPLEADOS} servicios={{pelo:true,barba:false,laciado:true}}/>
-      <Button type="submit" color={""}>
-          Aceptar
-        </Button>
+      <Calendario empleados={DUMMY_HORARIOS_EMPLEADOS} servicios={{corte:true,maquina:false,barba:false,laciado:true,decoloracion:false,tinta:true}}/>
       {/* <Footer/> */}
     </div>
   );

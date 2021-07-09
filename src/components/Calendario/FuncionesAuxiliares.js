@@ -40,6 +40,17 @@ const horariosAgendarDisponibles = (horarios,timeNeed) =>{
   let hora = 8;
   let minutos = 0;
   let horariosDisponibles = [];
+  let inicio = 0;
+  let tengoTiempo;
+  if(horarios[0].i===8){
+    hora = horarios[0].f;
+    inicio=1;
+  }
+  if(horarios.length>1){
+    for(let i = inicio;i<horarios.length-1;i++){
+      
+    }
+  }
   while(hora<=22){
     if(minutos === 60){
       hora++;
