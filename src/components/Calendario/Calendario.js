@@ -2,18 +2,21 @@ import classes from "./Calendario.module.css";
 import classesDia from "./Dias/Dias.module.css";
 import Mes from "./Mes";
 import Fotos from "./Fotos";
+import React from 'react';
 import { useState } from "react";
 import { days } from "./ContenidoCalendario/ContenidoCalendario";
 import {extraerFotos} from './FuncionesAuxiliares';
 const Calendario = (props) => {
+  console.log("ReCarge");
   const [currentEmployee, setCurrentEmployee] = useState(0);
   const [currentCalendar, setCurrentCalendar] = useState(0);
   const empleadosFotos = extraerFotos(props.empleados);
   // Como no tenemos todo pronto en la base de datos voya tener que armar unos tiempos y servicios y tiempos provicionales
   const timeNeed = calcularTiempo(currentEmployee,props.servicios);
-  console.log(timeNeed);
-  const { cantidadMeses, content } = days(props.empleados[currentEmployee].fechas,timeNeed);
-
+  const obtenerHorarios = (horarios) =>{
+    console.log(horarios);
+  }
+  const { cantidadMeses, content } = days(props.empleados[currentEmployee].fechas,timeNeed,obtenerHorarios);
   const prevCalendar = () => {
     if (currentCalendar > 0) {
       setCurrentCalendar((state) => state - 1);
@@ -54,7 +57,7 @@ const Calendario = (props) => {
     </div>
   );
 };
-export default Calendario;
+export default React.memo(Calendario);
 
 
 const calcularTiempo = (empleado,serv) => {
@@ -66,7 +69,8 @@ const calcularTiempo = (empleado,serv) => {
       if(serv.barba)total+=15;
       if(serv.laciado)total+=30;
       if(serv.decoloracion)total+=15;
-      if(serv.tinta)total+=15;      
+      if(serv.tinta)total+=15;
+      break;  
     default:
       if (serv.corte) total+=60;
       if( serv.maquina) total+=24;

@@ -2,7 +2,7 @@ import React from "react";
 import CSSTransition from "react-transition-group/CSSTransition";
 import "./Modal.css";
 import classes from './ModalContent.module.css'
-import Button from '../../Button';
+import Button from '../Button/Button';
 const animationTiming = {
   enter: 400,
   exit: 1000,

@@ -34,8 +34,7 @@ const Navbar = () => {
     });
   }
 
-  useEffect(() => {
-    
+  useEffect(() => {  
     animation();
     $(window).on('resize', function(){
       setTimeout(function(){ animation(); }, 500);

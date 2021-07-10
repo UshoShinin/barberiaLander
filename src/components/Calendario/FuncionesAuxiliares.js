@@ -11,54 +11,107 @@ export const extraerFotos = (empleados) => {
 };
 
 export const obtenerHorariosDeDia = (dia, myMonth, fechas) => {
-    if(fechas){
-        for (let i = 0; i < fechas.length; i++) {
-            if (fechas[i].dia == dia && fechas[i].mes == myMonth) {
-              return fechas[i].horarios;
-            }
-          }
+  if (fechas) {
+    for (let i = 0; i < fechas.length; i++) {
+      if (fechas[i].dia == dia && fechas[i].mes == myMonth) {
+        return fechas[i].horarios;
+      }
     }
+  }
   return null;
 };
 
-export const horariosDisponibilidad = (diaSemana, diasTotales, dia,mes,fechas,servicios) => {
-  const horarios = obtenerHorariosDeDia(dia,mes, fechas);
-  if (diasTotales === 0 || diaSemana === 7) return { valido: false, horariosDisponibles: [] };
-  if(horarios === null) return { valido: true, horariosDisponibles: [] };
-  else return { valido: true, horariosDisponibles: horariosAgendarDisponibles(horarios,servicios) };
+export const horariosDisponibilidad = (
+  diaSemana,
+  diasTotales,
+  dia,
+  mes,
+  fechas,
+  servicios
+) => {
+  const horarios = obtenerHorariosDeDia(dia, mes, fechas);
+  if (diasTotales === 0 || diaSemana === 7)
+    return { valido: false, horariosDisponibles: [] };
+  if (horarios === null) return { valido: true, horariosDisponibles: [] };
+  else
+    return {
+      valido: true,
+      horariosDisponibles: horariosAgendarDisponibles(horarios, servicios),
+    };
 };
 
-export const transformStringNumber = (horario) =>{
-    const hor = parseInt(horario.slice(0,2),10);
-    const min = parseInt(horario.slice(3,5),10);
-    return {H:hor,M:min}
-}
+const transformStringNumber = (horario) => {
+  const hor = parseInt(horario.slice(0, 2), 10);
+  const min = parseInt(horario.slice(3, 5), 10);
+  return { h: hor, m: min };
+};
 
-const horariosAgendarDisponibles = (horarios,timeNeed) =>{
-  console.log(horarios);
-  console.log(timeNeed);
-  let hora = 8;
-  let minutos = 0;
+const horarioEnMinutos = (hora) => {
+  return hora.h * 60 + hora.m;
+};
+
+const minutosAHorarios = (minutos) => {
+  return { h: (minutos - (minutos % 60)) / 60, m: minutos % 60 };
+};
+
+const horariosAgendarDisponibles = (horarios, timeNeed) => {
+  let hora = "08:00";
+  const horaCierre = "22:00";
   let horariosDisponibles = [];
   let inicio = 0;
   let tengoTiempo;
-  if(horarios[0].i===8){
+  let horarioBase;
+  if (horarios[0].i === hora) {
     hora = horarios[0].f;
-    inicio=1;
+    inicio = 1;
   }
-  if(horarios.length>1){
-    for(let i = inicio;i<horarios.length-1;i++){
-      
+  //poner que si las horas coinciden no haga calculos
+  if (horarios.length > 1) {
+    horarioBase = hora;
+    for (let i = inicio; i < horarios.length; i++) {
+      tengoTiempo = diferenciaDeTiempo(horarioBase, horarios[i].i);
+      if (tengoTiempo >= timeNeed) {
+        horariosDisponibles = [
+          ...horariosDisponibles,
+          ...cargarHorarios(
+            horarioEnMinutos(transformStringNumber(horarioBase)),
+            horarioEnMinutos(transformStringNumber(horarios[i].i)) - timeNeed
+          ),
+        ];
+      }
+      horarioBase = horarios[i].f;
     }
   }
-  while(hora<=22){
-    if(minutos === 60){
-      hora++;
-      minutos = 0;
-    }
-    horariosDisponibles.push({h:hora,m:minutos});
-    minutos+=15;
+  //poner que si las horas coinciden no haga calculos
+  tengoTiempo = diferenciaDeTiempo(horarioBase, horaCierre);
+  if (tengoTiempo >= timeNeed) {
+    horariosDisponibles = [
+      ...horariosDisponibles,
+      ...cargarHorarios(
+        horarioEnMinutos(transformStringNumber(horarioBase)),
+        horarioEnMinutos(transformStringNumber(horaCierre)) - timeNeed
+      ),
+    ];
   }
-  console.log(horariosDisponibles)
-  return [];
-}
+  return horariosDisponibles;
+};
+const diferenciaDeTiempo = (tiempoBase, siguienteHorario) => {
+  const BH = transformStringNumber(tiempoBase);
+  const SH = transformStringNumber(siguienteHorario);
+/*   console.log(
+    "Tiempo inicial: " + JSON.stringify(BH) + " valor:" + horarioEnMinutos(BH)
+  );
+  console.log(
+    "siguiente tiempo: " + JSON.stringify(SH) + " valor:" + horarioEnMinutos(SH)
+  ); */
+  return horarioEnMinutos(SH) - horarioEnMinutos(BH);
+};
+
+const cargarHorarios = (inicio, fin) => {
+  let lista = [];
+  while (inicio <= fin) {
+    lista.push(minutosAHorarios(inicio));
+    inicio += 15;
+  }
+  return lista;
+};

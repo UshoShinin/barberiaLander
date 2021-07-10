@@ -1,7 +1,7 @@
 import { useState, useReducer, useRef, useEffect, useContext } from "react";
 import "./App.css";
-import Button from "./components/Button";
-import Input from "./components/Input";
+import Button from "./components/UI/Button/Button";
+import Input from "./components/UI/Input/Input";
 import ComboBox from "./components/ComboBox/ComboBox";
 //import Switch from "./components/Switch/Switch";
 import LoaddingSpinner from "./components/LoaddingSpinner/LoaddingSpinner";
@@ -10,10 +10,7 @@ import Expenses from "./components/Lista/Expenses";
 import Modal from "./components/UI/Modal/Modal";
 import Backdrop from "./components/UI/Backdrop/Backdrop";
 import Calendario from "./components/Calendario/Calendario";
-import doggo from "./recursos/DogoDeFondo.png";
-import one from "./recursos/1.png";
-import two from "./recursos/2.png";
-import three from "./recursos/3.png";
+
 import ContextUsuario from "./context/contextUsuario";
 //IMPORTS PARA LAS PAGINAS
 import Inicio from "./paginas/Inicio";
@@ -31,7 +28,6 @@ import PreAgendas from "./paginas/Agenda/PreAgendas";
 import VisualAgendas from "./paginas/Agenda/VisualAgendas";
 import NoEncontrado from "./paginas/NoEncontrado";
 import Navbar from "./components/Navbar";
-import { faHome } from "@fortawesome/free-solid-svg-icons";
 import React from "react";
 import {
   BrowserRouter as Router,
@@ -114,54 +110,7 @@ const App =()=>{
     setShowModal(false);
   };
 
-  const DUMMY_COMBOBOX = [
-    { id: 1, title: "Soy la opcion 1" },
-    { id: 2, title: "Soy la opcion 2" },
-    { id: 3, title: "Soy la opcion 3" },
-    { id: 4, title: "Soy la opcion 4" },
-    { id: 5, title: "Soy la opcion 5" },
-    { id: 6, title: "Soy la opcion 6" },
-    { id: 7, title: "Soy la opcion 7" },
-    { id: 8, title: "Soy la opcion 8" },
-    { id: 9, title: "Soy la opcion 9" },
-    { id: 10, title: "Soy la opcion 10" },
-    { id: 11, title: "Soy la opcion 11" },
-  ];
   */
-
-  const DUMMY_HORARIOS_EMPLEADOS = [
-    {
-      id: 1,
-      title: "Perrujo trujo",
-      foto: doggo,
-      fechas: [
-        {
-          dia: 22,
-          mes:7,
-          horarios: [
-            { i: "10:00", f: "12:00" },//Una hora libre
-            { i: "13:00", f: "15:00" },
-            { i: "15:00", f: "16:30" },//Dos horas
-            { i: "18:30", f: "19:00" },//Una hora
-            { i: "20:00", f: "22:00" }
-          ],
-        },
-        {
-          dia: 23,
-          mes : 7,
-          horarios: [
-            { i: "15:00", f: "16:30" },//Dos horas
-            { i: "18:30", f: "19:00" },//Una hora
-            { i: "20:00", f: "22:00" }
-          ],
-        },
-      ],
-    },
-    { id: 2, title: "One", foto: one },
-    { id: 3, title: "Two", foto: two },
-    { id: 4, title: "Three", foto: three },
-  ];
-
   const initialExpenses = [
     { id: "e1", title: "Producto1", amount: 200 },
     { id: "e2", title: "Producto2", amount: 300 },
@@ -284,8 +233,8 @@ const App =()=>{
             <Redirect to="/" />
           </Switch>
     */}
-      <Calendario empleados={DUMMY_HORARIOS_EMPLEADOS} servicios={{corte:true,maquina:false,barba:false,laciado:true,decoloracion:false,tinta:true}}/>
       {/* <Footer/> */}
+
     </div>
   );
 }

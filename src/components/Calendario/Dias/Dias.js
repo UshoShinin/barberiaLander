@@ -12,7 +12,6 @@ const Dias = (props) => {
     parseInt(props.year.toString().substr(-2), 10)
   );
   let contenido;
-  
   //Asigna una clase para marcar que el día de inicio empieze en su lugar correspondiente del calendario
   switch (dayIndex) {
     case 1:
@@ -40,10 +39,18 @@ const Dias = (props) => {
   primerDia = props.diasMostrar[0];
   diasAuxiliares = props.diasMostrar.filter((dia)=>(dia.num!==1));
   contenido = diasAuxiliares.map((dia) => {
-    const classLi = !dia.disponibilidad.valido ? classes.invalid : classes.dia;
+    let par;
+    if(dia.disponibilidad.valido){
+      par= <p onClick={()=>{
+        props.obtenerHorarios(dia.disponibilidad.horariosDisponibles);
+        /* console.log(dia.disponibilidad.horariosDisponibles); */
+      }} className={classes.dia}>{dia.num}</p>;
+    }else{
+      par= <p className={classes.invalid}>{dia.num}</p>;
+    }
     return (
       <li key={dia.num}>
-        <p className={classLi}>{dia.num}</p>
+        {par}
       </li>
     );
   });
