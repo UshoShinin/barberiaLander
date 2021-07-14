@@ -1,0 +1,33 @@
+.title {
+  color: var(--clr-neon-white);
+  margin-bottom: 0em;
+}
+
+.label {
+  color: var(--clr-neon-white);
+  font-size: 1.45em;
+}
+
+.labelPlace{
+  padding-right: 0.9em;
+  text-align: right;
+}
+
+.opciones{
+  display: flex;
+}
+.opciones > div {
+  width: 50%;
+}
+.opciones table{
+  width: 100%;
+}
+@media (max-width:480px){
+  .opciones > div {
+    width: 40%;
+  }
+  .opciones table{
+    width: 20%;
+  }
+}
+

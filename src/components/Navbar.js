@@ -79,14 +79,15 @@ const Navbar = () => {
               Visualizar Agendas
             </NavLink>
           </li>
-          <li className="nav-item">
-            <NavLink to="/agenda/crearagenda">
-              Crear Agenda
-            </NavLink>
-          </li>
+          
           <li className="nav-item">
             <NavLink to="/caja/movimientocaja">
               Movimiento de Caja
+            </NavLink>
+          </li>
+          <li className="nav-item">
+            <NavLink to="/agenda/crearagenda">
+              Crear Agenda
             </NavLink>
           </li>
           <li className="nav-item"> 

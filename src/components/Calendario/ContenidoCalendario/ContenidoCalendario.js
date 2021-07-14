@@ -35,6 +35,7 @@ const getHorarios = (horarios) => {
       fechas,
       timeNeed
     );
+    console.log(diasMostrar);
     cantidadMeses=diasMostrar.length;
     let content = diasMostrar.map((meses) => {
       return (

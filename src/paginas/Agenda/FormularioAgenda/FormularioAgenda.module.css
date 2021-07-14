@@ -1,0 +1,44 @@
+.nuevaAgenda{
+  padding:3%;
+}
+.Inputs{
+  width: 100%;
+  align-items: center;
+}
+.inputsTasble{
+  width: 100%;
+}
+table {
+  border-collapse:separate; 
+  border-spacing: 0 1em;
+}
+
+.label{
+  text-align: right;
+  color:var(--clr-neon-white);
+  width: 5.2em;
+  padding-right: 0.8em;
+}
+.Cal{
+  width: 100%;
+}
+.Cal > div{
+  margin:0 auto;
+}
+.Inputs > div + div{
+  margin-top:1em;
+}
+.nuevaAgenda{
+  display:flex;
+  transition: display 1000ms linear;
+}
+
+
+@media(max-width:980px){
+  .nuevaAgenda{
+    display: block;
+  }
+  .Cal{
+    margin-top:2em;
+  }
+}

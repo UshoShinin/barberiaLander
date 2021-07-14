@@ -1,6 +1,10 @@
 
 .div {
   position: relative;
+  display:flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
 }
 .input[type="number"] {
   -webkit-appearance: textfield;
@@ -21,12 +25,13 @@
   box-shadow: 0 0 0.1em 0 var(--clr-inActive),
     inset 0 0 0.1em 0 var(--clr-inActive);
   color: var(--clr-inActive);
-  margin-bottom: 10%;
   transition: 
     border 250ms linear,
     box-shadow 250ms linear,
     color 250ms linear,
     ;
+    width: 100%;
+    padding:0.1em 0;
 }
 
 .input::placeholder {
@@ -36,54 +41,6 @@
 
 .input:focus::placeholder {
   color: var(--clr-neon-placeholder);
-}
-
-.button {
-  position: absolute;
-  height: 37%;
-  width: 6%;
-  right: 2%;
-}
-
-.up {
-  top: 10%; 
-}
-.down {
-  bottom: 10%;
-}
-.up::before,
-.up::after,
-.down::before,
-.down::after {
-  position: inherit;
-  content: "";
-  width: 45%;
-  height: 45%;
-  background-color: var(--clr-inActive);
-}
-.up::before,
-.up::after {
-  top: 30%;
-}
-.down::before,
-.down::after {
-  bottom: 30%;
-}
-.up::before {
-  right: 50%;
-  transform: skew(0, -35deg);
-}
-.up::after {
-  left: 50%;
-  transform: skew(0, 35deg);
-}
-.down::before {
-  right: 50%;
-  transform: skew(0, 35deg);
-}
-.down::after {
-  left: 50%;
-  transform: skew(0, -35deg);
 }
 
 .input:focus {

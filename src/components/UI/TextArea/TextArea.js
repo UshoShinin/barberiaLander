@@ -1,8 +1,8 @@
 import React, { useRef, useImperativeHandle } from "react";
-import classes from "./Input.module.css";
+import classes from "./TextArea.module.css";
 
 
-const Input = React.forwardRef((props, ref) => {
+const TextArea = React.forwardRef((props, ref) => {
   const inputRef = useRef();
   const activate = () => {
     inputRef.current.focus();
@@ -12,8 +12,7 @@ const Input = React.forwardRef((props, ref) => {
   });
   return (
     <div className={classes.div}>
-      {/* <label className={classes.label} htmlFor={props.input.id}>{props.label}</label> */}
-      <input
+      <textarea
         ref={inputRef}
         {...props.input}
         className={`${classes.input} ${
@@ -27,4 +26,4 @@ const Input = React.forwardRef((props, ref) => {
     </div>
   );
 });
-export default Input;
+export default TextArea;

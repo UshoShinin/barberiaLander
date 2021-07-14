@@ -1,6 +1,5 @@
-import FormularioAgenda from "./FormularioAgenda";
+import FormularioAgenda from "./FormularioAgenda/FormularioAgenda";
 import Card from "../../components/UI/Card/Card";
-import "./CrearAgenda.css";
 
 const CrearAgenda = (props) => {
   const guardarDatosAgendaHandler = (enteredDatosAgenda) => {
@@ -13,7 +12,7 @@ const CrearAgenda = (props) => {
   };
 
   return (
-    <div className="nueva-agenda">
+    <div className="nuevaAgenda">
       <Card>
         <FormularioAgenda onSaveDatosAgenda={guardarDatosAgendaHandler} />
       </Card>

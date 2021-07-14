@@ -30,7 +30,7 @@ export const horariosDisponibilidad = (
   servicios
 ) => {
   const horarios = obtenerHorariosDeDia(dia, mes, fechas);
-  if (diasTotales === 0 || diaSemana === 7)
+  if (diasTotales < 1 || diaSemana === 7)
     return { valido: false, horariosDisponibles: [] };
   if (horarios === null) return { valido: true, horariosDisponibles: [] };
   else

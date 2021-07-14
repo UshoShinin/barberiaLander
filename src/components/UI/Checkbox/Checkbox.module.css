@@ -1,0 +1,74 @@
+.icon {
+  color: var(--clr-inActive);
+  font-size: 1.4em;
+  transition: color 180ms linear;
+}
+
+.checkbox {
+  position: relative;
+  display: flex;
+  width: 38px;
+  height: 38px;
+  background-color: transparent;
+  border: var(--clr-inActive) 0.18em solid;
+  border-radius: 0.6em;
+  box-shadow: 0 0 0.1em 0 var(--clr-inActive);
+  position: relative;
+  transition: border 180ms linear, box-shadow 200ms linear;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.checkbox:hover {
+  border: var(--clr-neon-white) 0.18em solid;
+  box-shadow: 0 0 0.3em 0 var(--clr-neon-white),
+    inset 0 0 0.3em 0 var(--clr-neon-white), 0 0 0.5em 0 var(--clr-neon-white),
+    inset 0 0 0.5em 0 var(--clr-neon-white);
+}
+
+.active {
+  border: var(--clr-neon-blue) 0.18em solid;
+  box-shadow:
+  0 0 0.3em 0 var(--clr-neon-blue),inset 0 0 0.3em 0 var(--clr-neon-blue),
+    0 0 0.9em 0 var(--clr-neon-blue),inset 0 0 0.9em 0 var(--clr-neon-blue);
+}
+
+.active:hover {
+  border: var(--clr-neon-blue) 0.18em solid;
+  box-shadow:
+  0 0 0.3em 0 var(--clr-neon-blue),inset 0 0 0.3em 0 var(--clr-neon-blue),
+    0 0 0.9em 0 var(--clr-neon-blue),inset 0 0 0.9em 0 var(--clr-neon-blue);
+}
+
+.active::before {
+  content: "";
+  opacity: 1;
+  width: 6px;
+  height: 8.5px;
+  left:5px;
+  top:12.3px;
+  transform: rotate(-45deg);
+  background-color: var(--clr-neon-blue);
+  position: absolute;
+  filter:blur(2px)
+}
+
+.active::after {
+  content: "";
+  opacity: 1;
+  width: 6px;
+  height: 22px;
+  right: 10.4px;
+  transform: rotate(45deg);
+  background-color: var(--clr-neon-blue);
+  position: absolute;
+  filter:blur(2px)
+}
+.active .icon {
+  color: var(--clr-neon-blue);
+}
+
+
+
+
