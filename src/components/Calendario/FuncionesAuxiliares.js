@@ -33,11 +33,18 @@ export const horariosDisponibilidad = (
   if (diasTotales < 1 || diaSemana === 7)
     return { valido: false, horariosDisponibles: [] };
   if (horarios === null) return { valido: true, horariosDisponibles: [] };
-  else
-    return {
-      valido: true,
-      horariosDisponibles: horariosAgendarDisponibles(horarios, servicios),
-    };
+  else {
+    if (horariosAgendarDisponibles(horarios, servicios).length > 0) {
+      return {
+        valido: true,
+        horariosDisponibles: horariosAgendarDisponibles(horarios, servicios),
+      };
+    }
+  }
+  return {
+    valido: false,
+    horariosDisponibles: [],
+  };
 };
 
 const transformStringNumber = (horario) => {
@@ -50,7 +57,7 @@ const horarioEnMinutos = (hora) => {
   return hora.h * 60 + hora.m;
 };
 
-const minutosAHorarios = (minutos) => {
+export const minutosAHorarios = (minutos) => {
   return { h: (minutos - (minutos % 60)) / 60, m: minutos % 60 };
 };
 
@@ -98,12 +105,6 @@ const horariosAgendarDisponibles = (horarios, timeNeed) => {
 const diferenciaDeTiempo = (tiempoBase, siguienteHorario) => {
   const BH = transformStringNumber(tiempoBase);
   const SH = transformStringNumber(siguienteHorario);
-/*   console.log(
-    "Tiempo inicial: " + JSON.stringify(BH) + " valor:" + horarioEnMinutos(BH)
-  );
-  console.log(
-    "siguiente tiempo: " + JSON.stringify(SH) + " valor:" + horarioEnMinutos(SH)
-  ); */
   return horarioEnMinutos(SH) - horarioEnMinutos(BH);
 };
 

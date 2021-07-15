@@ -2,7 +2,6 @@ import classes from "./Fotos.module.css";
 import ComboBox from "../ComboBox/ComboBox";
 import { useReducer, useState } from "react";
 import { CSSTransition } from "react-transition-group";
-
 const Fotos = (props) => {
   let initialState = [];
   props.fotos.forEach((mFoto) => {
@@ -12,12 +11,13 @@ const Fotos = (props) => {
     });
   });
   const [index, setIndex] = useState(1);
-
+  const [active,setActive] = useState(false);
   initialState[index - 1].mostrar = true;
 
   const reducer = (state, action) => {
     switch (action.type) {
       case "change":
+        setActive(false);
         return state.map((foto) => {
           if (foto.id === action.payload.id) {
             foto.mostrar = !foto.mostrar;
@@ -54,14 +54,16 @@ const Fotos = (props) => {
     setIndex(id);
     props.changeEmployee(id-1);
   };
+  
   return (
     <>
       <div className={classes.container}>
         <div className={classes.marco}>
           <div className={classes.marcoIntermedio}>{imagenes}</div>
         </div>
+        
         <div style={{ width: "60%", margin: "0 auto" }}>
-          <ComboBox onChange={comboChangeHandler} opciones={props.fotos} />
+          <ComboBox height={5.75} active ={active} onClick={()=>{setActive((prev)=>!prev)}} current={index} onChange={comboChangeHandler} opciones={props.fotos} />
         </div>
       </div>
     </>

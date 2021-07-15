@@ -19,33 +19,4 @@
   animation: closeOpciones 0.3s ease-out forwards;
 }
 
-@keyframes openOpciones{
-  0%{
-    opacity: 0;
-    max-height: 0em;
-  }
-  80%{
-    opacity: 1;
-    max-height: 10em;
 
-  }
-  100%{
-    opacity: 1;
-    max-height: 10em;
-  }
-}
-
-@keyframes closeOpciones{
-  0%{
-    opacity: 1;
-    max-height: 10em;
-  }
-  50%{
-    opacity: 0.8;
-    max-height: 6em;
-  }
-  100%{
-    opacity: 0;
-    max-height: 0em;
-  }
-}

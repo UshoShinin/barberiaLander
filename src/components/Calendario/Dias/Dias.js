@@ -49,7 +49,7 @@ const Dias = (props) => {
       par= <p className={classes.invalid}>{dia.num}</p>;
     }
     return (
-      <li key={dia.num}>
+      <li key={dia.num} onClick={props.lostFocus}>
         {par}
       </li>
     );

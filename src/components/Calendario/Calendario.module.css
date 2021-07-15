@@ -11,6 +11,7 @@
   display: flow-root;
   overflow-x: hidden;
   background-size: cover;
+  transition: all 1000ms linear;
 }
 
 .calendario{

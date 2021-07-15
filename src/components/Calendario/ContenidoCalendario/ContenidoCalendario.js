@@ -2,7 +2,7 @@ import Dias from "../Dias/Dias";
 import { DaysGenerator } from "../Dias/GeneradorDias";
 import { getMonthChart, getDayIndex } from "../Dias/FunctionsDias";
 import classes from './ContenidoCalendario.module.css';
-export const days = (fechas,timeNeed,obtenerHorarios) => {
+export const days = (fechas,timeNeed,obtenerHorarios,lostFocus) => {
 
 const getHorarios = (horarios) => {
   /* console.log(horarios) */
@@ -35,20 +35,23 @@ const getHorarios = (horarios) => {
       fechas,
       timeNeed
     );
-    console.log(diasMostrar);
     cantidadMeses=diasMostrar.length;
+    let keys = 1;
     let content = diasMostrar.map((meses) => {
+      keys++;
       return (
-        <ol className={classes.diasCalendario}>
+        <ol key={keys} className={classes.diasCalendario}>
           <Dias
           diasMostrar={meses.dias}
           month={month+meses.id}
           year={year}
           yearChart={yearChart}
           obtenerHorarios = {getHorarios}
+          lostFocus={lostFocus}
         />
         </ol>
       );
+      
     });
     return { cantidadMeses:cantidadMeses, content:content };
   };

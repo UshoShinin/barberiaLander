@@ -1,7 +1,7 @@
 li{
     margin:0 auto;
 }
-p{
+.dia,.invalid{
     max-width: 1.25em;
     min-width: 1.25em;
 }

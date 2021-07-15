@@ -1,6 +1,6 @@
 .container {
   width: 100%;
-  height: 10em;
+  height: 11.2em;
   /* display: flex; */
   position: relative;
   margin-bottom: 1em;
@@ -14,9 +14,6 @@
 }
 
 .foto {
-/*   box-shadow: 0 0 0.8em 0 var(--clr-neon-blue),
-  0 0 0.3em 0 var(--clr-neon-blue);
-  border: 0.07em solid var(--clr-neon-white); */
   border-radius: 70%;
   width: 100%;
   transform: rotate(0deg);

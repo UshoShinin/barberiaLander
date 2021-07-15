@@ -8,15 +8,17 @@ import { days } from "./ContenidoCalendario/ContenidoCalendario";
 import {extraerFotos} from './FuncionesAuxiliares';
 const Calendario = (props) => {
   console.log("ReCarge");
-  const [currentEmployee, setCurrentEmployee] = useState(0);
   const [currentCalendar, setCurrentCalendar] = useState(0);
   const empleadosFotos = extraerFotos(props.empleados);
   // Como no tenemos todo pronto en la base de datos voya tener que armar unos tiempos y servicios y tiempos provicionales
-  const timeNeed = calcularTiempo(currentEmployee,props.servicios);
+  const timeNeed = props.time;
   const obtenerHorarios = (horarios) =>{
-    console.log(horarios);
+    props.getHorarios(horarios);
   }
-  const { cantidadMeses, content } = days(props.empleados[currentEmployee].fechas,timeNeed,obtenerHorarios);
+  const lostFocus =()=>{
+    document.getElementById('Calendario').classList.remove('FormularioAgenda_invalidCal__1yd0j');
+  }
+  const { cantidadMeses, content } = days(props.empleados[props.currentEmployee].fechas,timeNeed,obtenerHorarios,lostFocus);
   const prevCalendar = () => {
     if (currentCalendar > 0) {
       setCurrentCalendar((state) => state - 1);
@@ -28,8 +30,8 @@ const Calendario = (props) => {
     }
   };
   return (
-    <div className={classes.container}>
-      <Fotos fotos={empleadosFotos} changeEmployee = {setCurrentEmployee}/>
+    <div className={classes.container} tabIndex={-1} id="Calendario">
+      <Fotos fotos={empleadosFotos} changeEmployee = {props.changeEmployee}/>
       <Mes
         month={new Date().getMonth()}
         prev={prevCalendar}
@@ -59,25 +61,3 @@ const Calendario = (props) => {
 };
 export default React.memo(Calendario);
 
-
-const calcularTiempo = (empleado,serv) => {
-  let total = 0;
-  switch (empleado) {
-    case 0:
-      if (serv.corte) total+=30;
-      if( serv.maquina) total+=20;
-      if(serv.barba)total+=15;
-      if(serv.laciado)total+=30;
-      if(serv.decoloracion)total+=15;
-      if(serv.tinta)total+=15;
-      break;  
-    default:
-      if (serv.corte) total+=60;
-      if( serv.maquina) total+=24;
-      if(serv.barba)total+=30;
-      if(serv.laciado)total+=60;
-      if(serv.decoloracion)total+=30;
-      if(serv.tinta)total+=30;   
-  }
-  return total;
-}

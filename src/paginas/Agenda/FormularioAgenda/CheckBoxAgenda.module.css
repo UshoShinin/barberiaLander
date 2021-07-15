@@ -12,7 +12,11 @@
   padding-right: 0.9em;
   text-align: right;
 }
-
+.time{
+  text-align: left;
+  width: 100%;
+  color:var(--clr-neon-white);
+}
 .opciones{
   display: flex;
 }

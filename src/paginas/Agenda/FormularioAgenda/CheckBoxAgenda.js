@@ -1,52 +1,16 @@
-import React, { useReducer } from "react";
+import React from "react";
 import Checkbox from "../../../components/UI/Checkbox/Checkbox";
 import classes from "../../../paginas/Agenda/FormularioAgenda/CheckBoxAgenda.module.css";
-
-const initialState = {
-  corte: false,
-  maquina: false,
-  barba: false,
-  laciado: false,
-  decoloracion: false,
-  tinta: false,
-};
-
+import { minutosAHorarios } from "../../../components/Calendario/FuncionesAuxiliares";
 const CheckBoxAgenda = (props) => {
-  const checkReducer = (state, action) => {
-    let myState;
-    switch (action.type) {
-      case "CORTE":
-        myState = { ...state, corte: !state.corte };
-        break;
-      case "MAQUINA":
-        myState = { ...state, maquina: !state.maquina };
-        break;
-      case "BARBA":
-        myState = { ...state, barba: !state.barba };
-        break;
-      case "LACIADO":
-        myState = { ...state, laciado: !state.laciado };
-        break;
-      case "DECOLORACION":
-        myState = { ...state, decoloracion: !state.decoloracion };
-        break;
-      case "TINTA":
-        myState = { ...state, tinta: !state.tinta };
-        break;
-    }
-    props.onSaveDatosCheckBox(myState);
-    return myState;
-  };
-  const [checkboxState, dispatchChecks] = useReducer(
-    checkReducer,
-    initialState
-  );
   return (
     <div className="nueva-agenda__control">
       <h1 className={classes.title}>¿En que podemos ayudarte?</h1>
+      <p tabIndex={-1} id="timeLeft" className={classes.time}>{time(props.time)}</p>
       <div className={classes.opciones}>
         <div>
           <table>
+            <tbody>
             <tr>
               <td className={classes.labelPlace}>
                 <label className={classes.label} htmlFor={11}>
@@ -56,9 +20,9 @@ const CheckBoxAgenda = (props) => {
               <td>
                 <Checkbox
                   id={11}
-                  checked={checkboxState.corte}
+                  checked={props.state.corte}
                   onChange={() => {
-                    dispatchChecks({ type: "CORTE" });
+                    props.myAction({ type: "CORTE" });
                   }}
                 />
               </td>
@@ -72,11 +36,10 @@ const CheckBoxAgenda = (props) => {
               <td>
                 <Checkbox
                   id={13}
-                  checked={checkboxState.maquina}
+                  checked={props.state.maquina}
                   onChange={() => {
-                    dispatchChecks({ type: "MAQUINA" });
-                  }}
-                />
+                    props.myAction({ type: "MAQUINA" });
+                  }}/>
               </td>
             </tr>
             <tr>
@@ -88,17 +51,19 @@ const CheckBoxAgenda = (props) => {
               <td>
                 <Checkbox
                   id={15}
-                  checked={checkboxState.barba}
+                  checked={props.state.barba}
                   onChange={() => {
-                    dispatchChecks({ type: "BARBA" });
+                    props.myAction({ type: "BARBA" });
                   }}
                 />
               </td>
             </tr>
+            </tbody>
           </table>
         </div>
         <div>
           <table>
+            <tbody>
             <tr>
               <td className={classes.labelPlace}>
                 <label className={classes.label} htmlFor={12}>
@@ -108,9 +73,9 @@ const CheckBoxAgenda = (props) => {
               <td>
                 <Checkbox
                   id={12}
-                  checked={checkboxState.laciado}
+                  checked={props.state.laciado}
                   onChange={() => {
-                    dispatchChecks({ type: "LACIADO" });
+                    props.myAction({ type: "LACIADO" });
                   }}
                 />
               </td>
@@ -124,9 +89,9 @@ const CheckBoxAgenda = (props) => {
               <td>
                 <Checkbox
                   id={14}
-                  checked={checkboxState.decoloracion}
+                  checked={props.state.decoloracion}
                   onChange={() => {
-                    dispatchChecks({ type: "DECOLORACION" });
+                    props.myAction({ type: "DECOLORACION" });
                   }}
                 />
               </td>
@@ -140,18 +105,42 @@ const CheckBoxAgenda = (props) => {
               <td>
                 <Checkbox
                   id={16}
-                  checked={checkboxState.tinta}
+                  checked={props.state.tinta}
                   onChange={() => {
-                    dispatchChecks({ type: "TINTA" });
+                    props.myAction({ type: "TINTA" });
                   }}
                 />
               </td>
             </tr>
+            </tbody>
           </table>
         </div>
       </div>
     </div>
   );
 };
-
 export default CheckBoxAgenda;
+
+const time = (nTime)=>{
+  let myTime;
+  if(nTime>0){
+    const {h , m} = minutosAHorarios(nTime);
+    myTime = 'Tiempo estimado: ';
+    if(h>1){
+      myTime+=h+' horas';
+    }else{
+      if(h>0){
+        myTime+=' Una hora';
+      }
+    }
+    if(h>0&&m>0){
+      myTime +=' y ';
+    }
+    if(m>0){
+      myTime+= m +' minutos';
+    }
+  }else{
+    myTime='No hay servicios seleccionados';
+  }
+  return myTime;
+}
