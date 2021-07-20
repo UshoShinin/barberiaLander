@@ -25,7 +25,7 @@ import Historial from "./paginas/Caja/Historial";
 import MovimientoCaja from "./paginas/Caja/MovimientoCaja";
 import CrearAgenda from "./paginas/Agenda/CrearAgenda";
 import PreAgendas from "./paginas/Agenda/PreAgendas";
-import VisualAgendas from "./paginas/Agenda/VisualAgendas";
+import VisualAgendas from "./paginas/Agenda/VisualAgendas/VisualAgendas";
 import NoEncontrado from "./paginas/NoEncontrado";
 import Navbar from "./components/Navbar";
 import React from "react";
@@ -142,8 +142,8 @@ const App =()=>{
             <Route path="/administracion">
               <Administracion />
             </Route>
-            <Route path="/cuponeras" exact>
-              <Cuponeras />
+            <Route path="/agenda/visualagendas" exact>
+              <VisualAgendas />
             </Route>
             <Route path="/empleados" exact>
               <Empleados />
@@ -160,8 +160,8 @@ const App =()=>{
             <Route path="/agenda/preagendas" exact>
               <PreAgendas />
             </Route>
-            <Route path="/agenda/visualagendas" exact>
-              <VisualAgendas />
+            <Route path="/cuponeras" exact>
+              <Cuponeras />
             </Route>
             <Route path="/caja/aperturacierre" exact>
               <AperturaCierre />

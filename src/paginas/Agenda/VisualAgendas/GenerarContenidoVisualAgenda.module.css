@@ -1,0 +1,46 @@
+.cuanto {
+  height: 20px;
+}
+
+.horario {
+  display: "flex";
+  align-items: "center";
+  justify-content: "center";
+  position: relative;
+}
+
+.horario > .cuanto + .cuanto {
+  margin-top: 8px;
+}
+.horario > p {
+  position: absolute;
+  top: 0;
+  margin-left: 8px;
+  color: var(--clr-neon-cyan);
+}
+
+.horario > p + p {
+  top: auto;
+  bottom: 0;
+}
+
+.title {
+  font-size: 2em;
+}
+
+.Nav{
+    color:var(--clr-inActive);
+    width: 60%;
+    margin:10px auto;
+}
+
+.Nav > li{
+  border: 2px var(--clr-inActive) solid;
+  
+}
+
+@media (max-width: 580px) {
+  .title {
+    font-size: 1.2em;
+  }
+}

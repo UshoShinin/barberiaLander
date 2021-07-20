@@ -47,13 +47,13 @@ export const horariosDisponibilidad = (
   };
 };
 
-const transformStringNumber = (horario) => {
+export const transformStringNumber = (horario) => {
   const hor = parseInt(horario.slice(0, 2), 10);
   const min = parseInt(horario.slice(3, 5), 10);
   return { h: hor, m: min };
 };
 
-const horarioEnMinutos = (hora) => {
+export const horarioEnMinutos = (hora) => {
   return hora.h * 60 + hora.m;
 };
 
@@ -108,7 +108,7 @@ const diferenciaDeTiempo = (tiempoBase, siguienteHorario) => {
   return horarioEnMinutos(SH) - horarioEnMinutos(BH);
 };
 
-const cargarHorarios = (inicio, fin) => {
+export const cargarHorarios = (inicio, fin) => {
   let lista = [];
   while (inicio <= fin) {
     lista.push(minutosAHorarios(inicio));

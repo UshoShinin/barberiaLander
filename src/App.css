@@ -12,7 +12,7 @@
 
 :root {
   --clr-neon-blue: #0375eb;
-  --clr-neon-cyan:#b5d5f6;
+  --clr-neon-cyan2:#d6e0ea;
   --clr-neon-red:#fa1a52;
   --clr-neon-white: #dadada/*efefef*/;
   --clr-inActive: #737373; /*#c6c6c6;*/
@@ -23,7 +23,9 @@
   --clr-background-calendario:#50505e;
   --clr-footer:#060609;
   --clr-neon-green:#06c10f;
-
+  --clr-blue1-back: #4078b5;
+  --clr-blue2-back: #648fbc;
+  --clr-dark-blue:#0c3f76;
 }
 .App {
   text-align: center;

@@ -49,14 +49,14 @@ const Dias = (props) => {
       par= <p className={classes.invalid}>{dia.num}</p>;
     }
     return (
-      <li key={dia.num} onClick={props.lostFocus}>
+      <li className={classes.lis} key={dia.num} onClick={props.lostFocus}>
         {par}
       </li>
     );
   });
   return (
     <>
-      <li className={classFirstDay}><p className={primerDia.disponibilidad.valido?classes.dia:classes.invalid}>{primerDia.num}</p></li>
+      <li className={`${classFirstDay} ${classes.lis}`}><p className={primerDia.disponibilidad.valido?classes.dia:classes.invalid}>{primerDia.num}</p></li>
       {contenido}
     </>
   );

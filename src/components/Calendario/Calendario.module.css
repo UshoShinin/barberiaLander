@@ -28,12 +28,10 @@
 }
 
 li {
-  /* border: 0.08em solid var(--clr-inActive); */
   list-style-type: none;
 }
 
 .day {
-  /* background-color: var(--clr-background-calendario); */
   padding: 0.15em 0;
 }
 
