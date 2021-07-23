@@ -1,24 +1,25 @@
 import {
-    transformStringNumber,
-    horarioEnMinutos,
-    cargarHorarios
-  } from "../../../components/Calendario/FuncionesAuxiliares";
-import classes from './GenerarContenidoVisualAgenda.module.css';  
+  transformStringNumber,
+  horarioEnMinutos,
+  cargarHorarios,
+} from "../../../components/Calendario/FuncionesAuxiliares";
+import classes from "./GenerarContenidoVisualAgenda.module.css";
+import { Link } from "react-scroll";
 export const generarHoras = (i, f) => {
   return cargarHorarios(i * 60, f * 60).map((h) => {
     let hora = `${h.h}:${h.m < 10 ? "0" + h.m : h.m}`;
-    return <p key={hora}>{hora}</p>;
+    return <p id={h.m===0?h.h:''} key={hora}>{hora}</p>;
   });
 };
 
 const diferencia = (i, f) => {
-    const ini = horarioEnMinutos(transformStringNumber(i));
-    const fin = horarioEnMinutos(transformStringNumber(f));
-    const dif = (fin - ini) / 15;
-    return dif;
-  };
+  const ini = horarioEnMinutos(transformStringNumber(i));
+  const fin = horarioEnMinutos(transformStringNumber(f));
+  const dif = (fin - ini) / 15;
+  return dif;
+};
 
-export const generarCupos = (empleados,colorFilaI) => {
+export const generarCupos = (empleados, colorFilaI) => {
   let horariosHTML;
   let auxiliarDiv = [];
   for (let i = 0; i < empleados.length; i++) {
@@ -35,10 +36,7 @@ export const generarCupos = (empleados,colorFilaI) => {
     }
     for (let k = 0; k < calDiff; k++) {
       cuantos.push(
-        <div
-          style={{ backgroundColor: `var(--clr-blue${colorFilaI}-back)` }}
-          className={classes.cuanto}
-        ></div>
+        <div className={`${classes.cuanto} ${colorFilaI===1?classes.color1:classes.color2}`}></div>
       );
     }
     let cuantosHTML = cuantos.map((c) => {
@@ -62,13 +60,9 @@ export const generarCupos = (empleados,colorFilaI) => {
       const ini = empleados[i].agendas[j].i;
       const fin = empleados[i].agendas[j].f;
       calDiff = diferencia(ini, fin);
-      console.log(calDiff);
       for (let k = 0; k < calDiff; k++) {
         cuantos.push(
-          <div
-            style={{ backgroundColor: `var(--clr-blue${colorI}-back)` }}
-            className={classes.cuanto}
-          ></div>
+          <div className={`${classes.cuanto} ${colorI===1?classes.color1:classes.color2}`}></div>
         );
       }
       let cuantosHTML = cuantos.map((c) => {
@@ -112,10 +106,26 @@ export const generarCupos = (empleados,colorFilaI) => {
   return auxiliarDiv;
 };
 
-export const generarNavegacion = (ini,fin) => {
-    let list = [];
-    for(let i = ini;i<=fin;i++){
-        list.push(i);
-    }
-    return <ul className = {classes.Nav}>{list.map((h)=>(<li>{h}</li>))}</ul>
-}
+export const generarNavegacion = (ini, fin) => {
+  let list = [];
+  for (let i = ini; i <= fin; i++) {
+    list.push(i);
+  }
+  return (
+    <ul className={classes.Nav}>
+      {list.map((h) => (
+        <Link
+        className={classes.Link}
+          activeClass="active"
+          to={h}
+          spy={true}
+          smooth={true}
+          offset={-10}
+          duration={500}
+        >
+          {h}
+        </Link>
+      ))}
+    </ul>
+  );
+};

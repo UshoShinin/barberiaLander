@@ -16,6 +16,7 @@ export let DaysGenerator = (diaActual, month, year, dayIndex,fechas,timeNeed) =>
   for (let i = 1; i < diaActual; i++) {
     diasAuxiliares.push({
       num: i,
+      mes:null,
       disponibilidad:{valido:false,horarios:[]},
     });
   }
@@ -29,6 +30,7 @@ export let DaysGenerator = (diaActual, month, year, dayIndex,fechas,timeNeed) =>
     diaSemana = diaSemana > 7 ? 1 : diaSemana;
     diasAuxiliares.push({
       num: diaAuxiliar,
+      mes:month,
       disponibilidad: horariosDisponibilidad(diaSemana, diasTotales,i, myMonth+idMonth,fechas,timeNeed),
     });
     diaAuxiliar++;
@@ -49,6 +51,7 @@ export let DaysGenerator = (diaActual, month, year, dayIndex,fechas,timeNeed) =>
       diaSemana = diaSemana > 7 ? 1 : diaSemana;
       diasAuxiliares.push({
         num: i,
+        mes:myMonth+idMonth,
         disponibilidad: horariosDisponibilidad(diaSemana, diasTotales,i, myMonth+idMonth,fechas,timeNeed),
       });
       diaSemana++;
