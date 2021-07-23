@@ -1,4 +1,4 @@
-li{
+.lis{
     margin:0 auto;
 }
 .dia,.invalid{
@@ -6,7 +6,7 @@ li{
     min-width: 1.25em;
 }
 .invalid{
-    /* background-color: red; */
+    margin: 0 auto;
     color:var(--clr-red-inActive);
 }
 
