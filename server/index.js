@@ -27,7 +27,14 @@ app.use('/aceptarAgenda', (req, res) => {
 });
 
 
-
+app.use('/listadoAgendas', (req, res) => {
+  let ret = interfaz.getDatosListadoAgendas();
+  ret.then((resultado) => {
+    res.json({
+      mensaje: resultado
+    });
+  });  
+});
 
 
 //No escribir nada por debajo de esto

@@ -43,6 +43,51 @@ const aceptarAgenda = async (id, aceptada) => {
   }
 };
 
+const getDatosListadoAgendas = async () => {
+  //variable que tiene la conexion
+  let pool = await sql.connect(conexion);
+  //Voy a buscar los nombres de los empleados
+  let consultaNombreEmpleados = await pool.request().query('select Cedula, Nombre from Empleado');
+  //Voy a buscar los datos que me interesan de las agendas
+  let consultaAgendas = await pool.request().query('select A.IdAgenda, H.Cedula, H.HoraInicio, H.HoraFin from Agenda A, Horario H where A.IdHorario = H.IdHorario order by H.Cedula, H.HoraInicio');
+  //Dejo armado un array con los datos de las agendas
+  let agendas = consultaAgendas.recordset;
+  //Dejo armado un array con los empleados
+  let nombreEmpleados = consultaNombreEmpleados.recordset;
+  
+  //Armo el objeto que voy a devolver
+  let ret = {
+    agendas: []
+  }
+
+  //Recorro los empleados para armar los objetos que necesito pushear al array que devuelvo
+  for (let i = 0; i < nombreEmpleados.length; i++) {
+    //Armo el objeto con los datos del empleado
+    let empleadoAux = {
+      nombreEmpleado: nombreEmpleados[i].Nombre,
+      agendas: []
+    }
+    //Recorro las agendas para agregarle los datos de ellas al objeto empleadoAux
+    for (let j = 0; j < agendas.length; j++) {
+      //Verifico de si la agenda corresponde al empleado en el cual estoy parado
+      if(agendas[j].Cedula == nombreEmpleados[i].Cedula){
+        //Creo un objeto agenda para pushear al listado de agendas del empleado
+        let agendaAux = {
+          idAgenda: agendas[j].IdAgenda,
+          i: agendas[j].HoraInicio,
+          f:agendas[j].HoraFin
+        }
+        //Agrego la agenda al array de agendas del empleado seleccionado
+        empleadoAux.agendas.push(agendaAux);
+      }
+    }
+    //Agrego el empleado al array que se va a devolver
+    ret.agendas.push(empleadoAux);
+  }
+  //Devuelvo el objeto ret
+  return ret;
+}
+
 //REVISAR ESTO URGENTE
 //Conseguir datos para formularios
 const getDatosFormulario = async () => {
@@ -155,6 +200,7 @@ const crearSolicitudAgenda = async (agenda) => {
 const interfaz = {
   getDatosFormulario,
   aceptarAgenda,
+  getDatosListadoAgendas,
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar
