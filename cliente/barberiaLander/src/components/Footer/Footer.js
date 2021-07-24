@@ -7,10 +7,9 @@ import {
   faEnvelope,
   faClock,
 } from "@fortawesome/free-solid-svg-icons";
-import Redes from "./RedesSociales/Redes";
-
-import { NavLink } from "react-router-dom";
-
+import Redes from './RedesSociales/Redes'
+/* Este es el footer de la aplicación tiene muchos componente de FontAwesome y
+algunos iconos de redes sociales creados con css */
 const Footer = () => {
   return (
     <footer>

@@ -5,7 +5,7 @@ import Fotos from "./Fotos";
 import React from 'react';
 import { useState } from "react";
 import { days } from "./ContenidoCalendario/ContenidoCalendario";
-import {extraerFotos} from './FuncionesAuxiliares';
+import {extraerFotos,getEmpleadoById} from './FuncionesAuxiliares';
 const Calendario = (props) => {
   console.log("ReCarge");
   const [currentCalendar, setCurrentCalendar] = useState(0);
@@ -18,7 +18,10 @@ const Calendario = (props) => {
   const lostFocus =()=>{
     document.getElementById('Calendario').classList.remove('FormularioAgenda_invalidCal__1yd0j');
   }
-  const { cantidadMeses, content } = days(props.empleados[props.currentEmployee].fechas,timeNeed,obtenerHorarios,lostFocus);
+  console.log(props.currentEmployee);
+  console.log(props.empleados);
+  console.log(getEmpleadoById(props.empleados,props.currentEmployee));
+  const { cantidadMeses, content } = days(getEmpleadoById(props.empleados,props.currentEmployee).fechas,timeNeed,obtenerHorarios,lostFocus);
   const prevCalendar = () => {
     if (currentCalendar > 0) {
       setCurrentCalendar((state) => state - 1);
