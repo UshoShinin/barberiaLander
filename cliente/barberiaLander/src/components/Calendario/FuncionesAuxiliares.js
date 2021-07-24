@@ -116,3 +116,11 @@ export const cargarHorarios = (inicio, fin) => {
   }
   return lista;
 };
+
+
+/* Este metodo está obtener el equivalente en el state de un id de empleado */
+export const getEmpleadoById = (list,id) => {
+  for (let i = 0; i < list.length; i++) {
+    if (list[i].id === id) return list[i];
+  }
+};

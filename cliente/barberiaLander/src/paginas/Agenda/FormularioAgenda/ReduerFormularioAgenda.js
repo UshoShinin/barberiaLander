@@ -33,7 +33,7 @@ export const initialState = {
   Pelo: { value: "" },
   Calendario: { value: null },
   ComboBox: { value: null, active: false },
-  Employee: { value: 0 },
+  Employee: { value: null },
   Time: { value: 0 },
 };
 

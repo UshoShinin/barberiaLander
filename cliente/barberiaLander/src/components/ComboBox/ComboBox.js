@@ -3,15 +3,19 @@ import Opciones from "./Opciones";
 import Transition from "react-transition-group/Transition";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleRight } from "@fortawesome/free-solid-svg-icons";
+const getObjectById = (list, id) => {
+  for (let i = 0; i < list.length; i++) {
+    if (list[i].id === id) return list[i];
+  }
+};
 const ComboBox = (props) => {
-  /* const [datosMostrados,setDatosMostrados] = useState(props.opciones[0]); */
-  const currentData = props.opciones[props.current-1];
+  const currentData = getObjectById(props.opciones, props.current);
   const clickHandler = () => {
     props.onClick();
   };
-  const selectedOptionHandler = (id) =>{
+  const selectedOptionHandler = (id) => {
     props.onChange(id);
-  }
+  };
   return (
     <div className={classes.ComboBox}>
       <div
@@ -21,7 +25,10 @@ const ComboBox = (props) => {
         <div className="contenido-select">
           <h1 className={`${classes.title} ${props.active ? classes.titleActive:""}`}>{currentData.title}</h1>
         </div>
-        <FontAwesomeIcon className={`${classes.button } ${props.active ? classes.active : ""}`} icon={faAngleRight}/>
+        <FontAwesomeIcon
+          className={`${classes.button} ${props.active ? classes.active : ""}`}
+          icon={faAngleRight}
+        />
       </div>
       <Transition mountOnEnter unmountOnExit in={props.active} timeout={300}>
         {(state) => (
@@ -36,4 +43,5 @@ const ComboBox = (props) => {
     </div>
   );
 };
+
 export default ComboBox;
