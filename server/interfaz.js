@@ -3,8 +3,51 @@ const conexion = require("./conexion");
 //Importo el paquete que vamos a usar
 const sql = require("mssql");
 
+
+const aceptarAgenda = async (id, aceptada) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago la query para conseguir la agenda
+    let queryAgenda = "Select Aceptada from Agenda where IdAgenda = " + id;
+    //Voy a buscar si esta aceptada la agenda
+    let agenda = await pool.request().query(queryAgenda);
+    //Si la agenda esta aceptada devuelvo eso
+    console.log(agenda);
+    if (agenda.recordset[0].Aceptada) {
+      let ret = {
+        codigo: 400,
+        mensaje: "La agenda ya fue aceptada previamente",
+      };
+      return ret;
+    } else {
+      //Hago la query del update
+      let queryUpdate = "update Agenda set Aceptada = 1 where IdAgenda = " + id;
+      //Hago update de la agenda
+      let empleados = await pool.request().query(queryUpdate);
+      //Si salio todo bien y no fue al catch se confirma de que fue aceptada
+      let ret = {
+        codigo: 200,
+        mensaje: "La agenda fue aceptada",
+      };
+      return ret;
+    }
+  } catch (error) {
+    //Mensaje de error en caso de que haya pasado algo
+    let ret = {
+      codigo: 400,
+      mensaje: "Error al aceptarla",
+    };
+    console.log(error);
+    return ret;
+  }
+};
+
+//REVISAR ESTO URGENTE
 //Conseguir datos para formularios
 const getDatosFormulario = async () => {
+  //EN ESTO HAY QUE MANADR ANTES DE LOS EMPLEADOS, TODOS LOS SERVICIOS CON LOS ID
+  //ADEMAS HAY QUE MANDAR PARA CADA EMPLEADO CUANTO DEMORA EN CADA SERVICIO
   try {
     //variable que tiene la conexion
     let pool = await sql.connect(conexion);
@@ -20,7 +63,7 @@ const getDatosFormulario = async () => {
     let agendas = await pool
       .request()
       .query(
-        "select E.Cedula, A.IdAgenda,  A.Fecha,  AH.IdHorario from Empleado E left join Agenda_Horario AH on E.Cedula = AH.Cedula left join Agenda A on A.IdAgenda = AH.IdAgenda"
+        "select E.Cedula, A.IdAgenda, H.Fecha, H.IdHorario from Empleado E, Agenda A, Horario H where E.Cedula = H.Cedula and A.IdHorario = H.IdHorario and A.Aceptada = 1"
       );
     //Creo el objeto que voy a devolver
     let ret = {
@@ -75,45 +118,7 @@ const getDatosFormulario = async () => {
   }
 };
 
-const aceptarAgenda = async (id, aceptada) => {
-  try {
-    //Creo la conexion
-    let pool = await sql.connect(conexion);
-    //Hago la query para conseguir la agenda
-    let queryAgenda = "Select Aceptada from Agenda where IdAgenda = " + id;
-    //Voy a buscar si esta aceptada la agenda
-    let agenda = await pool.request().query(queryAgenda);
-    //Si la agenda esta aceptada devuelvo eso
-    console.log(agenda);
-    if (agenda.recordset[0].Aceptada) {
-      let ret = {
-        codigo: 400,
-        mensaje: "La agenda ya fue aceptada previamente",
-      };
-      return ret;
-    } else {
-      //Hago la query del update
-      let queryUpdate = "update Agenda set Aceptada = 1 where IdAgenda = " + id;
-      //Hago update de la agenda
-      let empleados = await pool.request().query(queryUpdate);
-      //Si salio todo bien y no fue al catch se confirma de que fue aceptada
-      let ret = {
-        codigo: 200,
-        mensaje: "La agenda fue aceptada",
-      };
-      return ret;
-    }
-  } catch (error) {
-    //Mensaje de error en caso de que haya pasado algo
-    let ret = {
-      codigo: 400,
-      mensaje: "Error al aceptarla",
-    };
-    console.log(error);
-    return ret;
-  }
-};
-
+//HAY QUE TERMINAR ESTO 
 //Metodo para agregar la agenda a la base, voy a recibir los datos todos dentro del objeto agenda
 const crearSolicitudAgenda = async (agenda) => {
   //Separo los datos para poder agregarlos en las querys correspondientes
@@ -132,7 +137,7 @@ const crearSolicitudAgenda = async (agenda) => {
 
   let queryHorario =
     "insert into Horario value (" +
-    agenda.ciPeluqueroRealizaServicio +
+    agenda.cedulaPeluquero +
     ", " +
     agenda.horario.horaInicio +
     ", " +
@@ -141,6 +146,9 @@ const crearSolicitudAgenda = async (agenda) => {
   //ACA TENGO QUE VER COMO CARAJOS RELACIONAR LA AGENDA CON LOS SERVICIOS, SEGURAMENTE TENGA QUE INSERTAR LO ANTERIOR
   //Y DESPUES INSERTAR ESTO PERO ANTES HACIENDO UN SELECT PARA SABER CUAL ES EL ID DE AGENDA
 };
+
+
+
 
 //Creo un objeto que voy a exportar para usarlo desde el index.js
 //Adentro voy a tener todos los metodos de llamar a la base
