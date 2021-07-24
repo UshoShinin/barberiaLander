@@ -15,6 +15,17 @@ app.use('/prueba', (req, res) => {
   });  
 });
 
+app.use('/aceptarAgenda', (req, res) => {
+  let id = req.query.id;
+  let aceptada = req.query.aceptada;
+  let ret = interfaz.aceptarAgenda(id, aceptada);
+  ret.then((resultado) => {
+    res.json({
+      mensaje: resultado
+    });
+  });  
+});
+
 
 
 
