@@ -6,7 +6,7 @@ const app = express();
 const interfaz = require("./interfaz");
 
 //ESTO ES PARA PROBAR LA FUNCIONALIDAD ACTUAL HAY QUE BORRARLO A LA MIERDA DESPUES
-app.use('/prueba', (req, res) => {
+app.use('/datosFormularioAgenda', (req, res) => {
   let ret = interfaz.getDatosFormulario();
   ret.then((resultado) => {
     res.json({
