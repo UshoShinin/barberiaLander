@@ -1,5 +1,6 @@
 import classes from "./Dias.module.css";
 import { getMonthChart, getDayIndex } from "./FunctionsDias";
+import { getDayOfDate } from "../FuncionesAuxiliares";
 
 const Dias = (props) => {
   let classFirstDay;
@@ -42,9 +43,9 @@ const Dias = (props) => {
     let par;
     if(dia.disponibilidad.valido){
       par= <p onClick={()=>{
-        props.obtenerHorarios({value:dia.disponibilidad.horariosDisponibles,dia:{d:dia.num,m:dia.m}});
+        props.obtenerHorarios({value:dia.disponibilidad.horariosDisponibles,dia:{d:dia.num,m:dia.mes}});
         console.log(dia);
-      }} className={classes.dia}>{dia.num}</p>;
+      }} className={`${classes.dia} ${dia.activo?classes.activo:''}`}>{dia.num}</p>;
     }else{
       par= <p className={classes.invalid}>{dia.num}</p>;
     }
@@ -56,7 +57,7 @@ const Dias = (props) => {
   });
   return (
     <>
-      <li className={`${classFirstDay} ${classes.lis}`}><p className={primerDia.disponibilidad.valido?classes.dia:classes.invalid}>{primerDia.num}</p></li>
+      <li className={`${classFirstDay} ${classes.lis}`}><p className={`${primerDia.disponibilidad.valido?classes.dia:classes.invalid} ${primerDia.activo?classes.activo:''}`}>{primerDia.num}</p></li>
       {contenido}
     </>
   );
