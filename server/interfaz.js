@@ -3,7 +3,7 @@ const conexion = require("./conexion");
 //Importo el paquete que vamos a usar
 const sql = require("mssql");
 
-
+//Aceptar una agenda
 const aceptarAgenda = async (id, aceptada) => {
   try {
     //Creo la conexion
@@ -42,41 +42,47 @@ const aceptarAgenda = async (id, aceptada) => {
     return ret;
   }
 };
-
+//Conseguir datos para el listado de agendas
 const getDatosListadoAgendas = async () => {
   //variable que tiene la conexion
   let pool = await sql.connect(conexion);
   //Voy a buscar los nombres de los empleados
-  let consultaNombreEmpleados = await pool.request().query('select Cedula, Nombre from Empleado');
+  let consultaNombreEmpleados = await pool
+    .request()
+    .query("select Cedula, Nombre from Empleado");
   //Voy a buscar los datos que me interesan de las agendas
-  let consultaAgendas = await pool.request().query('select A.IdAgenda, H.Cedula, H.HoraInicio, H.HoraFin from Agenda A, Horario H where A.IdHorario = H.IdHorario order by H.Cedula, H.HoraInicio');
+  let consultaAgendas = await pool
+    .request()
+    .query(
+      "select A.IdAgenda, H.Cedula, H.HoraInicio, H.HoraFin from Agenda A, Horario H where A.IdHorario = H.IdHorario order by H.Cedula, H.HoraInicio"
+    );
   //Dejo armado un array con los datos de las agendas
   let agendas = consultaAgendas.recordset;
   //Dejo armado un array con los empleados
   let nombreEmpleados = consultaNombreEmpleados.recordset;
-  
+
   //Armo el objeto que voy a devolver
   let ret = {
-    agendas: []
-  }
+    agendas: [],
+  };
 
   //Recorro los empleados para armar los objetos que necesito pushear al array que devuelvo
   for (let i = 0; i < nombreEmpleados.length; i++) {
     //Armo el objeto con los datos del empleado
     let empleadoAux = {
       nombreEmpleado: nombreEmpleados[i].Nombre,
-      agendas: []
-    }
+      agendas: [],
+    };
     //Recorro las agendas para agregarle los datos de ellas al objeto empleadoAux
     for (let j = 0; j < agendas.length; j++) {
       //Verifico de si la agenda corresponde al empleado en el cual estoy parado
-      if(agendas[j].Cedula == nombreEmpleados[i].Cedula){
+      if (agendas[j].Cedula == nombreEmpleados[i].Cedula) {
         //Creo un objeto agenda para pushear al listado de agendas del empleado
         let agendaAux = {
           idAgenda: agendas[j].IdAgenda,
           i: agendas[j].HoraInicio,
-          f:agendas[j].HoraFin
-        }
+          f: agendas[j].HoraFin,
+        };
         //Agrego la agenda al array de agendas del empleado seleccionado
         empleadoAux.agendas.push(agendaAux);
       }
@@ -86,35 +92,49 @@ const getDatosListadoAgendas = async () => {
   }
   //Devuelvo el objeto ret
   return ret;
-}
-
-//REVISAR ESTO URGENTE
+};
 //Conseguir datos para formularios
 const getDatosFormulario = async () => {
-  //EN ESTO HAY QUE MANADR ANTES DE LOS EMPLEADOS, TODOS LOS SERVICIOS CON LOS ID
-  //ADEMAS HAY QUE MANDAR PARA CADA EMPLEADO CUANTO DEMORA EN CADA SERVICIO
   try {
     //variable que tiene la conexion
-    let pool = await sql.connect(conexion);
+    const pool = await sql.connect(conexion);
+    //Consigo los servicios para devolverlos tambien
+    const listadoServicios = await pool.request().query("select * from Servicio");
+    //Consigo cuanto demora cada empleado por servicio
+    const duracionServiciosEmpleado = await pool
+      .request()
+      .query(
+        "select E.Cedula, SE.IdServicio, SE.Duracion from Empleado E, Servicio_Empleado SE where E.Cedula = SE.Cedula order by E.Cedula"
+      );
     //Consigo los datos de los empleados
-    let empleados = await pool
+    const empleados = await pool
       .request()
       .query("select Cedula, Nombre, Img from Empleado");
     //Consigo los datos de los horarios
-    let horarios = await pool
+    const horarios = await pool
       .request()
       .query("select * from Horario order by Cedula, HoraInicio");
     //Consigo los datos de las agendas
-    let agendas = await pool
+    const agendas = await pool
       .request()
       .query(
         "select E.Cedula, A.IdAgenda, H.Fecha, H.IdHorario from Empleado E, Agenda A, Horario H where E.Cedula = H.Cedula and A.IdHorario = H.IdHorario and A.Aceptada = 1"
       );
     //Creo el objeto que voy a devolver
     let ret = {
-      //A este array es al cual se le van a ir agregando los datos formateados
+      //Servicios con su id y nombre
+      servicios: [],
+      //Empleados con sus datos necesarios
       empleados: [],
     };
+    //Agrego los servicios al array de retorno
+    for (let u = 0; u < listadoServicios.recordset.length; u++) {
+      let servicioAux = {
+        idServicio: listadoServicios.recordset[u].IdServicio,
+        nombre: listadoServicios.recordset[u].Nombre
+      }
+      ret.servicios.push(servicioAux);
+    }
     //Agrego los empleados al array de retorno
     for (let i = 0; i < empleados.recordset.length; i++) {
       //Creo un empleado auxiliar para agregar al array de retorno
@@ -123,7 +143,19 @@ const getDatosFormulario = async () => {
         title: empleados.recordset[i].Nombre,
         foto: empleados.recordset[i].Img,
         fechas: [],
+        duracionServicio: []
       };
+      //Recorro las duraciones de servicios para ir agregandolo aca
+      for (let p = 0; p < duracionServiciosEmpleado.recordset.length; p++) {
+        if(duracionServiciosEmpleado.recordset[p].Cedula === empleados.recordset[i].Cedula){
+          //Creo un objeto auxiliar para agregar al empleadoAux
+          let duracionAux = {
+            idServicio: duracionServiciosEmpleado.recordset[p].IdServicio,
+            duracion: duracionServiciosEmpleado.recordset[p].Duracion
+          }
+          empleadoAux.duracionServicio.push(duracionAux);
+        }
+      }
       //Recorro las agendas para agregar las fechas
       for (let j = 0; j < agendas.recordset.length; j++) {
         //Si para la cedula del empleado en el que estoy hay una agenda, se agregan el dia y mes de cada agenda que tiene
@@ -163,7 +195,7 @@ const getDatosFormulario = async () => {
   }
 };
 
-//HAY QUE TERMINAR ESTO 
+//HAY QUE TERMINAR ESTO
 //Metodo para agregar la agenda a la base, voy a recibir los datos todos dentro del objeto agenda
 const crearSolicitudAgenda = async (agenda) => {
   //Separo los datos para poder agregarlos en las querys correspondientes
@@ -186,14 +218,11 @@ const crearSolicitudAgenda = async (agenda) => {
     ", " +
     agenda.horario.horaInicio +
     ", " +
-    agenda.horario.horaFin
-    ")";
+    agenda.horario.horaFin;
+  (")");
   //ACA TENGO QUE VER COMO CARAJOS RELACIONAR LA AGENDA CON LOS SERVICIOS, SEGURAMENTE TENGA QUE INSERTAR LO ANTERIOR
   //Y DESPUES INSERTAR ESTO PERO ANTES HACIENDO UN SELECT PARA SABER CUAL ES EL ID DE AGENDA
 };
-
-
-
 
 //Creo un objeto que voy a exportar para usarlo desde el index.js
 //Adentro voy a tener todos los metodos de llamar a la base
