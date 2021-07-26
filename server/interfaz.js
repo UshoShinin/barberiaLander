@@ -54,7 +54,7 @@ const getDatosListadoAgendas = async () => {
   let consultaAgendas = await pool
     .request()
     .query(
-      "select A.IdAgenda, H.Cedula, H.HoraInicio, H.HoraFin from Agenda A, Horario H where A.IdHorario = H.IdHorario order by H.Cedula, H.HoraInicio"
+      "select A.IdAgenda, A.Descripcion, H.Cedula, H.HoraInicio, H.HoraFin from Agenda A, Horario H where A.IdHorario = H.IdHorario order by H.Cedula, H.HoraInicio"
     );
   //Dejo armado un array con los datos de las agendas
   let agendas = consultaAgendas.recordset;
@@ -82,6 +82,7 @@ const getDatosListadoAgendas = async () => {
           idAgenda: agendas[j].IdAgenda,
           i: agendas[j].HoraInicio,
           f: agendas[j].HoraFin,
+          descripcion: agendas[j].Descripcion
         };
         //Agrego la agenda al array de agendas del empleado seleccionado
         empleadoAux.agendas.push(agendaAux);
