@@ -50,7 +50,6 @@ const Fotos = (props) => {
       <img className={`${classes.foto}`} src={mFoto.foto} />
     </CSSTransition>
   ));
-  console.log(props.fotos);
   const comboChangeHandler = (id) => {
     dispatch({ type: "change", payload: { id: index } });
     setIndex(id);

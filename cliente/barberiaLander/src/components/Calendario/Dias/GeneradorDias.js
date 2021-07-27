@@ -1,7 +1,16 @@
-import { counter } from "@fortawesome/fontawesome-svg-core";
-import { getMonthValue } from "./FunctionsDias";
+import { getMonthValue,getDayIndex,getMonthChart  } from "./FunctionsDias";
 import { horariosDisponibilidad } from './../FuncionesAuxiliares';
-export let DaysGenerator = (diaActual, month, year, dayIndex,fechas,timeNeed) => {
+export const getYearChart = () => {
+  return 6;
+}
+/* Esto genera los días del calendario cada uno con los horarios disponibles que tiene para los servicios seleccionados */
+export let DaysGenerator = (diaActual, month, year,fechas,timeNeed) => {
+  const dayIndex = getDayIndex(
+    1,
+    getMonthChart(month),
+    getYearChart(),
+    parseInt(year.toString().substr(-2), 10)
+  );
   let diasTotales = 30;
   let diasMostrar = [];
   let diasAuxiliares = [];
@@ -18,6 +27,7 @@ export let DaysGenerator = (diaActual, month, year, dayIndex,fechas,timeNeed) =>
       num: i,
       mes:null,
       disponibilidad:{valido:false,horarios:[]},
+      activo:null
     });
   }
 
@@ -32,6 +42,7 @@ export let DaysGenerator = (diaActual, month, year, dayIndex,fechas,timeNeed) =>
       num: diaAuxiliar,
       mes:month,
       disponibilidad: horariosDisponibilidad(diaSemana, diasTotales,i, myMonth+idMonth,fechas,timeNeed),
+      activo:diaSemana ===0 ? null:false,
     });
     diaAuxiliar++;
     diaSemana++;
@@ -53,6 +64,7 @@ export let DaysGenerator = (diaActual, month, year, dayIndex,fechas,timeNeed) =>
         num: i,
         mes:myMonth+idMonth,
         disponibilidad: horariosDisponibilidad(diaSemana, diasTotales,i, myMonth+idMonth,fechas,timeNeed),
+        activo:diaSemana ===0 ? null:false,
       });
       diaSemana++;
       diasTotales--;

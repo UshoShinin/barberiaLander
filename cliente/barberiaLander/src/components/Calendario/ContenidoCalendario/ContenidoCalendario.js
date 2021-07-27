@@ -1,8 +1,7 @@
 import Dias from "../Dias/Dias";
-import { DaysGenerator } from "../Dias/GeneradorDias";
-import { getMonthChart, getDayIndex } from "../Dias/FunctionsDias";
+import {getYearChart} from "../Dias/GeneradorDias";
 import classes from './ContenidoCalendario.module.css';
-export const days = (fechas,timeNeed,obtenerHorarios,lostFocus) => {
+export const days = (diasAMostrar,actividad,obtenerHorarios,lostFocus) => {
 
 const getHorarios = (horarios) => {
   /* console.log(horarios) */
@@ -20,21 +19,7 @@ const getHorarios = (horarios) => {
     const diaActual = Day.getDate();
     const month = Day.getMonth() + 1;
     const year = Day.getFullYear();
-    let yearChart = 6;
-    const dayIndex = getDayIndex(
-      1,
-      getMonthChart(month),
-      yearChart,
-      parseInt(year.toString().substr(-2), 10)
-    );
-    diasMostrar = DaysGenerator(
-      diaActual,
-      month,
-      Day.getFullYear(),
-      dayIndex,
-      fechas,
-      timeNeed
-    );
+    diasMostrar = diasAMostrar;
     cantidadMeses=diasMostrar.length;
     let keys = 1;
     let content = diasMostrar.map((meses) => {
@@ -45,7 +30,8 @@ const getHorarios = (horarios) => {
           diasMostrar={meses.dias}
           month={month+meses.id}
           year={year}
-          yearChart={yearChart}
+          actividad = {actividad}
+          yearChart={getYearChart()}
           obtenerHorarios = {getHorarios}
           lostFocus={lostFocus}
         />

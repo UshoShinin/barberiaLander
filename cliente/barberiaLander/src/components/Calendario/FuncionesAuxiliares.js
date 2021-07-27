@@ -1,3 +1,4 @@
+/* Extrae todas las fotos id y nombres de una lista de empleados */
 export const extraerFotos = (empleados) => {
   let resultado = [];
   empleados.forEach((empleado) => {
@@ -9,9 +10,10 @@ export const extraerFotos = (empleados) => {
   });
   return resultado;
 };
-
+/* Espera un día, un mes y una lista de fechas, en caso que no le llegen fechas no hace nada */
 export const obtenerHorariosDeDia = (dia, myMonth, fechas) => {
   if (fechas) {
+    /* Recorre las fechas y cuando encuentra la que tiene el día y mes mandados devuelve los horarios */
     for (let i = 0; i < fechas.length; i++) {
       if (fechas[i].dia == dia && fechas[i].mes == myMonth) {
         return fechas[i].horarios;
@@ -21,6 +23,8 @@ export const obtenerHorariosDeDia = (dia, myMonth, fechas) => {
   return null;
 };
 
+/* Esta funciona genera los días del calendario, si ese día no tiene horarios y no es domingo automaticamente está disponible
+en caso de que tenga horarios se evalúan si hay horarios disponibles y se devuelven */
 export const horariosDisponibilidad = (
   diaSemana,
   diasTotales,
@@ -60,7 +64,7 @@ export const horarioEnMinutos = (hora) => {
 export const minutosAHorarios = (minutos) => {
   return { h: (minutos - (minutos % 60)) / 60, m: minutos % 60 };
 };
-
+/* Carga todos los horarios disponibles dentro de una lista de gorarios y una cantidad de tiempo que es necesario ocupar */
 const horariosAgendarDisponibles = (horarios, timeNeed) => {
   let hora = "08:00";
   const horaCierre = "22:00";
@@ -102,12 +106,13 @@ const horariosAgendarDisponibles = (horarios, timeNeed) => {
   }
   return horariosDisponibles;
 };
+
 const diferenciaDeTiempo = (tiempoBase, siguienteHorario) => {
   const BH = transformStringNumber(tiempoBase);
   const SH = transformStringNumber(siguienteHorario);
   return horarioEnMinutos(SH) - horarioEnMinutos(BH);
 };
-
+/* Carga todas las horas entre un horario de inicio de fin */
 export const cargarHorarios = (inicio, fin) => {
   let lista = [];
   while (inicio <= fin) {
@@ -124,3 +129,10 @@ export const getEmpleadoById = (list,id) => {
     if (list[i].id === id) return list[i];
   }
 };
+
+/* Te da el día con su propiedad mostrar del array que gestiona la iluminación de los días */
+export const getDayOfDate = (dia,mes,dates) => {
+  for(let i = 0; i<dates.length;i++){
+    if(dates[i].dia === dia && dates[i].mes === mes) return dates[i];
+  }
+}
