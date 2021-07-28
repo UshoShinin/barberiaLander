@@ -1,4 +1,4 @@
-ul {
+.redes {
     list-style-type: none;
     display:flex;
     align-items: center;
@@ -6,7 +6,6 @@ ul {
     margin-top: 1rem;
   }
   .Elemento {
-    /* float: right; */
     margin-right: 1em;
     border: 0.2em solid var(--clr-inActive);
     border-radius: 30%;

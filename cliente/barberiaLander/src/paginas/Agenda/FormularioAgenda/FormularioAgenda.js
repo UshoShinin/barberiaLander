@@ -93,7 +93,7 @@ const FormularioAgenda = (props) => {
     isLoading,
     error,
     sendRequest: fetchHorarios /* Alias */,
-  } = useHttp({ url: "/prueba" }, obtenerHorarios);
+  } = useHttp({ url: "/datosFormularioAgenda" }, obtenerHorarios);
 
   /* Se ejecuta al inicio para que se cargen los datos */
   useEffect(() => {
@@ -246,18 +246,7 @@ const FormularioAgenda = (props) => {
               diasMostrar[i].dias[j].activo = true;
             }
           }
-          /* if (
-            myDia.activo &&
-            myDia.dia !== inputState.Calendario.dia.d &&
-            myDia.mes !== inputState.Calendario.dia.m
-          )
-            diasMostrar[i].dias[j].activo = false;
-          if (
-            myDia.dia === inputState.Calendario.dia.d &&
-            myDia.mes === inputState.Calendario.dia.m
-          ) {
-            diasMostrar[i].dias[j].activo = true;
-          } */
+
         }
       }
     } else {

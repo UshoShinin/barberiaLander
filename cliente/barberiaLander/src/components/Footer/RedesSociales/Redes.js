@@ -42,7 +42,7 @@ const Redes = () => {
     window.location.href = "https://api.whatsapp.com/send?phone=+59895533279";
   };
   return (
-    <ul>
+    <ul className={classes.redes}>
       <li
         className={`${classes.Elemento} ${
           faceActive ? classes.ElementoActiveFace : ""
