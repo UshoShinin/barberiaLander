@@ -16,7 +16,7 @@
   -webkit-appearance: none;
 }
 
-.input{
+.input {
   font-size: 1rem;
   text-align: center;
   background: transparent;
@@ -33,6 +33,7 @@
     width: 100%;
     padding:0.1em 0;
 }
+
 .input::placeholder {
   color: var(--clr-inActive);
   transition: color 250ms linear;

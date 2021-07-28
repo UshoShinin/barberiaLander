@@ -3,11 +3,13 @@ import CSSTransition from "react-transition-group/CSSTransition";
 import "./Modal.css";
 import classes from './ModalContent.module.css'
 import Button from '../Button/Button';
+/* Variable que define el tiempo de entrada y de salida */
 const animationTiming = {
   enter: 400,
   exit: 1000,
 };
-
+/* Todo el camponente tiene un CSSTransition  pero realmente las propiedades que usa solo son el show, 
+para saber si el div de modal debe estar entrando o nom este tambén cuenta ocn un botón el cual puede cerrar todo el modal*/
 const modal = (props) => {
   return (
     <CSSTransition

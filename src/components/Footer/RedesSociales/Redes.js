@@ -6,6 +6,8 @@ import classesWhat from "./Whatsapp.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
 const Redes = () => {
+  /* Este componente gestiona los estados de los iconoes de las redes sociales, como todos solo tienen un estado de
+  prendido o apagado me pareció apropiado manejalos con useState */
   const [faceActive, setFaceActive] = useState(false);
   const [instaActive, setInstaActive] = useState(false);
   const [whatActive, setWhatActive] = useState(false);
@@ -40,7 +42,7 @@ const Redes = () => {
     window.location.href = "https://api.whatsapp.com/send?phone=+59895533279";
   };
   return (
-    <ul>
+    <ul className={classes.redes}>
       <li
         className={`${classes.Elemento} ${
           faceActive ? classes.ElementoActiveFace : ""

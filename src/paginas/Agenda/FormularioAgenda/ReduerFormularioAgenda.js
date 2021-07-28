@@ -31,9 +31,9 @@ export const initialState = {
   Checkboxes: { value: null },
   Corte: { value: "" },
   Pelo: { value: "" },
-  Calendario: { value: null },
+  Calendario: { value: null,dia:null},
   ComboBox: { value: null, active: false },
-  Employee: { value: 0 },
+  Employee: { value: null },
   Time: { value: 0 },
 };
 
@@ -135,6 +135,7 @@ export const inputReducer = (state, action) => {
         },
         Calendario: {
           value: action.value,
+          dia:action.dia,
         },
       };
     case "HORARIOS_CLICK":

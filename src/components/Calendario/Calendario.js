@@ -8,17 +8,18 @@ import { days } from "./ContenidoCalendario/ContenidoCalendario";
 import {extraerFotos} from './FuncionesAuxiliares';
 const Calendario = (props) => {
   console.log("ReCarge");
-  const [currentCalendar, setCurrentCalendar] = useState(0);
-  const empleadosFotos = extraerFotos(props.empleados);
+  const [currentCalendar, setCurrentCalendar] = useState(0); //Se utiliza para gestionar el mes
+  const empleadosFotos = extraerFotos(props.empleados); /* De la lista de empleados se extraen solo las fotos para mandar
+  solo los nombres ci y fotos */
   // Como no tenemos todo pronto en la base de datos voya tener que armar unos tiempos y servicios y tiempos provicionales
-  const timeNeed = props.time;
   const obtenerHorarios = (horarios) =>{
     props.getHorarios(horarios);
   }
   const lostFocus =()=>{
     document.getElementById('Calendario').classList.remove('FormularioAgenda_invalidCal__1yd0j');
   }
-  const { cantidadMeses, content } = days(props.empleados[props.currentEmployee].fechas,timeNeed,obtenerHorarios,lostFocus);
+  /* Necesito comentar esta funcion */
+  const { cantidadMeses, content } = days(props.diasAMostrar,props.actividad,obtenerHorarios,lostFocus);
   const prevCalendar = () => {
     if (currentCalendar > 0) {
       setCurrentCalendar((state) => state - 1);

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-
 function CosasDisponibles() {
   const [cosas, setCosas] = useState([]);
     const [isLoading, setIsLoading] = useState(true);

@@ -1,6 +1,7 @@
 .lis{
     margin:0 auto;
 }
+
 .dia,.invalid{
     max-width: 1.25em;
     min-width: 1.25em;
@@ -42,4 +43,9 @@
 }
 .Dom{
     grid-column-start:7;
+}
+.activo,.activo:hover{
+    color:var(--clr-neon-blue);
+    border-radius: 6px;
+     text-shadow: 0 0 0.5em var(--clr-neon-blue);
 }

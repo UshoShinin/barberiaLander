@@ -3,12 +3,8 @@ import Card from "../../components/UI/Card/Card";
 
 const CrearAgenda = (props) => {
   const guardarDatosAgendaHandler = (enteredDatosAgenda) => {
-    const datosAgenda = {
-      ...enteredDatosAgenda,
-      id: Math.random().toString(),
-    };
-    //props.onAddAgenda(datosAgenda);
-    console.log(datosAgenda);
+
+    console.log(enteredDatosAgenda);
   };
 
   return (
