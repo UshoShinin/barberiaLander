@@ -54,7 +54,7 @@ const getDatosListadoAgendas = async () => {
   let consultaAgendas = await pool
     .request()
     .query(
-      "select A.IdAgenda, A.Descripcion, H.Cedula, H.HoraInicio, H.HoraFin from Agenda A, Horario H where A.IdHorario = H.IdHorario order by H.Cedula, H.HoraInicio"
+      "select A.IdAgenda, H.Cedula, H.HoraInicio, H.HoraFin from Agenda A, Horario H where A.IdHorario = H.IdHorario order by H.Cedula, H.HoraInicio"
     );
   //Dejo armado un array con los datos de las agendas
   let agendas = consultaAgendas.recordset;
@@ -82,7 +82,6 @@ const getDatosListadoAgendas = async () => {
           idAgenda: agendas[j].IdAgenda,
           i: agendas[j].HoraInicio,
           f: agendas[j].HoraFin,
-          descripcion: agendas[j].Descripcion
         };
         //Agrego la agenda al array de agendas del empleado seleccionado
         empleadoAux.agendas.push(agendaAux);
@@ -100,7 +99,9 @@ const getDatosFormulario = async () => {
     //variable que tiene la conexion
     const pool = await sql.connect(conexion);
     //Consigo los servicios para devolverlos tambien
-    const listadoServicios = await pool.request().query("select * from Servicio");
+    const listadoServicios = await pool
+      .request()
+      .query("select * from Servicio");
     //Consigo cuanto demora cada empleado por servicio
     const duracionServiciosEmpleado = await pool
       .request()
@@ -132,8 +133,8 @@ const getDatosFormulario = async () => {
     for (let u = 0; u < listadoServicios.recordset.length; u++) {
       let servicioAux = {
         idServicio: listadoServicios.recordset[u].IdServicio,
-        nombre: listadoServicios.recordset[u].Nombre
-      }
+        nombre: listadoServicios.recordset[u].Nombre,
+      };
       ret.servicios.push(servicioAux);
     }
     //Agrego los empleados al array de retorno
@@ -144,16 +145,19 @@ const getDatosFormulario = async () => {
         title: empleados.recordset[i].Nombre,
         foto: empleados.recordset[i].Img,
         fechas: [],
-        duracionServicio: []
+        duracionServicio: [],
       };
       //Recorro las duraciones de servicios para ir agregandolo aca
       for (let p = 0; p < duracionServiciosEmpleado.recordset.length; p++) {
-        if(duracionServiciosEmpleado.recordset[p].Cedula === empleados.recordset[i].Cedula){
+        if (
+          duracionServiciosEmpleado.recordset[p].Cedula ===
+          empleados.recordset[i].Cedula
+        ) {
           //Creo un objeto auxiliar para agregar al empleadoAux
           let duracionAux = {
             idServicio: duracionServiciosEmpleado.recordset[p].IdServicio,
-            duracion: duracionServiciosEmpleado.recordset[p].Duracion
-          }
+            duracion: duracionServiciosEmpleado.recordset[p].Duracion,
+          };
           empleadoAux.duracionServicio.push(duracionAux);
         }
       }
@@ -196,6 +200,37 @@ const getDatosFormulario = async () => {
   }
 };
 
+//Conseguir datos de todas las pre agendas
+const getPreAgendas = async () => {
+  //Variable donde esta la conexion con la bd
+  const pool = await sql.connect(conexion);
+  //Aca guardo el resultado de la consulta a la bd
+  const consultaPreAgendas = await pool.request().query(
+    "select A.IdAgenda, H.Fecha, A.NombreCliente, H.HoraInicio, H.HoraFin, A.Descripcion from Agenda A, Horario H where A.IdHorario = H.IdHorario and A.Aceptada = 0"
+  );
+  //Separo las preagendas de los resultados de la consulta
+  const preAgendas = consultaPreAgendas.recordset;
+  //Creo objeto de retorno
+  let ret = {
+    preAgendas: []
+  }
+  //Recorro las preagendas y las agrego al array de retorno
+  for (let i = 0; i < preAgendas.length; i++) {
+    //Creo la preagenda que agrego al array de retorno
+    let preAgendaAux = {
+      idAgenda: preAgendas[i].IdAgenda,
+      fecha: preAgendas[i].Fecha,
+      nombreCliente: preAgendas[i].nombreCliente,
+      horaInicio: preAgendas[i].HoraInicio,
+      horaFin: preAgendas[i].HoraFin,
+      descripcion: preAgendas[i].Descripcion
+    }
+    //Empujo la preagenda al array de retorno
+    ret.preAgendas.push(preAgendaAux);
+  }
+  return ret;
+};
+
 //HAY QUE TERMINAR ESTO
 //Metodo para agregar la agenda a la base, voy a recibir los datos todos dentro del objeto agenda
 const crearSolicitudAgenda = async (agenda) => {
@@ -231,6 +266,7 @@ const interfaz = {
   getDatosFormulario,
   aceptarAgenda,
   getDatosListadoAgendas,
+  getPreAgendas,
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar

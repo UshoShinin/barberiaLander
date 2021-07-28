@@ -36,6 +36,15 @@ app.use('/listadoAgendas', (req, res) => {
   });  
 });
 
+app.use('/listadoPreAgendas', (req, res) => {
+  let ret = interfaz.getPreAgendas();
+  ret.then((resultado) => {
+    res.json({
+      mensaje: resultado
+    });
+  });  
+});
+
 
 //No escribir nada por debajo de esto
 app.listen(PORT, () => {
