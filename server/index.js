@@ -26,7 +26,6 @@ app.use('/aceptarAgenda', (req, res) => {
   });  
 });
 
-
 app.use('/listadoAgendas', (req, res) => {
   let ret = interfaz.getDatosListadoAgendas();
   ret.then((resultado) => {
@@ -45,6 +44,15 @@ app.use('/listadoPreAgendas', (req, res) => {
   });  
 });
 
+app.use('/agendaPorId', (req, res) => {
+  let id = req.query.idAgenda;
+  let ret = interfaz.getAgendaPorId(id);
+  ret.then((resultado) => {
+    res.json({
+      mensaje: resultado
+    });
+  });  
+});
 
 //No escribir nada por debajo de esto
 app.listen(PORT, () => {

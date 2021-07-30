@@ -13,7 +13,6 @@ const aceptarAgenda = async (id, aceptada) => {
     //Voy a buscar si esta aceptada la agenda
     let agenda = await pool.request().query(queryAgenda);
     //Si la agenda esta aceptada devuelvo eso
-    console.log(agenda);
     if (agenda.recordset[0].Aceptada) {
       let ret = {
         codigo: 400,
@@ -205,15 +204,17 @@ const getPreAgendas = async () => {
   //Variable donde esta la conexion con la bd
   const pool = await sql.connect(conexion);
   //Aca guardo el resultado de la consulta a la bd
-  const consultaPreAgendas = await pool.request().query(
-    "select A.IdAgenda, H.Fecha, A.NombreCliente, H.HoraInicio, H.HoraFin, A.Descripcion from Agenda A, Horario H where A.IdHorario = H.IdHorario and A.Aceptada = 0"
-  );
+  const consultaPreAgendas = await pool
+    .request()
+    .query(
+      "select A.IdAgenda, H.Fecha, A.NombreCliente, H.HoraInicio, H.HoraFin, A.Descripcion from Agenda A, Horario H where A.IdHorario = H.IdHorario and A.Aceptada = 0"
+    );
   //Separo las preagendas de los resultados de la consulta
   const preAgendas = consultaPreAgendas.recordset;
   //Creo objeto de retorno
   let ret = {
-    preAgendas: []
-  }
+    preAgendas: [],
+  };
   //Recorro las preagendas y las agrego al array de retorno
   for (let i = 0; i < preAgendas.length; i++) {
     //Creo la preagenda que agrego al array de retorno
@@ -223,12 +224,37 @@ const getPreAgendas = async () => {
       nombreCliente: preAgendas[i].nombreCliente,
       horaInicio: preAgendas[i].HoraInicio,
       horaFin: preAgendas[i].HoraFin,
-      descripcion: preAgendas[i].Descripcion
-    }
+      descripcion: preAgendas[i].Descripcion,
+    };
     //Empujo la preagenda al array de retorno
     ret.preAgendas.push(preAgendaAux);
   }
   return ret;
+};
+
+//Conseguir los datos de una agenda por su id
+const getAgendaPorId = async (idAgenda) => {
+  try {
+    //Variable donde esta la conexion con la bd
+    const pool = await sql.connect(conexion);
+    //Armo la query
+    let query =
+      "select A.IdAgenda, A.NombreCliente, Ser.Nombre as NombreServicio, A.Descripcion, A.Img, A.Tel, H.Cedula, H.HoraInicio, H.HoraFin, H.Fecha, H.IdHorario from Agenda A, Horario H, Agenda_Servicio S, Servicio Ser where A.IdHorario = H.IdHorario and S.IdServicio = Ser.IdServicio and S.IdAgenda = A.IdAgenda and A.IdAgenda =" +
+      idAgenda;
+    //Aca guardo el resultado de la consulta a la bd
+    const consultaAgendaPorId = await pool.request().query(query);
+    //Verifico que haya una agenda
+    if (consultaAgendaPorId.rowsAffected[0] === 1) {
+      //Separo el resultado
+      let agenda = consultaAgendaPorId.recordset;
+      return agenda;
+    }else{
+      return 'No existe una agenda con ese id';
+    }
+  } catch (error) {
+    console.log(error);
+    return "Error al buscar agenda";
+  }
 };
 
 //HAY QUE TERMINAR ESTO
@@ -267,6 +293,7 @@ const interfaz = {
   aceptarAgenda,
   getDatosListadoAgendas,
   getPreAgendas,
+  getAgendaPorId,
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar
