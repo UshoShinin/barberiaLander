@@ -55,6 +55,7 @@ app.use('/agendaPorId', (req, res) => {
 });
 
 app.use('/crearAgenda', (req, res) => {
+  console.log(req, res);
   res.json({
     mensaje: req.query
   });

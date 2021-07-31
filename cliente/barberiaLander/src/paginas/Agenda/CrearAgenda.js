@@ -6,7 +6,7 @@ const getRespuesta = (res) => {
   console.log(res);
 };
 const CrearAgenda = (props) => {
-  const { isLoading, error, sendRequest: mandarAgenda } = useHttp(getRespuesta);
+  const { isLoading, error, sendRequest: mandarAgenda } = useHttp();
   const guardarDatosAgendaHandler = (enteredDatosAgenda) => {
     mandarAgenda({ url: "/crearAgenda",method:'POST',headers:{'Content-Type':'application/json'},body:enteredDatosAgenda},getRespuesta);
   };
