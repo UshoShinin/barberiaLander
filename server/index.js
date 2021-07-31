@@ -54,6 +54,22 @@ app.use('/agendaPorId', (req, res) => {
   });  
 });
 
+app.use('/crearAgenda', (req, res) => {
+  res.json({
+    mensaje: req
+  });
+  /*
+  let id = req.query.idAgenda;
+  let ret = interfaz.getAgendaPorId(id);
+  ret.then((resultado) => {
+    res.json({
+      mensaje: resultado
+    });
+  });  
+  */
+});
+
+
 //No escribir nada por debajo de esto
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);

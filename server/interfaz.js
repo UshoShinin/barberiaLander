@@ -248,8 +248,8 @@ const getAgendaPorId = async (idAgenda) => {
       //Separo el resultado
       let agenda = consultaAgendaPorId.recordset;
       return agenda;
-    }else{
-      return 'No existe una agenda con ese id';
+    } else {
+      return "No existe una agenda con ese id";
     }
   } catch (error) {
     console.log(error);
@@ -257,33 +257,76 @@ const getAgendaPorId = async (idAgenda) => {
   }
 };
 
-//HAY QUE TERMINAR ESTO
 //Metodo para agregar la agenda a la base, voy a recibir los datos todos dentro del objeto agenda
 const crearSolicitudAgenda = async (agenda) => {
-  //Separo los datos para poder agregarlos en las querys correspondientes
-  let queryAgenda =
-    "insert into Agenda value (" +
-    agenda.nombreCliente +
-    ", " +
-    agenda.fecha +
-    ", " +
-    agenda.descripcion +
-    ", " +
-    agenda.imagenEjemplo +
-    ", " +
-    agenda.telefono +
-    ", 0)"; //Esto ultimo es el campo Aceptado
-
-  let queryHorario =
-    "insert into Horario value (" +
-    agenda.cedulaPeluquero +
-    ", " +
-    agenda.horario.horaInicio +
-    ", " +
-    agenda.horario.horaFin;
-  (")");
-  //ACA TENGO QUE VER COMO CARAJOS RELACIONAR LA AGENDA CON LOS SERVICIOS, SEGURAMENTE TENGA QUE INSERTAR LO ANTERIOR
-  //Y DESPUES INSERTAR ESTO PERO ANTES HACIENDO UN SELECT PARA SABER CUAL ES EL ID DE AGENDA
+  try {
+    //Variable donde esta la conexion con la bd
+    const pool = await sql.connect(conexion);
+    //Armo la query de Horario
+    let queryHorario =
+      "Insert into Horario value (" +
+      agenda.cedulaPeluquero +
+      "," +
+      agenda.horario.i +
+      "," +
+      agenda.horario.f +
+      "," +
+      agenda.fecha +
+      ")";
+    //Inserto en la tabla Horario los datos de de la agenda
+    const insertHorario = await pool.request().query(queryHorario);
+    //Verifico que haya insertado algo
+    if (insertHorario.rowsAffected[0] === 1) {
+      //Armo la query para el select de abajo
+      let queryConsultaHorario =
+        "select IdHorario from Horario where Cedula = " +
+        agenda.cedulaPeluquero +
+        " and HoraInicio = " +
+        agenda.horario.i +
+        " and HoraFin = " +
+        agenda.horario.f;
+      //Hago un select para poder saber cual es el id del horario que acabo de insertar
+      const consultaHorarioAux = await pool.request().query(queryConsultaHorario);
+      //Separo el id del resultado de la query
+      const idHorario = consultaHorarioAux.recordset.IdHorario;
+      //Ahora que tengo el id del horario armo la query para agregar la agenda
+      let queryAgenda = 'Insert into Agenda value (' + agenda.nombreCliente + ', ' + agenda.descripcion + ', ' + agenda.imagenEjemplo + ', ' + agenda.telefono + ', 0, ' +  idHorario + ')';
+      //Hago el select para poder saber cual es el id de la agenda
+      const insertAgenda = await pool.request().query(queryAgenda);
+      if(insertAgenda.recordset.rowsAffected === 1){
+        //Armo la query para saber cual es el id de agenda
+        let queryConsultaAgenda = 'select IdAgenda from Agenda where IdHorario = ' + idHorario;
+        //Hago el select para saber el id de la agenda
+        const consultaAgendaAux = await pool.request().query(queryConsultaAgenda);
+        //Separo el valor del id de la agenda
+        const idAgenda = consultaAgendaAux.recordset.IdAgenda;
+        let queryServicioAgenda = 'Insert into Agenda_Servicio values ';
+        //Recorro todos los servicios que van para la agenda y armo la query
+        for (let i = 0; i < agenda.servicios.length; i++) {
+          //Verifico si en el servicio que estoy parado es el ultimo de la lista. Esto lo hago para armar la query con o si coma al final
+          if(i + 1 === agenda.servicios.length){
+            let queryAux = '(' + idAgenda + ', ' + idHorario + ', ' + agenda.servicios[i] + ')';
+          }else {
+            let queryAux = '(' + idAgenda + ', ' + idHorario + ', ' + agenda.servicios[i] + '), ';
+          }
+          queryServicioAgenda += queryAux;
+        }
+        const insertServicioAgenda = await pool.request().query(queryServicioAgenda);
+        if(insertServicioAgenda.recordset.rowsAffected > 0){
+          return 'La agenda fue agregada correctamente';
+        }else{
+          throw
+        }
+      }else{
+        throw
+      }
+    } else {
+      throw
+    }
+  } catch (error) {
+    //En caso de que por alguna razon explote esto devuelve el error al metodo que lo llamo y ese lo devuelve por json
+    return error;
+  }
 };
 
 //Creo un objeto que voy a exportar para usarlo desde el index.js
@@ -294,6 +337,7 @@ const interfaz = {
   getDatosListadoAgendas,
   getPreAgendas,
   getAgendaPorId,
+  crearSolicitudAgenda,
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar
