@@ -6,11 +6,17 @@ const Dias = (props) => {
   let classFirstDay;
   let primerDia;
   let diasAuxiliares = [];
+  let mes = props.month;
+  let year = props.year
+  if(props.month>12){
+    mes = mes - 12;
+    year = year+1;
+  }
   const dayIndex = getDayIndex(
     1,
-    getMonthChart(props.month),
+    getMonthChart(mes),
     props.yearChart,
-    parseInt(props.year.toString().substr(-2), 10)
+    parseInt(year.toString().substr(-2), 10)
   );
   let contenido;
   //Asigna una clase para marcar que el día de inicio empieze en su lugar correspondiente del calendario

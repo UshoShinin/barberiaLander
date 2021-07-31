@@ -57,6 +57,10 @@ export const transformStringNumber = (horario) => {
   return { h: hor, m: min };
 };
 
+export const transformNumberString = (hor) => {
+  return `${hor.h>9?hor.h:'0'+hor.h}:${hor.m>9?hor.m:'0'+hor.m}`;
+};
+
 export const horarioEnMinutos = (hora) => {
   return hora.h * 60 + hora.m;
 };

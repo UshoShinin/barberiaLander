@@ -10,7 +10,13 @@ import CheckBoxAgenda from "./CheckBoxAgenda";
 import useHttp from "./../../../hooks/useHttp";
 import { DaysGenerator } from "../../../components/Calendario/Dias/GeneradorDias";
 import LoaddingSpinner from "../../../components/LoaddingSpinner/LoaddingSpinner";
-import { getEmpleadoById } from "../../../components/Calendario/FuncionesAuxiliares";
+import {
+  getEmpleadoById,
+  transformStringNumber,
+  horarioEnMinutos,
+  minutosAHorarios,
+  transformNumberString,
+} from "../../../components/Calendario/FuncionesAuxiliares";
 
 import {
   inputReducer,
@@ -78,15 +84,14 @@ import ComboBox from "../../../components/ComboBox/ComboBox";
   { id: 3, title: "Two", foto: two, fechas: [] },
   { id: 4, title: "Three", foto: three, fechas: [] },
 ]; */
+
+
 const FormularioAgenda = (props) => {
-  const [horariosState, setHorariosState] = useState(null);
   /* Carga inicial de datos */
   const obtenerHorarios = (horarios) => {
-    /* console.log(horarios.mensaje.empleados); */
-    setHorariosState(horarios.mensaje.empleados);
     dispatchInput({
-      type: "CHANGE_EMPLOYEE",
-      value: horarios.mensaje.empleados[0].id,
+      type: "HORARIOS_CARGADOS",
+      value: horarios.mensaje.empleados,
     });
   };
   const {
@@ -101,10 +106,6 @@ const FormularioAgenda = (props) => {
   }, []);
 
   const [inputState, dispatchInput] = useReducer(inputReducer, initialState);
-  const [inputCheckState, dispatchCheck] = useReducer(
-    checkReducer,
-    initialStateCheck
-  );
   const nombreRef = useRef();
   const telefonoRef = useRef();
   const descripcionRef = useRef();
@@ -191,13 +192,13 @@ const FormularioAgenda = (props) => {
 
   const submitHandler = (event) => {
     event.preventDefault();
-    let count = 0;
-    Object.values(inputCheckState).forEach((serv) => {
-      if (serv) {
-        count++;
+    let services = [];
+    Object.values(inputState).forEach((serv) => {
+      if (serv.active) {
+        services.push(serv.id);
       }
     });
-    if (count === 0) {
+    if (services.length === 0) {
       const combo = document.getElementById("timeLeft");
       combo.className = `${combo.className} ${classes.invalidCombo}`;
       combo.focus();
@@ -209,44 +210,72 @@ const FormularioAgenda = (props) => {
       const cal = document.getElementById("Calendario");
       cal.className = `${cal.className} ${classes.invalidCal}`;
       cal.focus();
+    } else {
+      console.log(inputState);
+      const inicio =
+        "0" + inputState.Calendario.value[inputState.ComboBox.value - 1].title;
+      const fin = transformNumberString(
+        minutosAHorarios(
+          horarioEnMinutos(transformStringNumber(inicio)) + tiempoNecesario
+        )
+      );
+      const year =
+        inputState.Calendario.dia.m < date.getMonth() + 1
+          ? new Date().getFullYear() + 1
+          : new Date().getFullYear();
+      const datosAgenda = {
+        nombreCliente: inputState.Nombre.value,
+        telefono: inputState.Telefono.value,
+        descripcion: inputState.Descripcion.value,
+        imagenEjemplo: inputState.Referencia.value,
+        servicios: services,
+        fecha: `${year}-${inputState.Calendario.dia.m}-${inputState.Calendario.dia.d}`,
+        horario: { i: inicio, f: fin },
+      };
+      props.onSaveDatosAgenda(datosAgenda);
     }
-    const datosAgenda = {
-      nombre: inputState.Nombre.value,
-      telefono: inputState.Telefono.value,
-      descripcion: inputState.Descripcion.value,
-      corteARealizar: inputState.Corte.value,
-      referenciaActual: inputState.Pelo.value,
-    };
-    props.onSaveDatosAgenda(datosAgenda);
+    /* nombreCliente: "text",
+    telefono: "text",
+    descripcion: "text", 
+    imagenEjemplo: "url",
+    servicios:[1,4,6], Array de id's de servicios
+    fecha:` yyyy-mm-dd` ,
+    cedulaPeluquero:"text",
+    horario:{i:'08:00',f:10:00} */
   };
   let diasMostrar;
   let diasSeleccionables = [];
-  if (horariosState !== null && inputState.Employee.value !== null) {
-    const date = new Date();
+  let tiempoNecesario;
+  const realDate = new Date();
+  const date = new Date(
+    realDate.getFullYear(),
+    realDate.getMonth() + 5,
+    realDate.getDate()
+  );
+  if (inputState.Horarios !== null && inputState.Employee.value !== null) {
+    tiempoNecesario = calcularTiempo(
+      inputState.Employee.value,
+      inputState,
+      inputState.Horarios
+    );
     diasMostrar = DaysGenerator(
       date.getDate(),
       date.getMonth() + 1,
       date.getFullYear(),
-      getEmpleadoById(horariosState, inputState.Employee.value).fechas,
-      calcularTiempo(inputState.Employee.value, inputCheckState, horariosState)
+      getEmpleadoById(inputState.Horarios, inputState.Employee.value).fechas,
+      tiempoNecesario
     );
-    /* console.log(diasMostrar); */
-
     if (inputState.Calendario.value !== null) {
       const diaSelect = inputState.Calendario.dia.d;
       const mesSelect = inputState.Calendario.dia.m;
-      console.log(diaSelect);
-      console.log(mesSelect);
       for (let i = 0; i < diasMostrar.length; i++) {
         for (let j = 0; j < diasMostrar[i].dias.length; j++) {
           const myDia = diasMostrar[i].dias[j];
           if (myDia.activo !== null) {
-            console.log(myDia);
             if (myDia.num === diaSelect && myDia.mes === mesSelect) {
               diasMostrar[i].dias[j].activo = true;
             }
           }
-
         }
       }
     } else {
@@ -256,17 +285,12 @@ const FormularioAgenda = (props) => {
         }
       }
     }
-
-    /* diasMostrar[0].dias[26].activo = true;
-    diasMostrar[0].dias[27].activo = true;
-    diasMostrar[0].dias[28].activo = true;
-    diasMostrar[0].dias[29].activo = true; */
   }
 
   /* Este es el combo que aparece cuando se selecciona un día del calendario */
   /* En caso que no se haya hecho la precara de datos el combo es null */
   const combo =
-    horariosState === null ? null : (
+    inputState.Horarios === null ? null : (
       <div className={classes.ComboBox}>
         <ComboBox
           height={4.8}
@@ -278,14 +302,17 @@ const FormularioAgenda = (props) => {
         />
       </div>
     );
-  /* Calendario con todas sus empleados y horarios */
+
+    /* Calendario con todas sus empleados y horarios */
   /* Si no se hizo la precarga de datos se carga null */
-  const calendarioContent =
-    horariosState === null ? null : (
+  let calendarioContent = null;
+  if (inputState.Horarios !== null) {
+    calendarioContent = (
       <Calendario
+        date={date}
         actividad={diasSeleccionables}
         getHorarios={calendarioHandler}
-        empleados={horariosState}
+        empleados={inputState.Horarios}
         diasAMostrar={diasMostrar}
         currentEmployee={inputState.Employee.value}
         changeEmployee={(id) => {
@@ -293,8 +320,9 @@ const FormularioAgenda = (props) => {
         }}
       />
     );
+  }
 
-  console.log(inputState);
+  console.log(inputState.Horarios);
   return (
     <>
       {isLoading && <LoaddingSpinner />}
@@ -303,18 +331,17 @@ const FormularioAgenda = (props) => {
           <div className={classes.nuevaAgenda}>
             <div className={classes.Inputs}>
               <CheckBoxAgenda
-                state={inputCheckState}
+                state={inputState}
                 time={calcularTiempo(
                   inputState.Employee.value,
-                  inputCheckState,
-                  horariosState
+                  inputState,
+                  inputState.Horarios
                 )}
                 myAction={(action) => {
-                  console.log(document.getElementById("timeLeft").className);
                   document
                     .getElementById("timeLeft")
                     .classList.remove("FormularioAgenda_invalidCombo__1XMtB");
-                  dispatchCheck(action);
+                  dispatchInput(action);
                 }}
               />
 
@@ -422,19 +449,19 @@ const calcularTiempo = (id, serv, horariosState) => {
   let total = 0;
   if (horariosState !== null) {
     if (id === horariosState[0].id) {
-      if (serv.corte) total += 30;
-      if (serv.maquina) total += 20;
-      if (serv.barba) total += 15;
-      if (serv.laciado) total += 30;
-      if (serv.decoloracion) total += 15;
-      if (serv.tinta) total += 15;
+      if (serv.corte.active) total += 30;
+      if (serv.maquina.active) total += 20;
+      if (serv.barba.active) total += 15;
+      if (serv.brushing.active) total += 30;
+      if (serv.decoloracion.active) total += 15;
+      if (serv.claritos.active) total += 15;
     } else {
-      if (serv.corte) total += 60;
-      if (serv.maquina) total += 40;
-      if (serv.barba) total += 30;
-      if (serv.laciado) total += 60;
-      if (serv.decoloracion) total += 30;
-      if (serv.tinta) total += 30;
+      if (serv.corte.active) total += 60;
+      if (serv.maquina.active) total += 40;
+      if (serv.barba.active) total += 30;
+      if (serv.brushing.active) total += 60;
+      if (serv.decoloracion.active) total += 30;
+      if (serv.claritos.active) total += 30;
     }
   }
 

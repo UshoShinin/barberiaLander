@@ -51,19 +51,20 @@ export let DaysGenerator = (diaActual, month, year,fechas,timeNeed) => {
   diasMostrar.push({id:idMonth,dias:[...diasAuxiliares]});
   while (diasTotales > 0) {
     idMonth++;
+    myMonth++;
     diasAuxiliares = [];
-    if((myMonth+monthCounter)>12){
+    if((myMonth)>12){
         myMonth = 1;
         monthCounter=0;
         myYear++;
     }
-    let maxDays = getMonthValue(myMonth+monthCounter,myYear);
+    let maxDays = getMonthValue(myMonth,myYear);
     for (let i = 1; i <= maxDays; i++) {
       diaSemana = diaSemana > 7 ? 1 : diaSemana;
       diasAuxiliares.push({
         num: i,
-        mes:myMonth+idMonth,
-        disponibilidad: horariosDisponibilidad(diaSemana, diasTotales,i, myMonth+idMonth,fechas,timeNeed),
+        mes:myMonth,
+        disponibilidad: horariosDisponibilidad(diaSemana, diasTotales,i, myMonth,fechas,timeNeed),
         activo:diaSemana ===0 ? null:false,
       });
       diaSemana++;

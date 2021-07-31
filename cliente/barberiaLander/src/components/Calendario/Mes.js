@@ -12,7 +12,7 @@ const Mes = (props) => {
   const min = props.month + 1;
   const max = props.month + props.max;
   const canMoveLeft = myMonth > min;
-  const canMoveRight = myMonth < max
+  const canMoveRight = myMonth < max;
   const [move, setMove] = useState(0);
   const moveLeft = () => {
     if (canMoveLeft) {
@@ -33,24 +33,24 @@ const Mes = (props) => {
   const changeTitle = () => {
     switch (move) {
       case 1:
-        if (myMonth === 12) {
+        /* if (myMonth === 12) {
           setMyMonth(1);
-        } else {
+        } else { */
           setMyMonth((prev) => prev + 1);
-        }
+        /* } */
         break;
       case -1:
-        if (myMonth === 1) {
+        /* if (myMonth === 1) {
           setMyMonth(12);
-        } else {
+        } else { */
           setMyMonth((prev) => prev - 1);
-        }
+        /* } */
         break;
       default:
         break;
     }
   };
-  switch (myMonth) {
+  switch (myMonth%12) {
     case 1:
       monthName = "Enero";
       classMonth = classes.Enero;
@@ -95,7 +95,7 @@ const Mes = (props) => {
       monthName = "Noviembre";
       classMonth = classes.Noviembre;
       break;
-    case 12:
+    case 0:
       monthName = "Diciembre";
       classMonth = classes.Diciembre;
       break;

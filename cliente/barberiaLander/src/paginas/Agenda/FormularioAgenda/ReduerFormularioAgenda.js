@@ -1,44 +1,43 @@
-export const initialStateCheck = {
-  corte: false,
-  maquina: false,
-  barba: false,
-  laciado: false,
-  decoloracion: false,
-  tinta: false,
-};
+const noManeja = [
+  { id: 6, idEmpleados: [{ id: 50098037 }, { id: 48279578 }] },
+  { id: 7, idEmpleados: [{ id: 50098037 }, { id: 48279578 }] },
+  { id: 8, idEmpleados: [{ id: 50098037 }] },
+]; //Este los servicios que hacen que empleados salgan de la lista.
 
-export const checkReducer = (state, action) => {
-  switch (action.type) {
-    case "CORTE":
-      return { ...state, corte: !state.corte };
-    case "MAQUINA":
-      return { ...state, maquina: !state.maquina };
-    case "BARBA":
-      return { ...state, barba: !state.barba };
-    case "LACIADO":
-      return { ...state, laciado: !state.laciado };
-    case "DECOLORACION":
-      return { ...state, decoloracion: !state.decoloracion };
-    case "TINTA":
-      return { ...state, tinta: !state.tinta };
+const buscar = (id, lista) => {
+  for (let i = 0; i < lista.length; i++) {
+    if (lista[i].id === id) return lista[i];
   }
+  return null;
 };
 
 export const initialState = {
   Nombre: { value: "", isValid: null },
+  Horarios: null,
   Telefono: { value: "", isValid: null },
   Descripcion: { value: "", isValid: null },
   Checkboxes: { value: null },
-  Corte: { value: "" },
-  Pelo: { value: "" },
-  Calendario: { value: null,dia:null},
+  Referencia: { value: "" },
+  Calendario: { value: null, dia: null },
   ComboBox: { value: null, active: false },
   Employee: { value: null },
-  Time: { value: 0 },
+  corte: { active: false, id: 1 },
+  barba: { active: false, id: 4 },
+  maquina: { active: false, id: 5 },
+  claritos: { active: false, id: 6 },
+  decoloracion: { active: false, id: 7 },
+  brushing: { active: false, id: 8 },
 };
 
 export const inputReducer = (state, action) => {
+  let myState; //Esta variable se usa para los servicios
   switch (action.type) {
+    case "HORARIOS_CARGADOS":
+      return {
+        ...state,
+        Horarios: action.value,
+        Employee: { value: action.value[0].id },
+      };
     case "USER_INPUT_NAME":
       return {
         ...state,
@@ -112,17 +111,10 @@ export const inputReducer = (state, action) => {
           value: { ...action.value },
         },
       };
-    case "USER_INPUT_CORTE":
+    case "USER_INPUT_REFERENCIA":
       return {
         ...state,
-        Corte: {
-          value: action.value,
-        },
-      };
-    case "USER_INPUT_PELO":
-      return {
-        ...state,
-        Pelo: {
+        Referencia: {
           value: action.value,
         },
       };
@@ -135,7 +127,7 @@ export const inputReducer = (state, action) => {
         },
         Calendario: {
           value: action.value,
-          dia:action.dia,
+          dia: action.dia,
         },
       };
     case "HORARIOS_CLICK":
@@ -164,5 +156,45 @@ export const inputReducer = (state, action) => {
       };
     case "CHANGE_TIME":
       return { ...state, Time: { value: action.time } };
+    case "CORTE":
+      myState = {
+        ...state,
+        corte: { active: !state.corte.active, id: state.corte.id },
+      };
+      break;
+    case "MAQUINA":
+      myState = {
+        ...state,
+        maquina: { active: !state.maquina.active, id: state.maquina.id },
+      };
+      break;
+    case "BARBA":
+      myState = {
+        ...state,
+        barba: { active: !state.barba.active, id: state.barba.id },
+      };
+      break;
+    case "BRUSHING":
+      myState = {
+        ...state,
+        brushing: { active: !state.brushing.active, id: state.brushing.id },
+      };
+      break;
+    case "DECOLORACION":
+      myState = {
+        ...state,
+        decoloracion: {
+          active: !state.decoloracion.active,
+          id: state.decoloracion.id,
+        },
+      };
+      break;
+    case "CLARITOS":
+      myState = {
+        ...state,
+        claritos: { active: !state.claritos.active, id: state.claritos.id },
+      };
+      break;
   }
+  return { myState };
 };

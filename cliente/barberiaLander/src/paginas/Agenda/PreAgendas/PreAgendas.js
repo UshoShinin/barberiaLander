@@ -95,24 +95,12 @@ const PreAgendas = () => {
         <div className={classes.listado}>
           {agendasState !== null && <Lista items={agendasState} />}
           {/* Tengo que hacer esto con grid para sacar los margenes */}
-          <table className={classes.opciones}>
-            <tr>
-              <td>
-                <h2>Aceptar todo</h2>
-              </td>
-              <td>
-                <Switch active={true} />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <h2>Rechazar todo</h2>
-              </td>
-              <td>
-                <Switch active={true} />
-              </td>
-            </tr>
-          </table>
+          <div className={classes.opciones}>
+            <div className={classes.label}><h2>Aceptar todo</h2></div>
+            <div className={classes.actions}><Switch active={true} /></div>
+            <div className={classes.label}><h2>Rechazar todo</h2></div>
+            <div className={classes.actions}><Switch active={true} /></div>
+          </div>
         </div>
         <div className={classes.editor}>
           <h1>Editor</h1>

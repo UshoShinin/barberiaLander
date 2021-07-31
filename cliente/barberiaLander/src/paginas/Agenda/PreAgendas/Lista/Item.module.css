@@ -11,8 +11,7 @@
   width: 67%;
 }
 .contentBotones {
-  width: 33%;
-  /* display: flexbox; */
+  width: 90px;
 }
 .contentBotones > .actions {
   display: flexbox;

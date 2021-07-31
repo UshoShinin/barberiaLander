@@ -19,7 +19,7 @@ const Calendario = (props) => {
     document.getElementById('Calendario').classList.remove('FormularioAgenda_invalidCal__1yd0j');
   }
   /* Necesito comentar esta funcion */
-  const { cantidadMeses, content } = days(props.diasAMostrar,props.actividad,obtenerHorarios,lostFocus);
+  const { cantidadMeses, content } = days(props.date,props.diasAMostrar,props.actividad,obtenerHorarios,lostFocus);
   const prevCalendar = () => {
     if (currentCalendar > 0) {
       setCurrentCalendar((state) => state - 1);
@@ -34,7 +34,7 @@ const Calendario = (props) => {
     <div className={classes.container} tabIndex={-1} id="Calendario">
       <Fotos fotos={empleadosFotos} changeEmployee = {props.changeEmployee}/>
       <Mes
-        month={new Date().getMonth()}
+        month={props.date.getMonth()}
         prev={prevCalendar}
         next={nextCalendar}
         max={cantidadMeses}

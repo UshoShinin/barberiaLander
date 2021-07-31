@@ -20,7 +20,7 @@ const CheckBoxAgenda = (props) => {
               <td>
                 <Checkbox
                   id={11}
-                  checked={props.state.corte}
+                  checked={props.state.corte.active}
                   onChange={() => {
                     props.myAction({ type: "CORTE" });
                   }}
@@ -36,7 +36,7 @@ const CheckBoxAgenda = (props) => {
               <td>
                 <Checkbox
                   id={13}
-                  checked={props.state.maquina}
+                  checked={props.state.maquina.active}
                   onChange={() => {
                     props.myAction({ type: "MAQUINA" });
                   }}/>
@@ -51,7 +51,7 @@ const CheckBoxAgenda = (props) => {
               <td>
                 <Checkbox
                   id={15}
-                  checked={props.state.barba}
+                  checked={props.state.barba.active}
                   onChange={() => {
                     props.myAction({ type: "BARBA" });
                   }}
@@ -67,15 +67,15 @@ const CheckBoxAgenda = (props) => {
             <tr>
               <td className={classes.labelPlace}>
                 <label className={classes.label} htmlFor={12}>
-                  Laciado
+                  Brushing
                 </label>
               </td>
               <td>
                 <Checkbox
                   id={12}
-                  checked={props.state.laciado}
+                  checked={props.state.brushing.active}
                   onChange={() => {
-                    props.myAction({ type: "LACIADO" });
+                    props.myAction({ type: "BRUSHING" });
                   }}
                 />
               </td>
@@ -89,7 +89,7 @@ const CheckBoxAgenda = (props) => {
               <td>
                 <Checkbox
                   id={14}
-                  checked={props.state.decoloracion}
+                  checked={props.state.decoloracion.active}
                   onChange={() => {
                     props.myAction({ type: "DECOLORACION" });
                   }}
@@ -99,15 +99,15 @@ const CheckBoxAgenda = (props) => {
             <tr>
               <td className={classes.labelPlace}>
                 <label className={classes.label} htmlFor={16}>
-                  Tinta
+                  Claritos
                 </label>
               </td>
               <td>
                 <Checkbox
                   id={16}
-                  checked={props.state.tinta}
+                  checked={props.state.claritos.active}
                   onChange={() => {
-                    props.myAction({ type: "TINTA" });
+                    props.myAction({ type: "CLARITOS" });
                   }}
                 />
               </td>
