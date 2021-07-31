@@ -315,13 +315,13 @@ const crearSolicitudAgenda = async (agenda) => {
         if(insertServicioAgenda.recordset.rowsAffected > 0){
           return 'La agenda fue agregada correctamente';
         }else{
-          throw
+          throw ex;
         }
       }else{
-        throw
+        throw ex;
       }
     } else {
-      throw
+      throw ex;
     }
   } catch (error) {
     //En caso de que por alguna razon explote esto devuelve el error al metodo que lo llamo y ese lo devuelve por json
