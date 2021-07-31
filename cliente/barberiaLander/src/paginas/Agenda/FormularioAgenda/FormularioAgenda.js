@@ -252,17 +252,17 @@ const FormularioAgenda = (props) => {
     realDate.getMonth() + 5,
     realDate.getDate()
   );
-  if (inputState.Horarios !== null && inputState.Employee.value !== null) {
+  if (inputState.HorariosFiltrados !== null && inputState.Employee.value !== null) {
     tiempoNecesario = calcularTiempo(
       inputState.Employee.value,
       inputState,
-      inputState.Horarios
+      inputState.HorariosFiltrados
     );
     diasMostrar = DaysGenerator(
       date.getDate(),
       date.getMonth() + 1,
       date.getFullYear(),
-      getEmpleadoById(inputState.Horarios, inputState.Employee.value).fechas,
+      getEmpleadoById(inputState.HorariosFiltrados, inputState.Employee.value).fechas,
       tiempoNecesario
     );
     if (inputState.Calendario.value !== null) {
@@ -290,7 +290,7 @@ const FormularioAgenda = (props) => {
   /* Este es el combo que aparece cuando se selecciona un día del calendario */
   /* En caso que no se haya hecho la precara de datos el combo es null */
   const combo =
-    inputState.Horarios === null ? null : (
+    inputState.HorariosFiltrados === null ? null : (
       <div className={classes.ComboBox}>
         <ComboBox
           height={4.8}
@@ -306,13 +306,13 @@ const FormularioAgenda = (props) => {
     /* Calendario con todas sus empleados y horarios */
   /* Si no se hizo la precarga de datos se carga null */
   let calendarioContent = null;
-  if (inputState.Horarios !== null) {
+  if (inputState.HorariosFiltrados !== null) {
     calendarioContent = (
       <Calendario
         date={date}
         actividad={diasSeleccionables}
         getHorarios={calendarioHandler}
-        empleados={inputState.Horarios}
+        empleados={inputState.HorariosFiltrados}
         diasAMostrar={diasMostrar}
         currentEmployee={inputState.Employee.value}
         changeEmployee={(id) => {
@@ -322,7 +322,7 @@ const FormularioAgenda = (props) => {
     );
   }
 
-  console.log(inputState.Horarios);
+  console.log(inputState.HorariosFiltrados);
   return (
     <>
       {isLoading && <LoaddingSpinner />}
@@ -335,7 +335,7 @@ const FormularioAgenda = (props) => {
                 time={calcularTiempo(
                   inputState.Employee.value,
                   inputState,
-                  inputState.Horarios
+                  inputState.HorariosFiltrados
                 )}
                 myAction={(action) => {
                   document

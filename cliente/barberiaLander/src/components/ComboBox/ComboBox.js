@@ -4,6 +4,7 @@ import Transition from "react-transition-group/Transition";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleRight } from "@fortawesome/free-solid-svg-icons";
 const getObjectById = (list, id) => {
+  console.log(list,id);
   for (let i = 0; i < list.length; i++) {
     if (list[i].id === id) return list[i];
   }

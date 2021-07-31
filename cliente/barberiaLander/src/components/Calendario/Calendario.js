@@ -8,6 +8,7 @@ import { days } from "./ContenidoCalendario/ContenidoCalendario";
 import {extraerFotos} from './FuncionesAuxiliares';
 const Calendario = (props) => {
   console.log("ReCarge");
+  
   const [currentCalendar, setCurrentCalendar] = useState(0); //Se utiliza para gestionar el mes
   const empleadosFotos = extraerFotos(props.empleados); /* De la lista de empleados se extraen solo las fotos para mandar
   solo los nombres ci y fotos */
@@ -32,7 +33,7 @@ const Calendario = (props) => {
   };
   return (
     <div className={classes.container} tabIndex={-1} id="Calendario">
-      <Fotos fotos={empleadosFotos} changeEmployee = {props.changeEmployee}/>
+      <Fotos fotos={empleadosFotos} currentEmployee = {props.currentEmployee} changeEmployee = {props.changeEmployee}/>
       <Mes
         month={props.date.getMonth()}
         prev={prevCalendar}

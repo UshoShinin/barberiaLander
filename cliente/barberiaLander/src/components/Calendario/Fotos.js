@@ -11,7 +11,9 @@ const Fotos = (props) => {
       mostrar: false,
     });
   });
-  const [index, setIndex] = useState(props.fotos[0].id);
+  const [index, setIndex] = useState(props.currentEmployee);
+
+  console.log(index);
   const [active, setActive] = useState(false);
   initialState[0].mostrar = true;
 
@@ -29,11 +31,14 @@ const Fotos = (props) => {
   };
 
   const [state, dispatch] = useReducer(reducer, initialState);
-
+  if (index !== props.currentEmployee) {
+    dispatch({ type: "change", payload: { id: index } });
+    setIndex(props.currentEmployee);
+  }
   const imagenes = props.fotos.map((mFoto) => (
     <CSSTransition
       key={mFoto.id}
-      in={getEmpleadoById(state,mFoto.id).mostrar}
+      in={getEmpleadoById(state, mFoto.id).mostrar}
       mountOnEnter
       unmountOnExit
       timeout={220}

@@ -1,7 +1,7 @@
 const noManeja = [
-  { id: 6, idEmpleados: [{ id: 50098037 }, { id: 48279578 }] },
-  { id: 7, idEmpleados: [{ id: 50098037 }, { id: 48279578 }] },
-  { id: 8, idEmpleados: [{ id: 50098037 }] },
+  { id: 6, idEmpleados: [{ id: "50098037" }, { id: "48279578" }] },
+  { id: 7, idEmpleados: [{ id: "50098037" }, { id: "48279578" }] },
+  { id: 8, idEmpleados: [{ id: "50098037" }] },
 ]; //Este los servicios que hacen que empleados salgan de la lista.
 
 const buscar = (id, lista) => {
@@ -11,9 +11,19 @@ const buscar = (id, lista) => {
   return null;
 };
 
+const filtrarHorarios = (empleados, noManeja, id) => {
+  console.log(empleados, noManeja, id);
+  const servicio = buscar(id, noManeja);
+  if (servicio !== null)
+    return empleados.filter(
+      (em) => buscar(em.id, servicio.idEmpleados) === null
+    );
+  return empleados;
+};
 export const initialState = {
   Nombre: { value: "", isValid: null },
   Horarios: null,
+  HorariosFiltrados: null,
   Telefono: { value: "", isValid: null },
   Descripcion: { value: "", isValid: null },
   Checkboxes: { value: null },
@@ -30,12 +40,13 @@ export const initialState = {
 };
 
 export const inputReducer = (state, action) => {
-  let myState; //Esta variable se usa para los servicios
+  let myState = null; //Esta variable se usa para los servicios
   switch (action.type) {
     case "HORARIOS_CARGADOS":
       return {
         ...state,
         Horarios: action.value,
+        HorariosFiltrados: action.value,
         Employee: { value: action.value[0].id },
       };
     case "USER_INPUT_NAME":
@@ -159,30 +170,55 @@ export const inputReducer = (state, action) => {
     case "CORTE":
       myState = {
         ...state,
+        HorariosFiltrados: filtrarHorarios(
+          state.Horarios,
+          noManeja,
+          state.corte.id
+        ),
         corte: { active: !state.corte.active, id: state.corte.id },
       };
       break;
     case "MAQUINA":
       myState = {
         ...state,
+        HorariosFiltrados: filtrarHorarios(
+          state.Horarios,
+          noManeja,
+          state.maquina.id
+        ),
         maquina: { active: !state.maquina.active, id: state.maquina.id },
       };
       break;
     case "BARBA":
       myState = {
         ...state,
+        HorariosFiltrados: filtrarHorarios(
+          state.Horarios,
+          noManeja,
+          state.barba.id
+        ),
         barba: { active: !state.barba.active, id: state.barba.id },
       };
       break;
     case "BRUSHING":
       myState = {
         ...state,
+        HorariosFiltrados: filtrarHorarios(
+          state.Horarios,
+          noManeja,
+          state.brushing.id
+        ),
         brushing: { active: !state.brushing.active, id: state.brushing.id },
       };
       break;
     case "DECOLORACION":
       myState = {
         ...state,
+        HorariosFiltrados: filtrarHorarios(
+          state.Horarios,
+          noManeja,
+          state.decoloracion.id
+        ),
         decoloracion: {
           active: !state.decoloracion.active,
           id: state.decoloracion.id,
@@ -192,9 +228,18 @@ export const inputReducer = (state, action) => {
     case "CLARITOS":
       myState = {
         ...state,
+        HorariosFiltrados: filtrarHorarios(
+          state.Horarios,
+          noManeja,
+          state.claritos.id
+        ),
         claritos: { active: !state.claritos.active, id: state.claritos.id },
       };
       break;
   }
-  return { myState };
+  if (myState !== null) {
+    myState={...myState,Employee:{value:myState.HorariosFiltrados[0].id}}
+  }
+  console.log(myState);
+  return myState;
 };
