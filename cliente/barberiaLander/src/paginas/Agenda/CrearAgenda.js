@@ -1,10 +1,14 @@
 import FormularioAgenda from "./FormularioAgenda/FormularioAgenda";
 import Card from "../../components/UI/Card/Card";
 import useHttp from "../../hooks/useHttp";
+
+const getRespuesta = (res) => {
+  console.log(res);
+};
 const CrearAgenda = (props) => {
+  const { isLoading, error, sendRequest: mandarAgenda } = useHttp(getRespuesta);
   const guardarDatosAgendaHandler = (enteredDatosAgenda) => {
-    console.log(enteredDatosAgenda);
-    useHttp('/crearAgenda',{method:'POST',headers:{'Content-Type':'application/json'},body:{enteredDatosAgenda}})
+    mandarAgenda({ url: "/crearAgenda",method:'POST',headers:{'Content-Type':'application/json'},body:enteredDatosAgenda},getRespuesta);
   };
 
   return (

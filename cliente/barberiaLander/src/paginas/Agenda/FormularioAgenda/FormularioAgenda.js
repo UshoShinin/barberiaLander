@@ -98,11 +98,11 @@ const FormularioAgenda = (props) => {
     isLoading,
     error,
     sendRequest: fetchHorarios /* Alias */,
-  } = useHttp({ url: "/datosFormularioAgenda" }, obtenerHorarios);
+  } = useHttp();
 
   /* Se ejecuta al inicio para que se cargen los datos */
   useEffect(() => {
-    fetchHorarios();
+    fetchHorarios({ url: "/datosFormularioAgenda" }, obtenerHorarios);
   }, []);
 
   const [inputState, dispatchInput] = useReducer(inputReducer, initialState);
