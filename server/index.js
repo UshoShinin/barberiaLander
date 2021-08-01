@@ -61,6 +61,7 @@ app.use("/agendaPorId", (req, res) => {
 
 //TENGO QUE VER EL TEMA DEL BODY PPARSER PARA EXPRESS PARA PODER TOMAR LOS DATOS QUE ME MANDAN EN EL REQUEST
 app.post("/crearAgenda", (req, res) => {
+  console.log(req.body);
   const ret = interfaz.crearSolicitudAgenda(req.body);
   ret.then((resultado) => {
     console.log(resultado);

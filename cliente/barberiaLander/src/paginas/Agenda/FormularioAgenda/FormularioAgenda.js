@@ -228,7 +228,7 @@ const FormularioAgenda = (props) => {
         telefono: inputState.Telefono.value,
         descripcion: inputState.Descripcion.value,
         imagenEjemplo: inputState.Referencia.value,
-        ciEmpleado:inputState.currentEmployee,
+        ciEmpleado:inputState.currentEmployee.value,
         servicios: services,
         fecha: `${year}-${inputState.Calendario.dia.m}-${inputState.Calendario.dia.d}`,
         horario: { i: inicio, f: fin },
