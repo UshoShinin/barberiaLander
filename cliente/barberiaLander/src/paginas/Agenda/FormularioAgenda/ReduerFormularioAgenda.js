@@ -253,11 +253,7 @@ export const inputReducer = (state, action) => {
     });
     myState = {
       ...myState,
-      HorariosFiltrados: filtrarHorarios(
-        state.Horarios,
-        noManeja,
-        state.corte.id
-      ),
+      HorariosFiltrados:horariosAuxiliares ,
       Employee: { value: myState.HorariosFiltrados[0].id },
     };
   }

@@ -5,7 +5,7 @@ import useHttp from "../../../hooks/useHttp";
 import { useEffect, useState } from "react";
 import LoaddingSpinner from "../../../components/LoaddingSpinner/LoaddingSpinner";
 import Switch from "../../../components/UI/Switch/Switch";
-const DUMMY_AGENDAS = [
+/* const DUMMY_AGENDAS = [
   {
     idAgenda: 1,
     fecha: "28-07-2021",
@@ -70,31 +70,31 @@ const DUMMY_AGENDAS = [
     horaFin: "21:30",
     descripcion: "No se :c",
   },
-];
+]; */
 
 const PreAgendas = () => {
-  const [agendasState, setAgendasState] = useState(DUMMY_AGENDAS);
-  /* const obtenerAgendas = (agendas) => {
-    setAgendasState(agendas.mensaje.agendas);
+  const [agendasState, setAgendasState] = useState(null);
+  const obtenerAgendas = (agendas) => {
+    console.log(agendas.mensaje)
+    setAgendasState(agendas.mensaje.preAgendas);
   };
   const {
     isLoading,
     error,
     sendRequest: fetchAgendas,
-  } = useHttp({ url: "/listadoAgendas" }, obtenerAgendas);
+  } = useHttp();
 
   useEffect(() => {
-    fetchAgendas();
+    fetchAgendas({ url: "/listadoPreAgendas" }, obtenerAgendas);
   }, []);
-  console.log(agendasState); */
+  console.log(agendasState);
   return (
     <Card>
-      {/* {isLoading && <LoaddingSpinner />}
-      {!isLoading && ( */}
+      {isLoading && <LoaddingSpinner />}
+      {!isLoading && (
       <div className={classes.container}>
         <div className={classes.listado}>
-          {agendasState !== null && <Lista items={agendasState} />}
-          {/* Tengo que hacer esto con grid para sacar los margenes */}
+          {/* {agendasState !== null && <Lista items={agendasState} />} */}
           <div className={classes.opciones}>
             <div className={classes.label}><h2>Aceptar todo</h2></div>
             <div className={classes.actions}><Switch active={true} /></div>
@@ -106,7 +106,7 @@ const PreAgendas = () => {
           <h1>Editor</h1>
         </div>
       </div>
-      {/* )} */}
+        )} 
     </Card>
   );
 };
