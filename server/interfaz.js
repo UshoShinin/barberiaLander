@@ -264,13 +264,13 @@ const crearSolicitudAgenda = async (agenda) => {
     const pool = await sql.connect(conexion);
     //Armo la query de Horario
     let queryHorario =
-      "Insert into Horario value (" +
+      "Insert into Horario (" +
       agenda.cedulaPeluquero +
-      "," +
+      ", " +
       agenda.horario.i +
-      "," +
+      ", " +
       agenda.horario.f +
-      "," +
+      ", " +
       agenda.fecha +
       ")";
     //Inserto en la tabla Horario los datos de de la agenda
@@ -290,7 +290,7 @@ const crearSolicitudAgenda = async (agenda) => {
       //Separo el id del resultado de la query
       const idHorario = consultaHorarioAux.recordset.IdHorario;
       //Ahora que tengo el id del horario armo la query para agregar la agenda
-      let queryAgenda = 'Insert into Agenda value (' + agenda.nombreCliente + ', ' + agenda.descripcion + ', ' + agenda.imagenEjemplo + ', ' + agenda.telefono + ', 0, ' +  idHorario + ')';
+      let queryAgenda = 'Insert into Agenda (' + agenda.nombreCliente + ', ' + agenda.descripcion + ', ' + agenda.imagenEjemplo + ', ' + agenda.telefono + ', 0, ' +  idHorario + ')';
       //Hago el select para poder saber cual es el id de la agenda
       const insertAgenda = await pool.request().query(queryAgenda);
       if(insertAgenda.recordset.rowsAffected === 1){
