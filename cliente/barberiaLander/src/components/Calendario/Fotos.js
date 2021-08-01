@@ -1,63 +1,99 @@
 import classes from "./Fotos.module.css";
-import ComboBox from "../ComboBox/ComboBox";
+import ComboBox from "./../../components/ComboBox/ComboBox";
 import { useReducer, useState } from "react";
 import { CSSTransition } from "react-transition-group";
 import { getEmpleadoById } from "./FuncionesAuxiliares";
 const Fotos = (props) => {
-  let initialState = [];
-  props.fotos.forEach((mFoto) => {
-    initialState.push({
-      id: mFoto.id,
-      mostrar: false,
-    });
-  });
-  const [index, setIndex] = useState(props.currentEmployee);
-
-  console.log(index);
+  const initialState = {
+    Actual: { value: props.fotos[0].foto, mostrar: true },
+    Siguiente: { value: null, mostrar: false },
+  };
   const [active, setActive] = useState(false);
-  initialState[0].mostrar = true;
-
   const reducer = (state, action) => {
     switch (action.type) {
-      case "change":
-        setActive(false);
-        return state.map((foto) => {
-          if (foto.id === action.payload.id) {
-            foto.mostrar = !foto.mostrar;
-          }
-          return foto;
-        });
+      case "CHANGE_I":
+        if (state.Actual.value === null) {
+          return {
+            Actual: { value: action.value, mostrar: false },
+            Siguiente: { value: state.Siguiente.value, mostrar: false },
+          };
+        }
+        return {
+          Siguiente: { value: action.value, mostrar: false },
+          Actual: { value: state.Actual.value, mostrar: false },
+        };
+      case "MOSTRAR_ACTUAL":
+        return {
+          Siguiente: { value: null, mostrar: false },
+          Actual: { value: state.Actual.value, mostrar: true },
+        };
+      case "MOSTRAR_SIGUIENTE":
+        return {
+          Actual: { value: null, mostrar: false },
+          Siguiente: { value: state.Siguiente.value, mostrar: true },
+        };
     }
   };
-
   const [state, dispatch] = useReducer(reducer, initialState);
-  if (index !== props.currentEmployee) {
-    dispatch({ type: "change", payload: { id: index } });
-    setIndex(props.currentEmployee);
+  if (
+    (state.Actual.mostrar &&
+      state.Actual.value !==
+        getEmpleadoById(props.fotos, props.currentEmployee).foto) ||
+    (state.Siguiente.mostrar &&
+      state.Siguiente.value !==
+        getEmpleadoById(props.fotos, props.currentEmployee).foto)
+  ) {
+    dispatch({
+      type: "CHANGE_I",
+      value: getEmpleadoById(props.fotos, props.currentEmployee).foto,
+    });
   }
-  const imagenes = props.fotos.map((mFoto) => (
-    <CSSTransition
-      key={mFoto.id}
-      in={getEmpleadoById(state, mFoto.id).mostrar}
-      mountOnEnter
-      unmountOnExit
-      timeout={220}
-      onExited={() => {
-        dispatch({ type: "change", payload: { id: index } });
-      }}
-      classNames={{
-        enter: "",
-        enterActive: `${classes.Open}`,
-        exit: "",
-        exitActive: `${classes.Close}`,
-      }}
-    >
-      <img className={`${classes.foto}`} src={mFoto.foto} />
-    </CSSTransition>
-  ));
+
+  const imagenes = (
+    <>
+      <CSSTransition
+        key={1}
+        in={state.Actual.mostrar}
+        mountOnEnter
+        unmountOnExit
+        timeout={220}
+        onExited={() => {
+          dispatch({ type: "MOSTRAR_SIGUIENTE" });
+        }}
+        classNames={{
+          enter: "",
+          enterActive: `${classes.Open}`,
+          exit: "",
+          exitActive: `${classes.Close}`,
+        }}
+      >
+        <img className={`${classes.foto}`} src={state.Actual.value} />
+      </CSSTransition>
+      <CSSTransition
+        key={2}
+        in={state.Siguiente.mostrar}
+        mountOnEnter
+        unmountOnExit
+        timeout={220}
+        onExited={() => {
+          dispatch({ type: "MOSTRAR_ACTUAL" });
+        }}
+        classNames={{
+          enter: "",
+          enterActive: `${classes.Open}`,
+          exit: "",
+          exitActive: `${classes.Close}`,
+        }}
+      >
+        <img className={`${classes.foto}`} src={state.Siguiente.value} />
+      </CSSTransition>
+    </>
+  );
   const comboChangeHandler = (id) => {
-    dispatch({ type: "change", payload: { id: index } });
-    setIndex(id);
+    dispatch({
+      type: "CHANGE_I",
+      value: getEmpleadoById(props.fotos, id).foto,
+    });
     props.changeEmployee(id);
   };
 
@@ -75,7 +111,7 @@ const Fotos = (props) => {
             onClick={() => {
               setActive((prev) => !prev);
             }}
-            current={index}
+            current={props.currentEmployee}
             onChange={comboChangeHandler}
             opciones={props.fotos}
           />
