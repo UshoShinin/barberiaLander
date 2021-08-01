@@ -12,7 +12,6 @@ const buscar = (id, lista) => {
 };
 
 const filtrarHorarios = (empleados, noManeja, id) => {
-  console.log(empleados, noManeja, id);
   const servicio = buscar(id, noManeja);
   if (servicio !== null)
     return empleados.filter(
@@ -170,11 +169,6 @@ export const inputReducer = (state, action) => {
     case "CORTE":
       myState = {
         ...state,
-        HorariosFiltrados: filtrarHorarios(
-          state.Horarios,
-          noManeja,
-          state.corte.id
-        ),
         corte: { active: !state.corte.active, id: state.corte.id },
       };
       break;
@@ -238,7 +232,34 @@ export const inputReducer = (state, action) => {
       break;
   }
   if (myState !== null) {
-    myState={...myState,Employee:{value:myState.HorariosFiltrados[0].id}}
+    const servicios = Object.values({
+      corte: myState.corte,
+      maquina: myState.maquina,
+      barba: myState.barba,
+      brushing: myState.brushing,
+      decoloracion: myState.decoloracion,
+      claritos: myState.claritos,
+    });
+    console.log(servicios);
+    let horariosAuxiliares = [...myState.Horarios];
+    servicios.forEach(s => {
+      if(s.active){
+        const miniServicio = buscar(s.id,noManeja);
+        if(miniServicio!==null){
+          horariosAuxiliares = filtrarHorarios(horariosAuxiliares,
+            noManeja,miniServicio.id)
+        }
+      }
+    });
+    myState = {
+      ...myState,
+      HorariosFiltrados: filtrarHorarios(
+        state.Horarios,
+        noManeja,
+        state.corte.id
+      ),
+      Employee: { value: myState.HorariosFiltrados[0].id },
+    };
   }
   console.log(myState);
   return myState;
