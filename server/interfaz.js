@@ -207,7 +207,7 @@ const getPreAgendas = async () => {
   const consultaPreAgendas = await pool
     .request()
     .query(
-      "select A.IdAgenda, H.Fecha, A.NombreCliente, H.HoraInicio, H.HoraFin, A.Descripcion from Agenda A, Horario H where A.IdHorario = H.IdHorario and A.Aceptada = 0"
+      "select A.IdAgenda, H.Fecha, A.NombreCliente, H.HoraInicio, H.HoraFin, A.Descripcion, H.Cedula from Agenda A, Horario H where A.IdHorario = H.IdHorario and A.Aceptada = 0"
     );
   //Separo las preagendas de los resultados de la consulta
   const preAgendas = consultaPreAgendas.recordset;
@@ -220,8 +220,9 @@ const getPreAgendas = async () => {
     //Creo la preagenda que agrego al array de retorno
     let preAgendaAux = {
       idAgenda: preAgendas[i].IdAgenda,
+      ciEmpleado: preAgendas[i].Cedula,
       fecha: preAgendas[i].Fecha,
-      nombreCliente: preAgendas[i].nombreCliente,
+      nombreCliente: preAgendas[i].NombreCliente,
       horaInicio: preAgendas[i].HoraInicio,
       horaFin: preAgendas[i].HoraFin,
       descripcion: preAgendas[i].Descripcion,
@@ -257,6 +258,50 @@ const getAgendaPorId = async (idAgenda) => {
   }
 };
 
+//Modificar una agenda
+//Modificar una agenda deberia ser. Modifico todos los datos del Horario, despues modifico todo de la Agenda y despues Modifico todo de los servicios
+const modificarAgenda = async (nuevaAgenda) => {
+  try {
+    /*
+    ACA TIENE QUE IR EL CODIGO DE LA VERIFICACION DE SI EL HORARIO SIGUE ESTANDO DISPONIBLE
+    SE TIENE QUE REVISAR DE SI PARA EL PELUQUERO QUE MANDAN EL HORARIO DE ESA FECHA ESTA DISPONIBLE
+    EN CASO DE QUE NO ESTE DISPONIBLE  HAY QUE HACER EL RETURN ACA MISMO Y DECIS QUE EL HORARIO NO ESTA DISPONIBLE
+   */
+    //Variable donde esta la conexion con la bd
+    const pool = await sql.connect(conexion);
+    //Armo el update para el Horario
+    let queryUpdateHorario =
+      "update Horario set Cedula = " +
+      nuevaAgenda.ciPeluquero +
+      ", HoraInicio = " +
+      nuevaAgenda.horario.i +
+      ", HoraFin = " +
+      nuevaAgenda.horario.f +
+      ", Fecha = " +
+      nuevaAgenda.fecha +
+      " where IdHorario = " +
+      nuevaAgenda.idHorario;
+    //Armo el update para Agenda
+    let queryUpdateAgenda =
+      "update Agenda set NombreCliente = " +
+      nuevaAgenda.nombreCliente +
+      ", Descripcion = " +
+      nuevaAgenda.descripcion +
+      ", Img = " +
+      nuevaAgenda.imagenEjemplo +
+      ", Tel = " +
+      nuevaAgenda.telefono +
+      " where IdAgenda = " + 
+      nuevaAgenda.idAgenda;
+    /**
+     ACA VA A IR LO DEL SERVICIO, EL TEMA DE ESTO COMO PUEDE CAMBIAR TODOS LOS SERVICIOS QUE SE VA A HACER
+     LO MEJOR VA A SER BORRAR TODOS LOS QUE YA HAY Y HACER UN INSERT NUEVO CON TODOS LOS NUEVOS
+     */
+  } catch (error) {
+    return error;
+  }
+};
+
 //Metodo para agregar la agenda a la base, voy a recibir los datos todos dentro del objeto agenda
 const crearSolicitudAgenda = async (agenda) => {
   try {
@@ -265,7 +310,7 @@ const crearSolicitudAgenda = async (agenda) => {
     //Armo la query de Horario
     let queryHorario =
       "Insert into Horario (" +
-      agenda.cedulaPeluquero +
+      agenda.ciPeluquero +
       ", " +
       agenda.horario.i +
       ", " +
@@ -286,38 +331,70 @@ const crearSolicitudAgenda = async (agenda) => {
         " and HoraFin = " +
         agenda.horario.f;
       //Hago un select para poder saber cual es el id del horario que acabo de insertar
-      const consultaHorarioAux = await pool.request().query(queryConsultaHorario);
+      const consultaHorarioAux = await pool
+        .request()
+        .query(queryConsultaHorario);
       //Separo el id del resultado de la query
       const idHorario = consultaHorarioAux.recordset.IdHorario;
       //Ahora que tengo el id del horario armo la query para agregar la agenda
-      let queryAgenda = 'Insert into Agenda (' + agenda.nombreCliente + ', ' + agenda.descripcion + ', ' + agenda.imagenEjemplo + ', ' + agenda.telefono + ', 0, ' +  idHorario + ')';
+      let queryAgenda =
+        "Insert into Agenda (" +
+        agenda.nombreCliente +
+        ", " +
+        agenda.descripcion +
+        ", " +
+        agenda.imagenEjemplo +
+        ", " +
+        agenda.telefono +
+        ", 0, " +
+        idHorario +
+        ")";
       //Hago el select para poder saber cual es el id de la agenda
       const insertAgenda = await pool.request().query(queryAgenda);
-      if(insertAgenda.recordset.rowsAffected === 1){
+      if (insertAgenda.recordset.rowsAffected === 1) {
         //Armo la query para saber cual es el id de agenda
-        let queryConsultaAgenda = 'select IdAgenda from Agenda where IdHorario = ' + idHorario;
+        let queryConsultaAgenda =
+          "select IdAgenda from Agenda where IdHorario = " + idHorario;
         //Hago el select para saber el id de la agenda
-        const consultaAgendaAux = await pool.request().query(queryConsultaAgenda);
+        const consultaAgendaAux = await pool
+          .request()
+          .query(queryConsultaAgenda);
         //Separo el valor del id de la agenda
         const idAgenda = consultaAgendaAux.recordset.IdAgenda;
-        let queryServicioAgenda = 'Insert into Agenda_Servicio values ';
+        let queryServicioAgenda = "Insert into Agenda_Servicio values ";
         //Recorro todos los servicios que van para la agenda y armo la query
         for (let i = 0; i < agenda.servicios.length; i++) {
           //Verifico si en el servicio que estoy parado es el ultimo de la lista. Esto lo hago para armar la query con o si coma al final
-          if(i + 1 === agenda.servicios.length){
-            let queryAux = '(' + idAgenda + ', ' + idHorario + ', ' + agenda.servicios[i] + ')';
-          }else {
-            let queryAux = '(' + idAgenda + ', ' + idHorario + ', ' + agenda.servicios[i] + '), ';
+          if (i + 1 === agenda.servicios.length) {
+            let queryAux =
+              "(" +
+              idAgenda +
+              ", " +
+              idHorario +
+              ", " +
+              agenda.servicios[i] +
+              ")";
+          } else {
+            let queryAux =
+              "(" +
+              idAgenda +
+              ", " +
+              idHorario +
+              ", " +
+              agenda.servicios[i] +
+              "), ";
           }
           queryServicioAgenda += queryAux;
         }
-        const insertServicioAgenda = await pool.request().query(queryServicioAgenda);
-        if(insertServicioAgenda.recordset.rowsAffected > 0){
-          return 'La agenda fue agregada correctamente';
-        }else{
+        const insertServicioAgenda = await pool
+          .request()
+          .query(queryServicioAgenda);
+        if (insertServicioAgenda.recordset.rowsAffected > 0) {
+          return "La agenda fue agregada correctamente";
+        } else {
           throw ex;
         }
-      }else{
+      } else {
         throw ex;
       }
     } else {
