@@ -8,7 +8,43 @@ const Visualizador = React.memo((props) => {
   const { isLoading, error, sendRequest: getAgenda } = useHttp();
   const [agenda, setAgenda] = useState({ IdAgenda: -1 });
   const obtenerAgenda = (respuesta) => {
-    setAgenda(respuesta.mensaje[0]);
+    let servicios = {
+      corte: false,
+      barba: false,
+      maquina: false,
+      claritos: false,
+      decoloracion: false,
+      brushing: false,
+    };
+    respuesta.mensaje.servicios.forEach((s) => {
+      switch (s) {
+        case 1:
+          servicios.corte = true;
+          break;
+        case 4:
+          servicios.barba = true;
+          break;
+        case 5:
+          servicios.maquina = true;
+          break;
+        case 6:
+          servicios.claritos = true;
+          break;
+        case 7:
+          servicios.decoloracion = true;
+          break;
+        case 8:
+          servicios.brushing = true;
+          break;
+      }
+    });
+
+    const agendaObtenida = {
+      ...respuesta.mensaje,
+      fecha: respuesta.mensaje.fecha.slice(0, 10),
+      ...servicios,
+    };
+    setAgenda(agendaObtenida);
   };
 
   useEffect(() => {
@@ -17,29 +53,134 @@ const Visualizador = React.memo((props) => {
     }
   }, [props.id]);
   console.log(agenda);
+
   return (
     <>
-      {isLoading && <LoaddingSpinner />}
-      {!isLoading && (
-        <div className={classes.container}>
+      {/* {isLoading && <LoaddingSpinner />}
+      {!isLoading && ( */}
+      <div className={classes.container}>
+        <div>
           <div>
             <h1>Servicios</h1>
-            <h2>Corte</h2>
-            <h2>Barba</h2>
-            <h2>Maquina</h2>
-            <h2>Brushing</h2>
-            <h2>Decoloración</h2>
-            <h2>Claritos</h2>
+            <h2 className={`${agenda.corte ? classes.active : ""}`}>Corte</h2>
+            <h2 className={`${agenda.barba ? classes.active : ""}`}>Barba</h2>
+            <h2 className={`${agenda.maquina ? classes.active : ""}`}>
+              Maquina
+            </h2>
+            <h2 className={`${agenda.brushing ? classes.active : ""}`}>
+              Brushing
+            </h2>
+            <h2 className={`${agenda.decoloracion ? classes.active : ""}`}>
+              Decoloración
+            </h2>
+            <h2 className={`${agenda.claritos ? classes.active : ""}`}>
+              Claritos
+            </h2>
           </div>
           <div>
             <h1>Datos Agenda</h1>
             <div className={classes.datos}>
-              <label>Nombre Cliente</label>
-              <label></label>
+              <label
+                className={`${classes.downData} ${
+                  agenda.IdAgenda !== -1 ? classes.activeData : ""
+                }`}
+              >
+                Nombre Empleado{" "}
+              </label>
+              <label
+                className={`${classes.hide} ${
+                  agenda.IdAgenda !== -1 ? classes.show : ""
+                }`}
+              >
+                {agenda.ciPeluquero}
+              </label>
+              <label
+                className={`${classes.downData} ${
+                  agenda.IdAgenda !== -1 ? classes.activeData : ""
+                }`}
+              >
+                Nombre Cliente{" "}
+              </label>
+              <label
+                className={`${classes.hide} ${
+                  agenda.IdAgenda !== -1 ? classes.show : ""
+                }`}
+              >
+                {agenda.nombreCliente}
+              </label>
+              <label
+                className={`${classes.downData} ${
+                  agenda.IdAgenda !== -1 ? classes.activeData : ""
+                }`}
+              >
+                Fecha{" "}
+              </label>
+              <label
+                className={`${classes.hide} ${
+                  agenda.IdAgenda !== -1 ? classes.show : ""
+                }`}
+              >
+                {agenda.fecha}
+              </label>
+              <label
+                className={`${classes.downData} ${
+                  agenda.IdAgenda !== -1 ? classes.activeData : ""
+                }`}
+              >
+                Hora Inicio{" "}
+              </label>
+              <label
+                className={`${classes.hide} ${
+                  agenda.IdAgenda !== -1 ? classes.show : ""
+                }`}
+              >{`${agenda.IdAgenda !== -1 ? agenda.horario.i : ""}`}</label>
+              <label
+                className={`${classes.downData} ${
+                  agenda.IdAgenda !== -1 ? classes.activeData : ""
+                }`}
+              >
+                Hora Fin{" "}
+              </label>
+              <label
+                className={`${classes.hide} ${
+                  agenda.IdAgenda !== -1 ? classes.show : ""
+                }`}
+              >{`${agenda.IdAgenda !== -1 ? agenda.horario.f : ""}`}</label>
+              <label
+                className={`${classes.downData} ${
+                  agenda.IdAgenda !== -1 ? classes.activeData : ""
+                }`}
+              >
+                Telefono{" "}
+              </label>
+              <label
+                className={`${classes.hide} ${
+                  agenda.IdAgenda !== -1 ? classes.show : ""
+                }`}
+              >
+                {agenda.tel}
+              </label>
             </div>
           </div>
         </div>
-      )}
+        <div>
+          <div>
+            <h3 className={`${classes.downData} ${
+                  agenda.IdAgenda !== -1 ? classes.activeData : ""
+                }`}>Descripcion</h3>
+                
+            <p className={`${classes.hide} ${
+                  agenda.IdAgenda !== -1 ? classes.show : ""
+                }`}>
+              {`${agenda.descripcion!==undefined?agenda.descripcion:'No hay una descripción'}`}
+            </p>
+          </div>
+          <div>
+
+          </div>
+        </div>
+      </div>
+      {/* )} */}
     </>
   );
 });

@@ -49,6 +49,7 @@ app.use("/listadoPreAgendas", (req, res) => {
 });
 
 app.use("/agendaPorId", (req, res) => {
+  //Traer también el nombre del empleado
   let id = req.query.idAgenda;
   let ret = interfaz.getAgendaPorId(id);
   ret.then((resultado) => {
