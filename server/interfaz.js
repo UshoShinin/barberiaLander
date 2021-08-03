@@ -240,7 +240,7 @@ const getAgendaPorId = async (idAgenda) => {
     const pool = await sql.connect(conexion);
     //Armo la query
     let query =
-      "select A.IdAgenda, A.NombreCliente, Ser.Nombre as NombreServicio, A.Descripcion, A.Img, A.Tel, H.Cedula, H.HoraInicio, H.HoraFin, H.Fecha, H.IdHorario from Agenda A, Horario H, Agenda_Servicio S, Servicio Ser where A.IdHorario = H.IdHorario and S.IdServicio = Ser.IdServicio and S.IdAgenda = A.IdAgenda and A.IdAgenda =" +
+      "select A.IdAgenda, A.NombreCliente, A.Descripcion, A.Img, A.Tel, H.Cedula, H.HoraInicio, H.HoraFin, H.Fecha, H.IdHorario from Agenda A, Horario H where A.IdHorario = H.IdHorario and A.IdAgenda = " +
       idAgenda;
     //Aca guardo el resultado de la consulta a la bd
     const consultaAgendaPorId = await pool.request().query(query);
@@ -248,7 +248,31 @@ const getAgendaPorId = async (idAgenda) => {
     if (consultaAgendaPorId.rowsAffected[0] === 1) {
       //Separo el resultado
       let agenda = consultaAgendaPorId.recordset;
-      return agenda;
+      //Armo el objeto de retorno para poder agregarle todos los servicios de la agenda
+      let ret = {
+        idagenda: agenda[0].IdAgenda,
+        nombreCliente: agenda[0].NombreCliente,
+        descripcion: agenda[0].Descripcion,
+        img: agenda[0].Img,
+        tel: agenda[0].Tel,
+        ciPeluquero: agenda[0].Cedula,
+        horario:{i: agenda[0].HoraInicio, f: agenda[0].HoraFin},
+        fecha: agenda[0].Fecha,
+        servicios: [],
+        idHorario: agenda[0].IdHorario
+      };
+      //Armo la query para buscar todos los servicios de la agenda
+      let queryServicios = "select IdServicio from Agenda_Servicio where IdAgenda = " + idAgenda;
+      //Hago la consulta a la bd
+      const consultaServiciosAgenda = await pool.request().query(queryServicios);
+      //Separo el resultado
+      const serviciosAgenda = consultaServiciosAgenda.recordset;
+      //Por cada horario que haya en serviciosAgenda lo agrego al array de retorno
+      serviciosAgenda.forEach(servicio => {
+        ret.servicios.push(servicio.IdServicio);
+      });
+      console.log(agenda);
+      return ret;
     } else {
       return "No existe una agenda con ese id";
     }
