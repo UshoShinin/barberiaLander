@@ -3,18 +3,18 @@ import {useForm} from '../../hooks/useForm';
 
 
 const init =()=>{
-    return[{
-        idCaja: new Date().getDate(),
+    return{
+        idCaja: new Date(),
         desc:'AbrirCaja',
         montoInicial: 0
-    }];
+    };
 }
 
 
-const todoReducer = (state = [], action) =>{  
+const todoReducer = (state, action) =>{  
     switch (action.type) {
         case 'AbrirCaja':
-            return [...state, action.payload];    
+            return {...state, montoInicial: action.payload};    
         default:
             return state;
     }
@@ -22,7 +22,7 @@ const todoReducer = (state = [], action) =>{
 
 const AperturaCierre = () => {
     
-    const [state, dispatch] = useReducer(todoReducer, [], init);  
+    const [state, dispatch] = useReducer(todoReducer, init);  
 
     const [{montoInicial}, handleInputChange, reset] = useForm({        
         montoInicial:''
@@ -52,7 +52,7 @@ const AperturaCierre = () => {
                 name="montoInicial"
                 placeholder="Ingrese monto..."
                 autoComplete="off"
-                value= {montoInicial}
+                value= {state.montoInicial}
                 onChange = {handleInputChange}
             />
             <button type="submit">
