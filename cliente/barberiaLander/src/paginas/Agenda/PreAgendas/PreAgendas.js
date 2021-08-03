@@ -5,6 +5,7 @@ import useHttp from "../../../hooks/useHttp";
 import { useEffect, useState } from "react";
 import LoaddingSpinner from "../../../components/LoaddingSpinner/LoaddingSpinner";
 import Switch from "../../../components/UI/Switch/Switch";
+import Visualizador from "./Visualizador/Visualizador";
 /* const DUMMY_AGENDAS = [
   {
     idAgenda: 1,
@@ -74,39 +75,48 @@ import Switch from "../../../components/UI/Switch/Switch";
 
 const PreAgendas = () => {
   const [agendasState, setAgendasState] = useState(null);
+  const [idAgenda, setIdAgenda] = useState(null);
   const obtenerAgendas = (agendas) => {
-    console.log(agendas.mensaje)
-    setAgendasState(agendas.mensaje.preAgendas);
+    let misAgendas = [];
+    agendas.mensaje.preAgendas.forEach((agenda) => {
+      misAgendas.push({ ...agenda, fecha: agenda.fecha.slice(0, 10) });
+    });
+    setAgendasState(misAgendas);
   };
-  const {
-    isLoading,
-    error,
-    sendRequest: fetchAgendas,
-  } = useHttp();
+  const { isLoading, error, sendRequest: fetchAgendas } = useHttp();
 
   useEffect(() => {
     fetchAgendas({ url: "/listadoPreAgendas" }, obtenerAgendas);
   }, []);
-  console.log(agendasState);
   return (
     <Card>
       {isLoading && <LoaddingSpinner />}
       {!isLoading && (
-      <div className={classes.container}>
-        <div className={classes.listado}>
-          {/* {agendasState !== null && <Lista items={agendasState} />} */}
-          <div className={classes.opciones}>
-            <div className={classes.label}><h2>Aceptar todo</h2></div>
-            <div className={classes.actions}><Switch active={true} /></div>
-            <div className={classes.label}><h2>Rechazar todo</h2></div>
-            <div className={classes.actions}><Switch active={true} /></div>
+        <div className={classes.container}>
+          <div className={classes.listado}>
+            {agendasState !== null && (
+              <Lista items={agendasState} select={setIdAgenda} />
+            )}
+            <div className={classes.opciones}>
+              <div className={classes.label}>
+                <h2>Aceptar todo</h2>
+              </div>
+              <div className={classes.actions}>
+                <Switch active={true} />
+              </div>
+              <div className={classes.label}>
+                <h2>Rechazar todo</h2>
+              </div>
+              <div className={classes.actions}>
+                <Switch active={true} />
+              </div>
+            </div>
+          </div>
+          <div className={classes.editor}>
+            <Visualizador id={idAgenda} />
           </div>
         </div>
-        <div className={classes.editor}>
-          <h1>Editor</h1>
-        </div>
-      </div>
-        )} 
+      )}
     </Card>
   );
 };
