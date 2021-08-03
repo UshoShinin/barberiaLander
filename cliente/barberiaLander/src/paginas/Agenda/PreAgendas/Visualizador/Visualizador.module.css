@@ -1,0 +1,11 @@
+.container{
+    display: flex;
+    color:var(--clr-inActive);
+    padding:1em;
+    border: 2px var(--clr-inActive) solid;
+    border-radius: 5px;
+        height: 100%;
+    }
+.container > div{
+    width: 50%;
+}

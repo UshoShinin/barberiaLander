@@ -3,7 +3,7 @@ import classes from './Lista.module.css';
 const Lista = (props) => {
     const content = props.items.map((item)=>{
         return(
-            <Item key={item.nombreCliente} item={item}>
+            <Item key={item.nombreCliente} item={item} select={props.select}>
                 {/* {item.nombreCliente} */}
             </Item>
         )
