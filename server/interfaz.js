@@ -240,7 +240,7 @@ const getAgendaPorId = async (idAgenda) => {
     const pool = await sql.connect(conexion);
     //Armo la query
     let query =
-      "select A.IdAgenda, A.NombreCliente, A.Descripcion, A.Img, A.Tel, H.Cedula, H.HoraInicio, H.HoraFin, H.Fecha, H.IdHorario from Agenda A, Horario H where A.IdHorario = H.IdHorario and A.IdAgenda = " +
+      "select A.IdAgenda, A.NombreCliente, A.Descripcion, A.Img, A.Tel, E.Nombre, H.Cedula, H.HoraInicio, H.HoraFin, H.Fecha, H.IdHorario from Agenda A, Horario H, Empleado E where A.IdHorario = H.IdHorario and E.Cedula = H.Cedula and A.IdAgenda = " +
       idAgenda;
     //Aca guardo el resultado de la consulta a la bd
     const consultaAgendaPorId = await pool.request().query(query);
@@ -255,20 +255,24 @@ const getAgendaPorId = async (idAgenda) => {
         descripcion: agenda[0].Descripcion,
         img: agenda[0].Img,
         tel: agenda[0].Tel,
+        nombreEmpleado: agenda[0].Nombre,
         ciPeluquero: agenda[0].Cedula,
-        horario:{i: agenda[0].HoraInicio, f: agenda[0].HoraFin},
+        horario: { i: agenda[0].HoraInicio, f: agenda[0].HoraFin },
         fecha: agenda[0].Fecha,
         servicios: [],
-        idHorario: agenda[0].IdHorario
+        idHorario: agenda[0].IdHorario,
       };
       //Armo la query para buscar todos los servicios de la agenda
-      let queryServicios = "select IdServicio from Agenda_Servicio where IdAgenda = " + idAgenda;
+      let queryServicios =
+        "select IdServicio from Agenda_Servicio where IdAgenda = " + idAgenda;
       //Hago la consulta a la bd
-      const consultaServiciosAgenda = await pool.request().query(queryServicios);
+      const consultaServiciosAgenda = await pool
+        .request()
+        .query(queryServicios);
       //Separo el resultado
       const serviciosAgenda = consultaServiciosAgenda.recordset;
       //Por cada horario que haya en serviciosAgenda lo agrego al array de retorno
-      serviciosAgenda.forEach(servicio => {
+      serviciosAgenda.forEach((servicio) => {
         ret.servicios.push(servicio.IdServicio);
       });
       console.log(agenda);
@@ -315,7 +319,7 @@ const modificarAgenda = async (nuevaAgenda) => {
       nuevaAgenda.imagenEjemplo +
       ", Tel = " +
       nuevaAgenda.telefono +
-      " where IdAgenda = " + 
+      " where IdAgenda = " +
       nuevaAgenda.idAgenda;
     /**
      ACA VA A IR LO DEL SERVICIO, EL TEMA DE ESTO COMO PUEDE CAMBIAR TODOS LOS SERVICIOS QUE SE VA A HACER
