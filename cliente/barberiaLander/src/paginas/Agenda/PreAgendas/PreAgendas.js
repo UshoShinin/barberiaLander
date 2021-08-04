@@ -1,4 +1,4 @@
-import Card from "../../../components/UI/Card/Card";
+import NormalCard from "../../../components/UI/Card/NormalCard";
 import classes from "./PreAgendas.module.css";
 import Lista from "./Lista/Lista";
 import useHttp from "../../../hooks/useHttp";
@@ -80,7 +80,7 @@ const PreAgendas = () => {
     let misAgendas = [];
     agendas.mensaje.preAgendas.forEach((agenda) => {
       misAgendas.push({ ...agenda, fecha: agenda.fecha.slice(0, 10) });
-    });
+    }); 
     setAgendasState(misAgendas);
   };
   const { isLoading, error, sendRequest: fetchAgendas } = useHttp();
@@ -89,7 +89,7 @@ const PreAgendas = () => {
     fetchAgendas({ url: "/listadoPreAgendas" }, obtenerAgendas);
   }, []);
   return (
-    <Card>
+    <NormalCard>
       {isLoading && <LoaddingSpinner />}
       {!isLoading && (
         <div className={classes.container}>
@@ -117,7 +117,7 @@ const PreAgendas = () => {
           </div>
         </div>
       )}
-    </Card>
+    </NormalCard>
   );
 };
 
