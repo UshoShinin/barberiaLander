@@ -41,6 +41,7 @@ const aceptarAgenda = async (id, aceptada) => {
     return ret;
   }
 };
+
 //Conseguir datos para el listado de agendas
 const getDatosListadoAgendas = async () => {
   //variable que tiene la conexion
@@ -92,111 +93,197 @@ const getDatosListadoAgendas = async () => {
   //Devuelvo el objeto ret
   return ret;
 };
-//Conseguir datos para formularios
-const getDatosFormulario = async () => {
+
+//Metodo para conseguir todos los servicios con su nombre
+//Esto devuelve una promesa con todos los servicios
+const getServicios = async () => {
   try {
     //variable que tiene la conexion
     const pool = await sql.connect(conexion);
-    //Consigo los servicios para devolverlos tambien
+    //Consigo el listado de servicios
     const listadoServicios = await pool
       .request()
       .query("select * from Servicio");
-    //Consigo cuanto demora cada empleado por servicio
-    const duracionServiciosEmpleado = await pool
-      .request()
-      .query(
-        "select E.Cedula, SE.IdServicio, SE.Duracion from Empleado E, Servicio_Empleado SE where E.Cedula = SE.Cedula order by E.Cedula"
-      );
-    //Consigo los datos de los empleados
-    const empleados = await pool
-      .request()
-      .query("select Cedula, Nombre, Img from Empleado");
-    //Consigo los datos de los horarios
-    const horarios = await pool
-      .request()
-      .query("select * from Horario order by Cedula, HoraInicio");
-    //Consigo los datos de las agendas
-    const agendas = await pool
-      .request()
-      .query(
-        "select E.Cedula, A.IdAgenda, H.Fecha, H.IdHorario from Empleado E, Agenda A, Horario H where E.Cedula = H.Cedula and A.IdHorario = H.IdHorario and A.Aceptada = 1"
-      );
-    //Creo el objeto que voy a devolver
-    let ret = {
-      //Servicios con su id y nombre
-      servicios: [],
-      //Empleados con sus datos necesarios
-      empleados: [],
-    };
+    //Armo un array que es lo que voy a devolver
+    let arrayRetorno = [];
+    //Recorro el listado de servicios y agrego al array de retorno los servicios
     //Agrego los servicios al array de retorno
     for (let u = 0; u < listadoServicios.recordset.length; u++) {
       let servicioAux = {
         idServicio: listadoServicios.recordset[u].IdServicio,
         nombre: listadoServicios.recordset[u].Nombre,
       };
-      ret.servicios.push(servicioAux);
+      arrayRetorno.push(servicioAux);
     }
-    //Agrego los empleados al array de retorno
+    return arrayRetorno;
+  } catch (error) {
+    console.log(error);
+  }
+};
+//Metodo para conseguir los empleados para el formulario
+//Devuelve una promesa
+const getEmpleadosFormulario = async () => {
+  try {
+    //variable que tiene la conexion
+    const pool = await sql.connect(conexion);
+    //Consigo los datos de los empleados
+    const empleados = await pool
+      .request()
+      .query("select Cedula, Nombre, Img from Empleado");
+    //Creo el array de retorno
+    let arrayRetorno = [];
+    //Recorro el listado de empleados para armar el objeto como necesito
     for (let i = 0; i < empleados.recordset.length; i++) {
       //Creo un empleado auxiliar para agregar al array de retorno
       let empleadoAux = {
         id: empleados.recordset[i].Cedula,
         title: empleados.recordset[i].Nombre,
         foto: empleados.recordset[i].Img,
-        fechas: [],
-        duracionServicio: [],
+        //fechas: [], Esto se le agrega en otro metodo
+        //duracionServicio: [], Esto se le agrega en otro metodo
+      };
+      arrayRetorno.push(empleadoAux);
+    }
+    return arrayRetorno;
+  } catch (error) {
+    console.log(error);
+  }
+};
+//Metodo para agregarle a los empleados del formulario lo que duran con cada servicio
+//Nada mas espero que me llegue un array con objetos empleado
+//Devuelve una promesa
+const agregarDuracionEmpleados = async (listadoEmpleados) => {
+  try {
+    //variable que tiene la conexion
+    const pool = await sql.connect(conexion);
+    //Consigo cuanto demora cada empleado por servicio
+    const duracionServiciosEmpleado = await pool
+      .request()
+      .query(
+        "select E.Cedula, SE.IdServicio, SE.Duracion from Empleado E, Servicio_Empleado SE where E.Cedula = SE.Cedula order by E.Cedula"
+      );
+    let arrayRetorno = [];
+    for (let i = 0; i < listadoEmpleados.length; i++) {
+      //Creo empleado auxiliar para agregarle duracion
+      let empleadoAux = {
+        ...listadoEmpleados[i],
+        duracion: [],
       };
       //Recorro las duraciones de servicios para ir agregandolo aca
       for (let p = 0; p < duracionServiciosEmpleado.recordset.length; p++) {
-        if (
-          duracionServiciosEmpleado.recordset[p].Cedula ===
-          empleados.recordset[i].Cedula
-        ) {
+        if (duracionServiciosEmpleado.recordset[p].Cedula === empleadoAux.id) {
           //Creo un objeto auxiliar para agregar al empleadoAux
           let duracionAux = {
             idServicio: duracionServiciosEmpleado.recordset[p].IdServicio,
             duracion: duracionServiciosEmpleado.recordset[p].Duracion,
           };
-          empleadoAux.duracionServicio.push(duracionAux);
+          empleadoAux.duracion.push(duracionAux);
         }
       }
-      //Recorro las agendas para agregar las fechas
-      for (let j = 0; j < agendas.recordset.length; j++) {
-        //Si para la cedula del empleado en el que estoy hay una agenda, se agregan el dia y mes de cada agenda que tiene
-        if (
-          empleados.recordset[i].Cedula === agendas.recordset[j].Cedula &&
-          agendas.recordset[j].Fecha !== null
-        ) {
-          let fechaAux = {
-            dia: agendas.recordset[j].Fecha.getDate(),
-            mes: agendas.recordset[j].Fecha.getMonth() + 1,
-            horarios: [],
-          };
-          //Recorro los horarios para agregarlos a las fechas correspondientes
-          for (let k = 0; k < horarios.recordset.length; k++) {
-            //Cuando para la agenda en la que estoy encuentro un horario, agrego ese horario
-            if (
-              horarios.recordset[k].IdHorario === agendas.recordset[j].IdHorario
-            ) {
-              let horarioAux = {
-                i: horarios.recordset[k].HoraInicio,
-                f: horarios.recordset[k].HoraFin,
-              };
-              //Agrego el horario al array de horarios que tiene la fecha
-              fechaAux.horarios.push(horarioAux);
-            }
-          }
-          //Agrego las fechas al array que tiene las fechas
-          empleadoAux.fechas.push(fechaAux);
-        }
-      }
-      //Agrego al empleado con todos su datos
-      ret.empleados.push(empleadoAux);
+      arrayRetorno.push(empleadoAux);
     }
-    return ret;
+    return arrayRetorno;
   } catch (error) {
     console.log(error);
   }
+};
+//Metodo para agregarle las fechas agendadas a los
+//Espero que me llegue un listado de empleados
+//Devuelve una promesa
+const agregarFechasEmpleados = async (listadoEmpleados) => {
+  try {
+    //variable que tiene la conexion
+    const pool = await sql.connect(conexion);
+    //Voy a buscar las fechas de todas las agendas aceptadas
+    const fechasAgenda = await pool
+      .request()
+      .query(
+        "select E.Cedula, H.Fecha from Empleado E, Agenda A, Horario H where E.Cedula = H.Cedula and A.IdHorario = H.IdHorario and A.Aceptada = 1 group by H.Fecha, E.Cedula"
+      );
+    //Armo el array de retorno
+    let arrayRetorno = [];
+    //Recorro todos los empleados y por cada uno le agrego las fechas de las agendas
+    for (let i = 0; i < listadoEmpleados.length; i++) {
+      //Armo un empleado aux que tiene un array de fechas
+      let empleadoAux = {
+        ...listadoEmpleados[i],
+        fechas: [],
+      };
+      //Recorro las fechas de las agendas para agregarlas
+      for (let j = 0; j < fechasAgenda.recordset.length; j++) {
+        if (empleadoAux.id === fechasAgenda.recordset[j].Cedula) {
+          //Creo el objeto fecha para agregar al empleado
+          let fechaAux = {
+            dia: fechasAgenda.recordset[j].Fecha.getUTCDate(),
+            mes: fechasAgenda.recordset[j].Fecha.getMonth() + 1,
+            horarios: [],
+          };
+          empleadoAux.fechas.push(fechaAux);
+        }
+      }
+      arrayRetorno.push(empleadoAux);
+    }
+    return arrayRetorno;
+  } catch (error) {
+    console.log(error);
+  }
+};
+//Metodo para agregar los horarios de las agendas al empleado
+//Me llega un empleado y le tengo que agregar los horarios a ese empleado
+//Devuelve una promesa
+const agregarHorariosEmpleado = async (listadoEmpleados) => {
+  try {
+    //variable que tiene la conexion
+    const pool = await sql.connect(conexion);
+    //Consigo los datos de los horarios
+    const horarios = await pool
+      .request()
+      .query("select * from Horario order by Cedula, HoraInicio");
+    //Recorro todos los empleados para ir agregando uno por uno sus horarios
+    for (let k = 0; k < listadoEmpleados.length; k++) {
+      //Recorro las fechas del empleado en el cual estoy parado
+      for (let j = 0; j < listadoEmpleados[k].fechas.length; j++) {
+        //Recorro el array de horarios para ver cuales le tengo que asignar
+        for (let i = 0; i < horarios.recordset.length; i++) {
+          //Tengo que verificar de que la fecha del horario sea la fecha correspondiente
+          if (
+            listadoEmpleados[k].fechas[j].dia ===
+              horarios.recordset[i].Fecha.getUTCDate() &&
+            listadoEmpleados[k].fechas[j].mes ===
+              horarios.recordset[i].Fecha.getMonth() + 1
+          ) {
+            //Creo objeto auxiliar horario para agregar
+            let horarioAux = {
+              i: horarios.recordset[i].HoraInicio,
+              f: horarios.recordset[i].HoraFin,
+            };
+            listadoEmpleados[k].fechas[j].horarios.push(horarioAux);
+          }
+        }
+      }
+    }
+    return listadoEmpleados;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Conseguir datos para formularios
+const getDatosFormulario = async () => {
+  let probar = getEmpleadosFormulario()
+    .then((listadoEmpleados) => {
+      return agregarDuracionEmpleados(listadoEmpleados);
+    })
+    .then((listadoEmpleadosDuracion) => {
+      return agregarFechasEmpleados(listadoEmpleadosDuracion);
+    })
+    .then((listadoEmpleadosConFecha) => {
+      return agregarHorariosEmpleado(listadoEmpleadosConFecha);
+    })
+    .then((listadoCompleto) => {
+      return listadoCompleto;
+    });
+  return probar;
 };
 
 //Conseguir datos de todas las pre agendas
@@ -330,108 +417,145 @@ const modificarAgenda = async (nuevaAgenda) => {
   }
 };
 
+//Este es un metodo que dado los datos de un horario lo inserta en la base de datos
+//Es un metodo auxiliar que devuelve el id del horario en caso de que se inserte, si no devuelve -1
+const insertarHorario = async (horario) => {
+  /*
+    ACA TIENE QUE IR EL CODIGO DE LA VERIFICACION DE SI EL HORARIO SIGUE ESTANDO DISPONIBLE
+    SE TIENE QUE REVISAR DE SI PARA EL PELUQUERO QUE MANDAN EL HORARIO DE ESA FECHA ESTA DISPONIBLE
+    EN CASO DE QUE NO ESTE DISPONIBLE  HAY QUE HACER EL RETURN ACA MISMO Y DECIS QUE EL HORARIO NO ESTA DISPONIBLE
+   */
+  const pool = await sql.connect(conexion);
+  const insertHorario = await pool
+    .request()
+    .input("Cedula", sql.VarChar, horario.ciEmpleado)
+    .input("HoraInicio", sql.VarChar, horario.i)
+    .input("HoraFin", sql.VarChar, horario.f)
+    .input("Fecha", sql.Date, horario.fecha)
+    .query(
+      "insert into Horario (Cedula, HoraInicio, HoraFin, Fecha) OUTPUT inserted.IdHorario values (@Cedula, @HoraInicio, @HoraFin, @Fecha)"
+    )
+    .then((resultado) => {
+      //El objeto que me devuele el insert tiene la cantidad de filas afectadas y el idHorario del horario que acabo de insertar
+      //Devuelvo el idHorario
+      return resultado.recordset[0].IdHorario;
+    })
+    .catch((error) => {
+      console.log(error);
+      //Hago dejo en consola el error y por las dudas devuelvo -1 que significa que no se inserto nada
+      return {
+        error: error,
+        idAgenda: -1,
+      };
+    });
+  //Cuando tengo el resultado ya en la variable devuelvo el id del horario que recien se inserto
+  return insertHorario;
+};
+//Este es un metodo que dado los datos de una agenda lo inserta en la base de datos
+//Es un metodo auxiliar que devuelve el idAgenda y idHorario si se inserta, si no devuelve en cada uno -1
+const insertarAgenda = async (agenda) => {
+  //Variable que tiene la conexion
+  const pool = await sql.connect(conexion);
+  //Armo el insert
+  const insertAgenda = await pool
+    .request()
+    .input("NombreCliente", sql.VarChar, agenda.nombre)
+    .input("Descripcion", sql.VarChar, agenda.descripcion)
+    .input("Img", sql.VarChar, agenda.imagenEjemplo)
+    .input("Tel", sql.VarChar, agenda.telefono)
+    .input("Aceptada", sql.Bit, agenda.aceptada)
+    .input("IdHorario", sql.Int, agenda.idHorario)
+    .query(
+      "insert into Agenda (NombreCliente, Descripcion, Img, Tel, Aceptada, IdHorario) OUTPUT inserted.IdHorario, inserted.IdAgenda values (@NombreCliente, @Descripcion, @Img, @Tel, @Aceptada, @IdHorario)"
+    )
+    .then((resultado) => {
+      //El objeto resultado devuelve la cantidad de filas afectadas, el idAgenda y el idHorario
+      let ret = {
+        idHorario: resultado.recordset[0].IdHorario,
+        idAgenda: resultado.recordset[0].IdAgenda,
+      };
+      return ret;
+    })
+    .catch((error) => {
+      //Armo un objeto con el error y los valores en -1
+      return {
+        error: error,
+        idHorario: -1,
+        idAgenda: -1,
+      };
+    });
+  //Cuando tengo el resultado del insert de la agenda, devuelvo el idAgenda y el idHorario
+  return insertAgenda;
+};
+//Este es un metodo que dado los datos de una agenda y un servicio lo inserta en la base de datos
+//Es un metodo auxiliar que devuelve
+const insertarServicioAgenda = async (servicioAgenda) => {
+  //Variable que tiene la conexion
+  const pool = await sql.connect(conexion);
+  //Creo la tabla que voy a insertar
+  const tabla = new sql.Table("PeluqueriaLander.dbo.Agenda_Servicio");
+  tabla.database = "PeluqueriaLander";
+  //Tengo que decir si creo la tabla o no
+  tabla.create = false;
+  //Segun lo leido tengo que insertar a la variable 'tabla' las columnas que va a tener
+  tabla.columns.add("IdAgenda", sql.Int, { nullable: false, primary: true });
+  tabla.columns.add("IdHorario", sql.Int, { nullable: true });
+  tabla.columns.add("IdServicio", sql.Int, { nullable: false, primary: true });
+  //Por cada servicio que me llegue agrego una fila (row)
+  servicioAgenda.servicios.forEach((servicio) => {
+    tabla.rows.add(servicioAgenda.idAgenda, servicioAgenda.idHorario, servicio);
+  });
+  //Creo el request que voy a hacer
+  const request = pool.request();
+  //Le digo al request que haga el insert
+  const resultado = await request.bulk(tabla);
+  //Devuelvo el resultado que es la cantidad de filas afectadas
+  return resultado.rowsAffected;
+};
+
 //Metodo para agregar la agenda a la base, voy a recibir los datos todos dentro del objeto agenda
 const crearSolicitudAgenda = async (agenda) => {
-  try {
-    //Variable donde esta la conexion con la bd
-    const pool = await sql.connect(conexion);
-    //Armo la query de Horario
-    let queryHorario =
-      "Insert into Horario (" +
-      agenda.ciPeluquero +
-      ", " +
-      agenda.horario.i +
-      ", " +
-      agenda.horario.f +
-      ", " +
-      agenda.fecha +
-      ")";
-    //Inserto en la tabla Horario los datos de de la agenda
-    const insertHorario = await pool.request().query(queryHorario);
-    //Verifico que haya insertado algo
-    if (insertHorario.rowsAffected[0] === 1) {
-      //Armo la query para el select de abajo
-      let queryConsultaHorario =
-        "select IdHorario from Horario where Cedula = " +
-        agenda.cedulaPeluquero +
-        " and HoraInicio = " +
-        agenda.horario.i +
-        " and HoraFin = " +
-        agenda.horario.f;
-      //Hago un select para poder saber cual es el id del horario que acabo de insertar
-      const consultaHorarioAux = await pool
-        .request()
-        .query(queryConsultaHorario);
-      //Separo el id del resultado de la query
-      const idHorario = consultaHorarioAux.recordset.IdHorario;
-      //Ahora que tengo el id del horario armo la query para agregar la agenda
-      let queryAgenda =
-        "Insert into Agenda (" +
-        agenda.nombreCliente +
-        ", " +
-        agenda.descripcion +
-        ", " +
-        agenda.imagenEjemplo +
-        ", " +
-        agenda.telefono +
-        ", 0, " +
-        idHorario +
-        ")";
-      //Hago el select para poder saber cual es el id de la agenda
-      const insertAgenda = await pool.request().query(queryAgenda);
-      if (insertAgenda.recordset.rowsAffected === 1) {
-        //Armo la query para saber cual es el id de agenda
-        let queryConsultaAgenda =
-          "select IdAgenda from Agenda where IdHorario = " + idHorario;
-        //Hago el select para saber el id de la agenda
-        const consultaAgendaAux = await pool
-          .request()
-          .query(queryConsultaAgenda);
-        //Separo el valor del id de la agenda
-        const idAgenda = consultaAgendaAux.recordset.IdAgenda;
-        let queryServicioAgenda = "Insert into Agenda_Servicio values ";
-        //Recorro todos los servicios que van para la agenda y armo la query
-        for (let i = 0; i < agenda.servicios.length; i++) {
-          //Verifico si en el servicio que estoy parado es el ultimo de la lista. Esto lo hago para armar la query con o si coma al final
-          if (i + 1 === agenda.servicios.length) {
-            let queryAux =
-              "(" +
-              idAgenda +
-              ", " +
-              idHorario +
-              ", " +
-              agenda.servicios[i] +
-              ")";
-          } else {
-            let queryAux =
-              "(" +
-              idAgenda +
-              ", " +
-              idHorario +
-              ", " +
-              agenda.servicios[i] +
-              "), ";
-          }
-          queryServicioAgenda += queryAux;
-        }
-        const insertServicioAgenda = await pool
-          .request()
-          .query(queryServicioAgenda);
-        if (insertServicioAgenda.recordset.rowsAffected > 0) {
-          return "La agenda fue agregada correctamente";
-        } else {
-          throw ex;
-        }
-      } else {
-        throw ex;
+  //Esto lo que hace es insertar primero el horario, despues la agenda y al final agenda servicio
+  const insertarAgendaCompleto = insertarHorario({
+    ciEmpleado: agenda.ciEmpleado,
+    i: agenda.horario.i,
+    f: agenda.horario.f,
+    fecha: agenda.fecha,
+  })
+    .then((resHorario) => {
+      //El resultado de la promesa de insertarHorario es el id del horario que se acaba de insertar
+      //Controlo de que si el id es -1 es porque dio error
+      if (resHorario.idAgenda < 0) {
+        throw "Error al insertar agenda";
       }
-    } else {
-      throw ex;
-    }
-  } catch (error) {
-    //En caso de que por alguna razon explote esto devuelve el error al metodo que lo llamo y ese lo devuelve por json
-    return error;
-  }
+      //Esto lo que hace es devolver la promesa que devuelve el insertar agenda
+      //Esto le llega al then de arriba para que pueda hacerle .then abajo y seguir trabajando
+      return insertarAgenda({
+        nombre: agenda.nombreCliente,
+        descripcion: agenda.descripcion,
+        imagenEjemplo: agenda.imagenEjemplo,
+        telefono: agenda.telefono,
+        aceptada: 0, //Esto hay que ver porque capaz se puede modificar para que siempre me lo manden y no lo tenga que hardcodear
+        idHorario: resHorario,
+      });
+    })
+    .then((resAgenda) => {
+      //El resultado de la promesa de insertarAgenda es un objeto con idHorario y idAgenda
+      return insertarServicioAgenda({
+        idAgenda: resAgenda.idAgenda,
+        idHorario: resAgenda.idHorario,
+        servicios: agenda.servicios,
+      });
+    })
+    .then((resServicioAgenda) => {
+      //El resultado de la promesa de insertarServicioAgenda es la cantidad de filas afectadas, es decir la cantidad de registros que se guardaron en la tabla
+      if (resServicioAgenda === agenda.servicios.length) {
+        return "Agenda insertada correctamente";
+      } else {
+        return "Error al insertar agenda";
+      }
+    });
+  return insertarAgendaCompleto;
 };
 
 //Creo un objeto que voy a exportar para usarlo desde el index.js
