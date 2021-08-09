@@ -7,6 +7,7 @@ export const initialState = {
   sinAgendar: { value: false },
   soloHoy: { value: false },
   montoAgenda: { value: "", isValid: null },
+  propinaAgenda: { value: "", isValid: null },
 };
 
 const validarMonto = (value) => {
@@ -55,6 +56,8 @@ export const cajaReducer = (state, action) => {
       return {
         ...state,
         sinAgendar: { value: !state.sinAgendar.value },
+        soloHoy: { value: false },
+        propinaAgenda: { value: "",isValid:null },
       };
     case "CLICK_S_H":
       return {
@@ -96,6 +99,31 @@ export const cajaReducer = (state, action) => {
         ...state,
         montoAgenda: {
           value: state.montoAgenda.value,
+          isValid: valido,
+        },
+      };
+    case "USER_INPUT_PROPINA_A":
+      return {
+        ...state,
+        propinaAgenda: {
+          value: action.value,
+          isValid: state.propinaAgenda.isValid,
+        },
+      };
+    case "FOCUS_INPUT_PROPINA_A":
+      return {
+        ...state,
+        propinaAgenda: {
+          value: state.propinaAgenda.value,
+          isValid: null,
+        },
+      };
+    case "BLUR_INPUT_PROPINA_A":
+      valido = validarMonto(state.propinaAgenda.value);
+      return {
+        ...state,
+        propinaAgenda: {
+          value: state.propinaAgenda.value,
           isValid: valido,
         },
       };

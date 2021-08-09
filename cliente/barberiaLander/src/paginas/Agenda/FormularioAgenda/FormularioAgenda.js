@@ -112,9 +112,11 @@ const FormularioAgenda = (props) => {
   } */
   /* Carga inicial de datos */
   const obtenerHorarios = (horarios) => {
+    console.log('Inicio');
+    console.log(horarios);
     dispatchInput({
       type: "HORARIOS_CARGADOS",
-      value: horarios.mensaje.empleados,
+      value: horarios.mensaje,
     });
   };
   const {

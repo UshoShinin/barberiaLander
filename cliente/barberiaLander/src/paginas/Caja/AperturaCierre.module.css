@@ -64,15 +64,53 @@
   position: absolute;
   right: 20px;
 }
-.switchs {
+.comboAgenda{
+  height: 60px;
+}
+.agenda > .dobleFild + div,
+.agenda > div + .dobleFild{
+  margin-bottom: 20px;
+}
+
+.dobleFild {
     display: flex;
+}
+.dobleFild > div{
+  display: flex;
   align-items: center;
+  width: 50%;
+  justify-content: center;
+  
+}
+.dobleFild > div > label{
+  margin-right:10px;
 }
 
 .agendaProductos{
     display:grid;
-    grid-template-columns: 50% 50%;
+    grid-template-columns: 49% 49%;
+    grid-column-gap:2%;
 }
 .entrada {
   /* background-color: brown; */
+}
+
+.productos{
+  display: grid;
+  grid-template-rows: 30px auto;
+}
+
+.productos > div{
+  height: 100%;
+  display: grid;
+  grid-template-columns: 45% 10% 45%;
+}
+.productos> div>div{
+  background-color: darkslategray;
+}
+.productos> div>div+div{
+  background-color: grey;
+}
+.productos> div>div+div+div{
+  background-color: darkslategray;
 }
