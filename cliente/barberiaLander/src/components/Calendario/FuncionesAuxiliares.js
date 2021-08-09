@@ -70,6 +70,7 @@ export const minutosAHorarios = (minutos) => {
 };
 /* Carga todos los horarios disponibles dentro de una lista de gorarios y una cantidad de tiempo que es necesario ocupar */
 const horariosAgendarDisponibles = (horarios, timeNeed) => {
+  console.log(horarios, timeNeed);
   let hora = "08:00";
   const horaCierre = "22:00";
   let horariosDisponibles = [];

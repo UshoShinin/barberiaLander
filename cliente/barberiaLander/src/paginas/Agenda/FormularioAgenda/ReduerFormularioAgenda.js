@@ -19,7 +19,7 @@ const filtrarHorarios = (empleados, noManeja, id) => {
     );
   return empleados;
 };
-export const initialState = {
+export const initialBaseState = {
   Nombre: { value: "", isValid: null },
   Horarios: null,
   HorariosFiltrados: null,
@@ -112,13 +112,6 @@ export const inputReducer = (state, action) => {
         Descripcion: {
           value: state.Descripcion.value,
           isValid: null,
-        },
-      };
-    case "CHECKBOXES":
-      return {
-        ...state,
-        Checkboxes: {
-          value: { ...action.value },
         },
       };
     case "USER_INPUT_REFERENCIA":

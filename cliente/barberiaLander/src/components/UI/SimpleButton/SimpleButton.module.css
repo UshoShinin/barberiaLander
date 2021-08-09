@@ -2,7 +2,8 @@
   font-size: 1rem;
   font-family: "Staatliches";
   letter-spacing: 0.1em;
-  display: inline-block;
+  /* display: inline-block; */
+  width: max-content;
   cursor: pointer;
   text-decoration: none;
   color: var(--clr-neon-blue);

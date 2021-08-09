@@ -16,10 +16,6 @@
 .container > div > div{
     width: 50%;
 }
-.container > div > div > h1 {
-  color: var(--clr-inActive);
-  transition: color 200ms linear;
-}
 .container > div > div > h2 {
   color: var(--clr-inActive);
   transition: color 200ms linear;
@@ -52,4 +48,15 @@
 .show {
   color: var(--clr-neon-white);
   opacity: 1;
+}
+.foto{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.foto > img{
+  max-width: 80%;
+  max-height: 80%;
+  border-radius: 20px;
 }

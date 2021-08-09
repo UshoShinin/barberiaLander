@@ -1,17 +1,6 @@
-import { useState, useReducer, useRef, useEffect, useContext } from "react";
+/* import {useContext } from "react"; */
+/* import ContextUsuario from "./context/contextUsuario"; */
 import "./App.css";
-import Button from "./components/UI/Button/Button";
-import Input from "./components/UI/Input/Input";
-import ComboBox from "./components/ComboBox/ComboBox";
-//import Switch from "./components/Switch/Switch";
-import LoaddingSpinner from "./components/LoaddingSpinner/LoaddingSpinner";
-import Footer from "./components/Footer/Footer";
-import Expenses from "./paginas/Agenda/PreAgendas/Lista/Lista";
-import Modal from "./components/UI/Modal/Modal";
-import Backdrop from "./components/UI/Backdrop/Backdrop";
-import Calendario from "./components/Calendario/Calendario";
-
-import ContextUsuario from "./context/contextUsuario";
 //IMPORTS PARA LAS PAGINAS
 import Inicio from "./paginas/Inicio";
 import Administracion from "./paginas/Administracion";
@@ -33,25 +22,16 @@ import {
   BrowserRouter as Router,
   Route,
   Redirect,
-  Swich,
   Switch,
-  NavLink,
 } from "react-router-dom";
-const App =()=>{
-  const initialExpenses = [
-    { id: "e1", title: "Producto1", amount: 200 },
-    { id: "e2", title: "Producto2", amount: 300 },
-    { id: "e3", title: "Producto3", amount: 20 },
-    { id: "e4", title: "Producto4", amount: 500 },
-  ];
-
+const App = () => {
   //DEJO ACA LO QUE IRIAMOS A USAR PARA CUANDO CONTROLEMOS A DONDE TIENE QUE IR EL USUARIO
   //ESTO POR AHORA QUEDA NADA MAS, CUANDO ACOMODEMOS LAS COSAS PARA QUE QUEDEN PROLIJAS HAY QUE PONER EL IMPORT DONDE TIENE QUE IR
   //HAY QUE IMPORTAR useContext y ContextUsuario donde sea que vayamos a ir
   //DEJO UNA LISTA CON COMPONENTES LINKS QUE SON LOS QUE DEBERIAMOS USAR EN EL HEADER, SE VAN A RENDERIZAR SEGUN EL ROL
-  const ctxUsuario = useContext(ContextUsuario);
+  /* const ctxUsuario = useContext(ContextUsuario);
   const estaLogueado = ctxUsuario.estaLogueado;
-  const rol = ctxUsuario.rol;
+  const rol = ctxUsuario.rol; */
 
   return (
     <div className="App">
@@ -108,8 +88,8 @@ const App =()=>{
           </Switch>
         </main>
       </Router>
-      </div>
+    </div>
   );
-}
+};
 
 export default App;

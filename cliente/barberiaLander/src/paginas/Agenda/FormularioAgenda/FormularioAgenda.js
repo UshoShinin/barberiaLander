@@ -20,9 +20,7 @@ import {
 
 import {
   inputReducer,
-  initialState,
-  checkReducer,
-  initialStateCheck,
+  initialBaseState,
 } from "./ReduerFormularioAgenda";
 import ComboBox from "../../../components/ComboBox/ComboBox";
 
@@ -87,6 +85,31 @@ import ComboBox from "../../../components/ComboBox/ComboBox";
 
 
 const FormularioAgenda = (props) => {
+  /* console.log(props.agenda);
+  console.log(props.horario); */
+  /* let initialState;
+  if(false){ props.agenda !==null&&props.horario!==null 
+    
+    initialState = {
+      Nombre: { value: props.agenda.nombreCliente, isValid: true },
+      Horarios: null,
+      HorariosFiltrados: null,
+      Telefono: { value: props.agenda.tel, isValid: true },
+      Descripcion: { value: props.agenda.descripcion, isValid: props.agenda.descripcion.length!==0?true:null },
+      Referencia: { value: props.agenda.img },
+      Calendario: { value: null, dia: props.agenda.fecha },
+      ComboBox: { value: null, active: false },
+      Employee: { value: props.agenda.ciPeluquero },
+      corte: { active: props.agenda.corte, id: 1 },
+      barba: { active: props.agenda.barba, id: 4 },
+      maquina: { active: props.agenda.maquina, id: 5 },
+      claritos: { active: props.agenda.claritos, id: 6 },
+      decoloracion: { active: props.agenda.decoloracion, id: 7 },
+      brushing: { active: props.agenda.brushing, id: 8 },
+    }
+  }else{
+    initialState = initialBaseState;
+  } */
   /* Carga inicial de datos */
   const obtenerHorarios = (horarios) => {
     dispatchInput({
@@ -105,11 +128,12 @@ const FormularioAgenda = (props) => {
     fetchHorarios({ url: "/datosFormularioAgenda" }, obtenerHorarios);
   }, []);
 
-  const [inputState, dispatchInput] = useReducer(inputReducer, initialState);
+  const [inputState, dispatchInput] = useReducer(inputReducer, initialBaseState);
   const nombreRef = useRef();
   const telefonoRef = useRef();
   const descripcionRef = useRef();
-
+  
+  console.log(inputState);
   /* Eventos reducer */
   const nombreChangeHandler = (event) => {
     dispatchInput({ type: "USER_INPUT_NAME", value: event.target.value });
@@ -235,14 +259,6 @@ const FormularioAgenda = (props) => {
       };
       props.onSaveDatosAgenda(datosAgenda);
     }
-    /* nombreCliente: "text",
-    telefono: "text",
-    descripcion: "text", 
-    imagenEjemplo: "url",
-    servicios:[1,4,6], Array de id's de servicios
-    fecha:` yyyy-mm-dd` ,
-    cedulaPeluquero:"text",
-    horario:{i:'08:00',f:10:00} */
   };
   let diasMostrar;
   let diasSeleccionables = [];
@@ -250,7 +266,7 @@ const FormularioAgenda = (props) => {
   const realDate = new Date();
   const date = new Date(
     realDate.getFullYear(),
-    realDate.getMonth() + 5,
+    realDate.getMonth() + 1,
     realDate.getDate()
   );
   if (inputState.HorariosFiltrados !== null && inputState.Employee.value !== null) {

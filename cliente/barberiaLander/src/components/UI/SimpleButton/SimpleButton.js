@@ -4,13 +4,13 @@ const SimpleButton = (props) => {
   let classesButton;
   switch (props.color) {
     case "red":
-      classesButton = `${classes.button} ${classes.red}`;
+      classesButton = `${props.className} ${classes.button} ${classes.red}`;
       break;
     case "white":
-      classesButton = `${classes.button} ${classes.white}`;
+      classesButton = `${props.className} ${classes.button} ${classes.white}`;
       break;
     default:
-      classesButton = `${classes.button}`;
+      classesButton = `${props.className} ${classes.button}`;
       break;
   }
   return (

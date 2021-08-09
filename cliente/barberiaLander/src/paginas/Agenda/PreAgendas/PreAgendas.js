@@ -1,4 +1,5 @@
 import NormalCard from "../../../components/UI/Card/NormalCard";
+import Card from "../../../components/UI/Card/Card";
 import classes from "./PreAgendas.module.css";
 import Lista from "./Lista/Lista";
 import useHttp from "../../../hooks/useHttp";
@@ -6,6 +7,8 @@ import { useEffect, useState } from "react";
 import LoaddingSpinner from "../../../components/LoaddingSpinner/LoaddingSpinner";
 import Switch from "../../../components/UI/Switch/Switch";
 import Visualizador from "./Visualizador/Visualizador";
+import FormularioAgenda from "../FormularioAgenda/FormularioAgenda";
+import { getEmpleadoById,obtenerHorariosDeDia } from "../../../components/Calendario/FuncionesAuxiliares";
 /* const DUMMY_AGENDAS = [
   {
     idAgenda: 1,
@@ -76,48 +79,71 @@ import Visualizador from "./Visualizador/Visualizador";
 const PreAgendas = () => {
   const [agendasState, setAgendasState] = useState(null);
   const [idAgenda, setIdAgenda] = useState(null);
+  const [agendaAModificar, setAgendaAModificar] = useState(null);
+  const [horarioAgenda, setHorarioAgenda] = useState(null);
   const obtenerAgendas = (agendas) => {
     let misAgendas = [];
     agendas.mensaje.preAgendas.forEach((agenda) => {
       misAgendas.push({ ...agenda, fecha: agenda.fecha.slice(0, 10) });
-    }); 
+    });
     setAgendasState(misAgendas);
   };
-  const { isLoading, error, sendRequest: fetchAgendas } = useHttp();
-
+  
+  const { isLoadingPreAgendas, errorPreAgendas, sendRequest: fetchAgendas } = useHttp();
+  const {isLoadingHorarios,errorHorarios,sendRequest:fetchHorarios} = useHttp();
   useEffect(() => {
     fetchAgendas({ url: "/listadoPreAgendas" }, obtenerAgendas);
   }, []);
+
+  const obtenerHorarios = (horarios) => {
+    setHorarioAgenda(obtenerHorariosDeDia(agendaAModificar.fecha.d,agendaAModificar.fecha.m,getEmpleadoById(horarios,agendaAModificar.ciPeluquero).fechas));
+  }
+
+  const showAgenda = (agendita) => {
+    setAgendaAModificar({...agendita,fecha:{d:parseInt(agendita.fecha.slice(8,10),10),m:parseInt(agendita.fecha.slice(5,7),10)}})
+    fetchHorarios({ url: "/datosFormularioAgenda"},obtenerHorarios);
+  };
+
   return (
-    <NormalCard>
-      {isLoading && <LoaddingSpinner />}
-      {!isLoading && (
-        <div className={classes.container}>
-          <div className={classes.listado}>
-            {agendasState !== null && (
-              <Lista items={agendasState} select={setIdAgenda} />
-            )}
-            <div className={classes.opciones}>
-              <div className={classes.label}>
-                <h2>Aceptar todo</h2>
+    <>
+      {" "}
+      {agendaAModificar !== null && (
+        <Card>
+          <FormularioAgenda agenda={agendaAModificar} horario={horarioAgenda} />
+        </Card>
+      )}
+      {agendaAModificar === null && (
+        <NormalCard>
+          {isLoadingPreAgendas && <LoaddingSpinner />}
+          {!isLoadingPreAgendas && (
+            <div className={classes.container}>
+              <div className={classes.listado}>
+                {agendasState !== null && (
+                  <Lista items={agendasState} select={setIdAgenda} />
+                )}
+                <div className={classes.opciones}>
+                  <div className={classes.label}>
+                    <h2>Aceptar todo</h2>
+                  </div>
+                  <div className={classes.actions}>
+                    <Switch active={true} />
+                  </div>
+                  <div className={classes.label}>
+                    <h2>Rechazar todo</h2>
+                  </div>
+                  <div className={classes.actions}>
+                    <Switch active={true} />
+                  </div>
+                </div>
               </div>
-              <div className={classes.actions}>
-                <Switch active={true} />
-              </div>
-              <div className={classes.label}>
-                <h2>Rechazar todo</h2>
-              </div>
-              <div className={classes.actions}>
-                <Switch active={true} />
+              <div className={classes.editor}>
+                <Visualizador id={idAgenda} mostrarAgenda={showAgenda} />
               </div>
             </div>
-          </div>
-          <div className={classes.editor}>
-            <Visualizador id={idAgenda} />
-          </div>
-        </div>
-      )}
-    </NormalCard>
+          )}
+        </NormalCard>
+      )}{" "}
+    </>
   );
 };
 
