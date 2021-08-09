@@ -2,9 +2,8 @@ const express = require("express");
 const router = express.Router();
 const PORT = process.env.PORT || 3001;
 const app = express();
-app.use(express.urlencoded({extended: true}));
-app.use(express.json()) // To parse the incoming requests with JSON payloads
-
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json()); // To parse the incoming requests with JSON payloads
 
 //Importo la interfaz. Esto va a tener los metodos para llamar a la base
 const interfaz = require("./interfaz");
@@ -59,16 +58,12 @@ app.use("/agendaPorId", (req, res) => {
   });
 });
 
-
-//TENGO QUE VER EL TEMA DEL BODY PPARSER PARA EXPRESS PARA PODER TOMAR LOS DATOS QUE ME MANDAN EN EL REQUEST
 app.post("/crearAgenda", (req, res) => {
-  console.log(req.body);
   const ret = interfaz.crearSolicitudAgenda(req.body);
   ret.then((resultado) => {
-    console.log(resultado);
-  });
-  res.json({
-    mensaje: req.body,
+    res.json({
+      mensaje: resultado,
+    });
   });
 });
 
