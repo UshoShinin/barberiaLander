@@ -267,10 +267,22 @@ const agregarHorariosEmpleado = async (listadoEmpleados) => {
     console.log(error);
   }
 };
-
+//Metodo para agregar los servicios al array que devuelvo
+//Devuelvo una promesa
+const agregarServiciosRetorno = async (listado) => {
+  let retorno = getServicios().then((resultado) => {
+    //Armo el array entero con todo
+    let objetoRetorno = {
+      servicios: resultado,
+      empleados: [...listado],
+    };
+    return objetoRetorno;
+  });
+  return retorno;
+};
 //Conseguir datos para formularios
 const getDatosFormulario = async () => {
-  let probar = getEmpleadosFormulario()
+  let retorno = getEmpleadosFormulario()
     .then((listadoEmpleados) => {
       return agregarDuracionEmpleados(listadoEmpleados);
     })
@@ -281,9 +293,10 @@ const getDatosFormulario = async () => {
       return agregarHorariosEmpleado(listadoEmpleadosConFecha);
     })
     .then((listadoCompleto) => {
-      return listadoCompleto;
-    });
-  return probar;
+      return agregarServiciosRetorno(listadoCompleto);
+    })
+    .then((listadoConServicios) => listadoConServicios);
+  return retorno;
 };
 
 //Conseguir datos de todas las pre agendas
@@ -420,12 +433,20 @@ const modificarAgenda = async (nuevaAgenda) => {
 //Este es un metodo que dado los datos de un horario lo inserta en la base de datos
 //Es un metodo auxiliar que devuelve el id del horario en caso de que se inserte, si no devuelve -1
 const insertarHorario = async (horario) => {
+  const pool = await sql.connect(conexion);
   /*
     ACA TIENE QUE IR EL CODIGO DE LA VERIFICACION DE SI EL HORARIO SIGUE ESTANDO DISPONIBLE
     SE TIENE QUE REVISAR DE SI PARA EL PELUQUERO QUE MANDAN EL HORARIO DE ESA FECHA ESTA DISPONIBLE
     EN CASO DE QUE NO ESTE DISPONIBLE  HAY QUE HACER EL RETURN ACA MISMO Y DECIS QUE EL HORARIO NO ESTA DISPONIBLE
    */
-  const pool = await sql.connect(conexion);
+  //Para verificar el horario primero lo que hago traerme todos los horarios de esa fecha para ese empleado
+  const horarios = await pool
+    .request()
+    .input("ci", sql.VarChar, horario.ciEmpleado)
+    .input("fecha", sql.Date, horario.fecha)
+    .query("select * from Horario where Cedula = @ci and Fecha = @fecha")
+    .then((resultado) => console.log(resultado));
+
   const insertHorario = await pool
     .request()
     .input("Cedula", sql.VarChar, horario.ciEmpleado)

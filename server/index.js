@@ -11,9 +11,9 @@ const interfaz = require("./interfaz");
 //ESTO ES PARA PROBAR LA FUNCIONALIDAD ACTUAL HAY QUE BORRARLO A LA MIERDA DESPUES
 app.use("/datosFormularioAgenda", (req, res) => {
   let ret = interfaz.getDatosFormulario();
-  ret.then((resultado) => {
+  ret.then((empleados) => {
     res.json({
-      mensaje: resultado,
+      mensaje: empleados,
     });
   });
 });
