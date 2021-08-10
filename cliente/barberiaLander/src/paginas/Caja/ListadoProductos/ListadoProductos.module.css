@@ -1,0 +1,20 @@
+.productos {
+  border-radius: 10px;
+  border: 1px var(--clr-neon-placeholder) solid;
+  box-shadow: 0 0 0.5em 0 var(--clr-neon-placeholder), inset 0 0 0.5em 0 var(--clr-neon-placeholder);
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+.productos > li {
+  font-size: 1.2em;
+  padding: 0.2em 0;
+}
+.productos > li:hover {
+  background-color: var(--clr-neon-white);
+  color: var(--clr-background);
+}
+

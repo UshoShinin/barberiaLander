@@ -87,6 +87,5 @@ width: 1em;
 .ComboBox ::-webkit-scrollbar-thumb {
   background: var(--clr-neon-white);
   border-radius: 10px;
-  
 }
 

@@ -116,7 +116,7 @@ const FormularioAgenda = (props) => {
     console.log(horarios);
     dispatchInput({
       type: "HORARIOS_CARGADOS",
-      value: horarios.mensaje,
+      value: horarios.mensaje.empleados,
     });
   };
   const {

@@ -26,11 +26,11 @@
     background-color:var(--clr-navbar);
 }
 
-li {
+.navbar-ul >li {
     float: left;
 }
 
-li a {
+.navbar-ul >li a {
     display: block;
     color: var(--clr-neon-blue);
     text-align: center;
@@ -38,7 +38,7 @@ li a {
     text-decoration: none;
 }
 
-li a:hover:not(.active) {
+.navbar-ul >li a:hover:not(.active) {
     background-color: #111; 
     color: var(--clr-neon-blue);
     box-shadow: 0 0 0.6em 0 var(--clr-neon-blue);

@@ -1,12 +1,15 @@
 .container {
   padding: 1.4em;
-  display: grid;
+  /* display: grid;
   grid-template-columns: 210px auto;
-  grid-column-gap: 20px;
-  position: relative;
+  grid-column-gap: 20px; */
+  width: 100%;
   overflow: hidden;
+  position: absolute;
+  top:50px;
+  bottom: 0;
 }
-.cajaContainer {
+.cajaContainer {  
   color: var(--clr-neon-white);
   padding: 1em;
   border: 1px var(--clr-neon-cyan) solid;
@@ -54,9 +57,14 @@
 }
 
 .caja {
+  position: absolute;
+  top:15px;
+  left:0px;
+  right: 15px;
+  bottom: 15px;
   margin-left: 1.3em;
   display: grid;
-  grid-template-rows: 66px auto;
+  grid-template-rows: 66px auto 40px;
   grid-row-gap: 20px;
 }
 
@@ -91,9 +99,6 @@
     grid-template-columns: 49% 49%;
     grid-column-gap:2%;
 }
-.entrada {
-  /* background-color: brown; */
-}
 
 .productos{
   display: grid;
@@ -104,8 +109,25 @@
   height: 100%;
   display: grid;
   grid-template-columns: 45% 10% 45%;
+  position: relative;
 }
-.productos> div>div{
+.productos> div ::-webkit-scrollbar {
+  width: 1em;
+}
+/* Track */
+.productos> div ::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 0.8em 0 var(--clr-neon-white);
+  border-radius: 10px;
+  position: absolute;
+  right: 30px;
+}
+
+/* Handle */
+.productos> div ::-webkit-scrollbar-thumb {
+  background: var(--clr-neon-white);
+  border-radius: 10px;
+}
+/* .productos> div>div{
   background-color: darkslategray;
 }
 .productos> div>div+div{
@@ -113,4 +135,4 @@
 }
 .productos> div>div+div+div{
   background-color: darkslategray;
-}
+} */
