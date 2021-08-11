@@ -430,6 +430,14 @@ const modificarAgenda = async (nuevaAgenda) => {
   }
 };
 
+//Metodo auxiliar para verificar que un horario siga disponible
+//Devuelve una promesa con true o false
+const verificarHorario = async (horario) => {
+  //Paso a valores numericos los datos del horario para poder trabajar mejor
+  let horaInicio = parseInt(horario.i.replace(":", ""));
+  let horaFin = parseInt(horario.f.replace(":", ""));
+};
+
 //Este es un metodo que dado los datos de un horario lo inserta en la base de datos
 //Es un metodo auxiliar que devuelve el id del horario en caso de que se inserte, si no devuelve -1
 const insertarHorario = async (horario) => {
@@ -579,6 +587,80 @@ const crearSolicitudAgenda = async (agenda) => {
   return insertarAgendaCompleto;
 };
 
+//Metodo auxiliar para conseguir todas las agendas aceptadas
+//Devuelve una promesa
+const getListadoAgendasAceptadas = async () => {
+  try {
+    //variable que tiene la conexion
+    const pool = await sql.connect(conexion);
+    //Voy a buscar todas las agendas
+    const agendas = await pool
+      .request()
+      .query(
+        "select A.IdAgenda as id, A.NombreCliente as title, H.Fecha as fecha, H.Cedula as empleado from Agenda A, Horario H where A.Aceptada = 1 and H.IdHorario = A.IdHorario"
+      );
+    //Separo los datos de la consulta
+    const listadoAgendas = agendas.recordset;
+    return listadoAgendas;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo auxiliar para agregar todos los servicios a las agendas aceptadas
+//Devuelve una promesa
+const agregarServiciosAgendasAceptadas = async (agendas) => {
+  try {
+    //variable que tiene la conexion
+    const pool = await sql.connect(conexion);
+    //Voy a buscar todos los servicios
+    const servicios = await pool
+      .request()
+      .query(
+        "select A.IdAgenda, S.IdServicio from Agenda A, Agenda_Servicio S where A.IdAgenda = S.IdAgenda and A.Aceptada = 1 order by IdAgenda"
+      );
+    //Separo los datos de la consulta
+    const listadoServicios = servicios.recordset;
+    //Armo el array de retorno
+    let arrayRetorno = [];
+    //Recorro el listado de agendas para irle agregando
+    for (let i = 0; i < agendas.length; i++) {
+      //Armo un objeto con los datos de la agenda y le agrego un array de servicios
+      let agendaAux = {
+        ...agendas[i],
+        servicios: [],
+      };
+      //Recorro el listado de servicios para agregarlo a la agendaAux
+      for (let j = 0; j < listadoServicios.length; j++) {
+        if(agendaAux.id === listadoServicios[j].IdAgenda){
+          agendaAux.servicios.push(listadoServicios[j].IdServicio);
+        }
+      }
+      arrayRetorno.push(agendaAux);
+    }
+    return arrayRetorno;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo para devolver todas las agendas aceptadas
+const getAgendasAceptadas = async () => {
+  try {
+    //Llamo a los metodos auxiliares
+    const retorno = getListadoAgendasAceptadas()
+      .then((listado) => {
+        return agregarServiciosAgendasAceptadas(listado);
+      })
+      .then((listadoCompleto) => {
+        return listadoCompleto;
+      });
+      return retorno;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 //Creo un objeto que voy a exportar para usarlo desde el index.js
 //Adentro voy a tener todos los metodos de llamar a la base
 const interfaz = {
@@ -588,6 +670,7 @@ const interfaz = {
   getPreAgendas,
   getAgendaPorId,
   crearSolicitudAgenda,
+  getAgendasAceptadas,
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar
