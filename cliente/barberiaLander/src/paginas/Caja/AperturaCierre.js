@@ -99,7 +99,11 @@ const AperturaCierre = () => {
                   cajaState.sinAgendar.value ? "Empleado" : "Agenda"
                 }`}</label>
                 <ComboBox
-                  opciones={cajaState.soloHoy.value?cajaState.agendasHoy:cajaState.agendas}
+                  opciones={
+                    cajaState.soloHoy.value
+                      ? cajaState.agendasHoy
+                      : cajaState.agendas
+                  }
                   current={cajaState.comboAgenda.value}
                   active={cajaState.comboAgenda.active}
                   onClick={() => {
@@ -331,13 +335,116 @@ const AperturaCierre = () => {
           </div>
         </div>
         <div>
-          <Checkbox
-            id={15}
-            /* checked={props.state.barba.active}
-            onChange={() => {
-              props.myAction({ type: "BARBA" });
-            }} */
-          />
+          <div className={classes.total}>
+            <div>
+              <div>
+                <label>Efectivo</label>
+                <Input
+                  ref={montoIniRef}
+                  isValid={cajaState.montoInicial.isValid}
+                  input={{
+                    id: 6,
+                    type: "number",
+                    value: cajaState.montoInicial.value,
+                    placeholder: "0",
+                    onChange: (event) => {
+                      dispatchCaja({
+                        type: "USER_INPUT_EFECTIVO",
+                        value: event.target.value,
+                      });
+                    },
+                    onBlur: () => {
+                      dispatchCaja({ type: "BLUR_INPUT_EFECTIVO" });
+                    },
+                    onFocus: () => {
+                      dispatchCaja({ type: "FOCUS_INPUT_EFECTIVO" });
+                    },
+                  }}
+                />
+              </div>
+              <div>
+                <Checkbox
+                  id={11}
+                  checked={cajaState.efectivo.value}
+                  onChange={() => {
+                    dispatchCaja({ type: "CLICK_EFECTIVO" });
+                  }}
+                />
+              </div>
+            </div>
+            <div>
+              <div>
+                <label>Debito</label>
+                <Input
+                  ref={montoIniRef}
+                  isValid={cajaState.montoInicial.isValid}
+                  input={{
+                    id: 7,
+                    type: "number",
+                    value: cajaState.montoInicial.value,
+                    placeholder: "0",
+                    onChange: (event) => {
+                      dispatchCaja({
+                        type: "USER_INPUT_DEBITO",
+                        value: event.target.value,
+                      });
+                    },
+                    onBlur: () => {
+                      dispatchCaja({ type: "BLUR_INPUT_DEBITO" });
+                    },
+                    onFocus: () => {
+                      dispatchCaja({ type: "FOCUS_INPUT_DEBITO" });
+                    },
+                  }}
+                />
+              </div>
+              <div>
+                <Checkbox
+                  id={12}
+                  checked={cajaState.debito.value}
+                  onChange={() => {
+                    dispatchCaja({ type: "CLICK_DEBITO" });
+                  }}
+                />
+              </div>
+            </div>
+            <div>
+              <div>
+                <label>Cuponera</label>
+                <Input
+                  ref={montoIniRef}
+                  isValid={cajaState.montoInicial.isValid}
+                  input={{
+                    id: 6,
+                    type: "number",
+                    value: cajaState.montoInicial.value,
+                    placeholder: "0",
+                    onChange: (event) => {
+                      dispatchCaja({
+                        type: "USER_INPUT_EFECTIVO",
+                        value: event.target.value,
+                      });
+                    },
+                    onBlur: () => {
+                      dispatchCaja({ type: "BLUR_INPUT_EFECTIVO" });
+                    },
+                    onFocus: () => {
+                      dispatchCaja({ type: "FOCUS_INPUT_EFECTIVO" });
+                    },
+                  }}
+                />
+              </div>
+              <div>
+                <Checkbox
+                  id={13}
+                  checked={cajaState.cuponera.value}
+                  onChange={() => {
+                    dispatchCaja({ type: "CLICK_CUPONERA" });
+                  }}
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

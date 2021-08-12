@@ -70,6 +70,12 @@ export const initialState = {
       servicios: [7, 1, 4],
     },
   ],
+  efectivo: { value: false}, 
+  debito: { value: false}, 
+  cuponera: { value: false}, 
+  montoEfectivo:{}, 
+  montoDebito:{}, 
+  montoCuponera:{}, 
 };
 
 const orden = (a, b) => {
@@ -148,17 +154,18 @@ export const cajaReducer = (state, action) => {
       const nuevoEstado = !state.soloHoy.value;
       let listaBase;
       let posicion = state.comboAgenda.value;
-      if(nuevoEstado){
+      if (nuevoEstado) {
         listaBase = [...state.agendasHoy];
-      }else{
+      } else {
         listaBase = [...state.agendas];
       }
-      if(getElementById(listaBase,posicion)===null){
-        posicion=listaBase[0].id;
+      if (getElementById(listaBase, posicion) === null) {
+        posicion = listaBase[0].id;
       }
       return {
         ...state,
-        soloHoy: { value: nuevoEstado },comboAgenda:{value:posicion,active:false}
+        soloHoy: { value: nuevoEstado },
+        comboAgenda: { value: posicion, active: false },
       };
     case "CLICK_COMBO_AGENDA":
       return {
@@ -381,6 +388,21 @@ export const cajaReducer = (state, action) => {
         montoProductos: { value: "", isValid: null },
         productosSEl: [],
         montoTotalProd: { value: total, isValid: true },
+      };
+    case "CLICK_EFECTIVO":
+      return {
+        ...state,
+        efectivo: { value: !state.efectivo.value },
+      };
+    case "CLICK_DEBITO":
+      return {
+        ...state,
+        debito: { value: !state.debito.value },
+      };
+    case "CLICK_CUPONERA":
+      return {
+        ...state,
+        cuponera: { value: !state.cuponera.value },
       };
   }
 };
