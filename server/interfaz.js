@@ -447,10 +447,10 @@ const verificarHorario = async (horario) => {
 //Es un metodo auxiliar que devuelve el id del horario en caso de que se inserte, si no devuelve -1
 const insertarHorario = async (horario) => {
   const pool = await sql.connect(conexion);
-  const resultado = verificarHorario(horario)
+  const resultado = await verificarHorario(horario)
     .then((puedoInsertar) => {
       if (puedoInsertar) {
-        const insertHorario = await pool
+        const insertHorario = pool
           .request()
           .input("Cedula", sql.VarChar, horario.ciEmpleado)
           .input("HoraInicio", sql.VarChar, horario.i)
