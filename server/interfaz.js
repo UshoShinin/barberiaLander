@@ -397,34 +397,7 @@ const modificarAgenda = async (nuevaAgenda) => {
    */
     //Variable donde esta la conexion con la bd
     const pool = await sql.connect(conexion);
-    //Armo el update para el Horario
-    let queryUpdateHorario =
-      "update Horario set Cedula = " +
-      nuevaAgenda.ciPeluquero +
-      ", HoraInicio = " +
-      nuevaAgenda.horario.i +
-      ", HoraFin = " +
-      nuevaAgenda.horario.f +
-      ", Fecha = " +
-      nuevaAgenda.fecha +
-      " where IdHorario = " +
-      nuevaAgenda.idHorario;
-    //Armo el update para Agenda
-    let queryUpdateAgenda =
-      "update Agenda set NombreCliente = " +
-      nuevaAgenda.nombreCliente +
-      ", Descripcion = " +
-      nuevaAgenda.descripcion +
-      ", Img = " +
-      nuevaAgenda.imagenEjemplo +
-      ", Tel = " +
-      nuevaAgenda.telefono +
-      " where IdAgenda = " +
-      nuevaAgenda.idAgenda;
-    /**
-     ACA VA A IR LO DEL SERVICIO, EL TEMA DE ESTO COMO PUEDE CAMBIAR TODOS LOS SERVICIOS QUE SE VA A HACER
-     LO MEJOR VA A SER BORRAR TODOS LOS QUE YA HAY Y HACER UN INSERT NUEVO CON TODOS LOS NUEVOS
-     */
+    
   } catch (error) {
     return error;
   }
@@ -606,6 +579,8 @@ const crearSolicitudAgenda = async (agenda) => {
       } else {
         return "Error al insertar agenda";
       }
+    }).catch(error => {
+      return error;
     });
   return insertarAgendaCompleto;
 };
