@@ -10,39 +10,18 @@ import Checkbox from "../../components/UI/Checkbox/Checkbox";
 import ListadoProductos from "./ListadoProductos/ListadoProductos";
 import { initialState, cajaReducer } from "./ReducerCaja";
 
-const DUMMY_OPTIONS = [
-  { id: 1, title: "Hola" },
-  { id: 2, title: "Chao" },
-];
-
-const DUMMY_PRODUCTOS = [
-  { id: 1, nombre: "Pan" },
-  { id: 2, nombre: "Pan bimbo" },
-  { id: 3, nombre: "Jamon bimbo" },
-  { id: 4, nombre: "Banana" },
-  { id: 5, nombre: "Uva" },
-  { id: 6, nombre: "Naranjita" },
-  { id: 7, nombre: "Shampoo" },
-  { id: 8, nombre: "Lentejas" },
-  { id: 9, nombre: "Pan" },
-  { id: 10, nombre: "Pan bimbo" },
-  { id: 11, nombre: "Jamon bimbo" },
-  { id: 12, nombre: "Banana" },
-  { id: 13, nombre: "Uva" },
-  { id: 14, nombre: "Naranjita" },
-  { id: 15, nombre: "Shampoo" },
-  { id: 16, nombre: "Lentejas" },
-];
-
 const AperturaCierre = () => {
   const [cajaState, dispatchCaja] = useReducer(cajaReducer, initialState);
   const montoIniRef = useRef();
   const montoAgendaRef = useRef();
   const propinaAgendaRef = useRef();
+  const montoProductoRef = useRef();
+  const montoTotalProdRef = useRef();
 
   const handleSubmit = (e) => {
     e.preventDefault();
   };
+  console.log(cajaState.montoTotalProd);
   return (
     <div className={classes.container}>
       {/*<Note show={cajaState.jornal.show}>{cajaState.jornal.value}</Note>
@@ -120,7 +99,7 @@ const AperturaCierre = () => {
                   cajaState.sinAgendar.value ? "Empleado" : "Agenda"
                 }`}</label>
                 <ComboBox
-                  opciones={DUMMY_OPTIONS}
+                  opciones={cajaState.soloHoy.value?cajaState.agendasHoy:cajaState.agendas}
                   current={cajaState.comboAgenda.value}
                   active={cajaState.comboAgenda.active}
                   onClick={() => {
@@ -130,6 +109,55 @@ const AperturaCierre = () => {
                     dispatchCaja({ type: "CHANGE_COMBO_AGENDA", value: id });
                   }}
                 />
+              </div>
+              <h1>Servicios</h1>
+              <div className={classes.servicios}>
+                <div>
+                  <h2
+                    className={`${
+                      cajaState.servicios.corte ? classes.active : ""
+                    }`}
+                  >
+                    Corte
+                  </h2>
+                  <h2
+                    className={`${
+                      cajaState.servicios.barba ? classes.active : ""
+                    }`}
+                  >
+                    Barba
+                  </h2>
+                  <h2
+                    className={`${
+                      cajaState.servicios.maquina ? classes.active : ""
+                    }`}
+                  >
+                    Maquina
+                  </h2>
+                </div>
+                <div>
+                  <h2
+                    className={`${
+                      cajaState.servicios.brushing ? classes.active : ""
+                    }`}
+                  >
+                    Brushing
+                  </h2>
+                  <h2
+                    className={`${
+                      cajaState.servicios.decoloracion ? classes.active : ""
+                    }`}
+                  >
+                    Decoloración
+                  </h2>
+                  <h2
+                    className={`${
+                      cajaState.servicios.claritos ? classes.active : ""
+                    }`}
+                  >
+                    Claritos
+                  </h2>
+                </div>
               </div>
               <div className={classes.dobleFild}>
                 <div>
@@ -183,19 +211,122 @@ const AperturaCierre = () => {
                   />
                 </div>
               </div>
-              {/* <SimpleButton>Cobrar</SimpleButton> */}
             </div>
-            <div></div>
           </div>
           <div className={`${classes.cajaContainer} ${classes.productos}`}>
             <h2>Productos</h2>
-            <div>
-              <div style={{position:'relative'}}><ListadoProductos productos={DUMMY_PRODUCTOS}/></div>
-              <div>
-                <div></div>
-                <div></div>
+            <div className={classes.alinearCampos}>
+              <div className={classes.label}>
+                <label>Cantidad productos</label>
               </div>
-              <div>{/* <ListadoProductos/> */}</div>
+              <div>
+                <Input
+                  ref={montoProductoRef}
+                  isValid={cajaState.montoProductos.isValid}
+                  input={{
+                    id: 4,
+                    type: "number",
+                    value: cajaState.montoProductos.value,
+                    placeholder: "1",
+                    onChange: (event) => {
+                      dispatchCaja({
+                        type: "USER_INPUT_MONTO_PRODUCTO",
+                        value: event.target.value,
+                      });
+                    },
+                    onBlur: () => {
+                      dispatchCaja({ type: "BLUR_INPUT_MONTO_PRODUCTO" });
+                    },
+                    onFocus: () => {
+                      dispatchCaja({ type: "FOCUS_INPUT_MONTO_PRODUCTO" });
+                    },
+                  }}
+                />
+              </div>
+            </div>
+            <div>
+              <div style={{ position: "relative" }}>
+                <ListadoProductos
+                  onClick={(myValue) => {
+                    dispatchCaja({ type: "CLICK_LISTA_P", value: myValue });
+                  }}
+                  productos={cajaState.productos}
+                  seleccionados={cajaState.productosSAg}
+                />
+              </div>
+              <div>
+                <div className={classes.productosActions}>
+                  <SimpleButton
+                    action={() => {
+                      dispatchCaja({
+                        type: "AGREGAR",
+                        value:
+                          cajaState.montoProductos.value !== ""
+                            ? cajaState.montoProductos.value
+                            : 1,
+                      });
+                    }}
+                  >
+                    +
+                  </SimpleButton>
+                </div>
+                <div className={classes.productosActions}>
+                  <SimpleButton
+                    color="red"
+                    action={() => {
+                      dispatchCaja({
+                        type: "QUITAR",
+                        value:
+                          cajaState.montoProductos.value !== ""
+                            ? cajaState.montoProductos.value
+                            : 1,
+                      });
+                    }}
+                  >
+                    -
+                  </SimpleButton>
+                </div>
+              </div>
+              <div style={{ position: "relative" }}>
+                <ListadoProductos
+                  onClick={(myValue) => {
+                    dispatchCaja({ type: "CLICK_LISTA_A", value: myValue });
+                  }}
+                  productos={cajaState.productosAgregados}
+                  seleccionados={cajaState.productosSEl}
+                />
+              </div>
+            </div>
+            <div className={classes.alinearCampos}>
+              <div className={classes.label}>
+                <label>Monto Total</label>
+              </div>
+              <div>
+                <Input
+                  ref={montoTotalProdRef}
+                  isValid={cajaState.montoTotalProd.isValid}
+                  input={{
+                    id: 5,
+                    type: "number",
+                    value: cajaState.montoTotalProd.value,
+                    placeholder: "0",
+                    onChange: (event) => {
+                      dispatchCaja({
+                        type: "USER_INPUT_MONTO_TOTAL_PRODUCTO",
+                        value: event.target.value,
+                      });
+                    },
+                    onBlur: () => {
+                      dispatchCaja({ type: "BLUR_INPUT_MONTO_TOTAL_PRODUCTO" });
+                    },
+                    onFocus: () => {
+                      dispatchCaja({
+                        type: "FOCUS_INPUT_MONTO_TOTAL_PRODUCTO",
+                      });
+                    },
+                  }}
+                />
+              </div>
             </div>
           </div>
         </div>

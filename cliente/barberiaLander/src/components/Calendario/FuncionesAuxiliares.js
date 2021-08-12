@@ -70,7 +70,6 @@ export const minutosAHorarios = (minutos) => {
 };
 /* Carga todos los horarios disponibles dentro de una lista de gorarios y una cantidad de tiempo que es necesario ocupar */
 const horariosAgendarDisponibles = (horarios, timeNeed) => {
-  console.log(horarios, timeNeed);
   let hora = "08:00";
   const horaCierre = "22:00";
   let horariosDisponibles = [];
@@ -82,7 +81,7 @@ const horariosAgendarDisponibles = (horarios, timeNeed) => {
     inicio = 1;
   }
   //poner que si las horas coinciden no haga calculos
-  if (horarios.length > 1) {
+  if (horarios.length > 0) {
     horarioBase = hora;
     for (let i = inicio; i < horarios.length; i++) {
       tengoTiempo = diferenciaDeTiempo(horarioBase, horarios[i].i);
@@ -95,6 +94,7 @@ const horariosAgendarDisponibles = (horarios, timeNeed) => {
           ),
         ];
       }
+      
       horarioBase = horarios[i].f;
     }
   }
@@ -129,10 +129,11 @@ export const cargarHorarios = (inicio, fin) => {
 
 
 /* Este metodo está obtener el equivalente en el state de un id de empleado */
-export const getEmpleadoById = (list,id) => {
+export const getElementById = (list,id) => {
   for (let i = 0; i < list.length; i++) {
     if (list[i].id === id) return list[i];
   }
+  return null
 };
 
 /* Te da el día con su propiedad mostrar del array que gestiona la iluminación de los días */

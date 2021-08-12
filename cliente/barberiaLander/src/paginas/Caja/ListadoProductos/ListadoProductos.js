@@ -1,19 +1,24 @@
-import classes from './ListadoProductos.module.css';
-import { useReducer } from 'react';
-
-const reducer = (state,action) => {
-  switch(action.type){
-    case 'CLICK':
-      return [...state];
-  }
-}
-
+import classes from "./ListadoProductos.module.css";
+import { getElementById } from "../../../components/Calendario/FuncionesAuxiliares";
 const ListadoProductos = (props) => {
-  const initialState = [];
-  const [listado,dispatchP] = useReducer(reducer,initialState);
-
+  let lista = [...props.seleccionados];
   const content = props.productos.map((p) => {
-    return <li onClick={()=>{}}>{p.nombre}</li>;
+    let pertenece = false;
+    if (getElementById(lista, p.id) !== null) {
+      pertenece = true;
+      lista.shift();
+    }
+    return (
+      <li
+        key={p.id}
+        className={`${pertenece ? classes.active : ""}`}
+        onClick={() => {
+          props.onClick(p);
+        }}
+      >
+        {p.nombre} {`${p.count!==undefined&&p.count>1?'X'+p.count:''}`}
+      </li>
+    );
   });
   return <ul className={classes.productos}>{content}</ul>;
 };

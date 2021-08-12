@@ -8,7 +8,7 @@ import LoaddingSpinner from "../../../components/LoaddingSpinner/LoaddingSpinner
 import Switch from "../../../components/UI/Switch/Switch";
 import Visualizador from "./Visualizador/Visualizador";
 import FormularioAgenda from "../FormularioAgenda/FormularioAgenda";
-import { getEmpleadoById,obtenerHorariosDeDia } from "../../../components/Calendario/FuncionesAuxiliares";
+import { getElementById,obtenerHorariosDeDia } from "../../../components/Calendario/FuncionesAuxiliares";
 /* const DUMMY_AGENDAS = [
   {
     idAgenda: 1,
@@ -96,7 +96,7 @@ const PreAgendas = () => {
   }, []);
 
   const obtenerHorarios = (horarios) => {
-    setHorarioAgenda(obtenerHorariosDeDia(agendaAModificar.fecha.d,agendaAModificar.fecha.m,getEmpleadoById(horarios,agendaAModificar.ciPeluquero).fechas));
+    setHorarioAgenda(obtenerHorariosDeDia(agendaAModificar.fecha.d,agendaAModificar.fecha.m,getElementById(horarios,agendaAModificar.ciPeluquero).fechas));
   }
 
   const showAgenda = (agendita) => {

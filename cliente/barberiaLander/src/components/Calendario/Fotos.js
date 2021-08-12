@@ -2,7 +2,7 @@ import classes from "./Fotos.module.css";
 import ComboBox from "./../../components/ComboBox/ComboBox";
 import { useReducer, useState } from "react";
 import { CSSTransition } from "react-transition-group";
-import { getEmpleadoById } from "./FuncionesAuxiliares";
+import { getElementById } from "./FuncionesAuxiliares";
 const Fotos = (props) => {
   const initialState = {
     Actual: { value: props.fotos[0].foto, mostrar: true },
@@ -38,14 +38,14 @@ const Fotos = (props) => {
   if (
     (state.Actual.mostrar &&
       state.Actual.value !==
-        getEmpleadoById(props.fotos, props.currentEmployee).foto) ||
+        getElementById(props.fotos, props.currentEmployee).foto) ||
     (state.Siguiente.mostrar &&
       state.Siguiente.value !==
-        getEmpleadoById(props.fotos, props.currentEmployee).foto)
+        getElementById(props.fotos, props.currentEmployee).foto)
   ) {
     dispatch({
       type: "CHANGE_I",
-      value: getEmpleadoById(props.fotos, props.currentEmployee).foto,
+      value: getElementById(props.fotos, props.currentEmployee).foto,
     });
   }
 
@@ -92,7 +92,7 @@ const Fotos = (props) => {
   const comboChangeHandler = (id) => {
     dispatch({
       type: "CHANGE_I",
-      value: getEmpleadoById(props.fotos, id).foto,
+      value: getElementById(props.fotos, id).foto,
     });
     props.changeEmployee(id);
   };

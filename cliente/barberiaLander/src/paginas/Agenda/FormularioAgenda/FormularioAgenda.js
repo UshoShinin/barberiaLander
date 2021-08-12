@@ -11,7 +11,7 @@ import useHttp from "./../../../hooks/useHttp";
 import { DaysGenerator } from "../../../components/Calendario/Dias/GeneradorDias";
 import LoaddingSpinner from "../../../components/LoaddingSpinner/LoaddingSpinner";
 import {
-  getEmpleadoById,
+  getElementById,
   transformStringNumber,
   horarioEnMinutos,
   minutosAHorarios,
@@ -112,8 +112,6 @@ const FormularioAgenda = (props) => {
   } */
   /* Carga inicial de datos */
   const obtenerHorarios = (horarios) => {
-    console.log('Inicio');
-    console.log(horarios);
     dispatchInput({
       type: "HORARIOS_CARGADOS",
       value: horarios.mensaje.empleados,
@@ -268,7 +266,7 @@ const FormularioAgenda = (props) => {
   const realDate = new Date();
   const date = new Date(
     realDate.getFullYear(),
-    realDate.getMonth() + 1,
+    realDate.getMonth() - 1,
     realDate.getDate()
   );
   if (inputState.HorariosFiltrados !== null && inputState.Employee.value !== null) {
@@ -281,7 +279,7 @@ const FormularioAgenda = (props) => {
       date.getDate(),
       date.getMonth() + 1,
       date.getFullYear(),
-      getEmpleadoById(inputState.HorariosFiltrados, inputState.Employee.value).fechas,
+      getElementById(inputState.HorariosFiltrados, inputState.Employee.value).fechas,
       tiempoNecesario
     );
     if (inputState.Calendario.value !== null) {
