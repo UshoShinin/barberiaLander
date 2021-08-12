@@ -8,7 +8,6 @@ app.use(express.json()); // To parse the incoming requests with JSON payloads
 //Importo la interfaz. Esto va a tener los metodos para llamar a la base
 const interfaz = require("./interfaz");
 
-//ESTO ES PARA PROBAR LA FUNCIONALIDAD ACTUAL HAY QUE BORRARLO A LA MIERDA DESPUES
 app.use("/datosFormularioAgenda", (req, res) => {
   let ret = interfaz.getDatosFormulario();
   ret.then((empleados) => {

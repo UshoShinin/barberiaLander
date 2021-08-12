@@ -433,52 +433,75 @@ const modificarAgenda = async (nuevaAgenda) => {
 //Metodo auxiliar para verificar que un horario siga disponible
 //Devuelve una promesa con true o false
 const verificarHorario = async (horario) => {
-  //Paso a valores numericos los datos del horario para poder trabajar mejor
-  let horaInicio = parseInt(horario.i.replace(":", ""));
-  let horaFin = parseInt(horario.f.replace(":", ""));
+  try {
+    //variable que tiene la conexion
+    const pool = await sql.connect(conexion);
+    //Voy a buscar todos los horarios del empleado que me mandaron
+    const horarios = await pool
+      .request()
+      .input("ci", sql.VarChar, horario.ciEmpleado)
+      .input("fecha", sql.Date, horario.fecha)
+      .query(
+        "select HoraInicio, HoraFin from Horario where Cedula = @ci and Fecha = @fecha"
+      );
+    //Separo el listado
+    const lista = horarios.recordset;
+    //Paso a valores numericos los datos del horario que me pasan por parametro para poder trabajar mejor
+    let horaInicio = parseInt(horario.i.replace(":", ""));
+    let horaFin = parseInt(horario.f.replace(":", ""));
+    //Esta variable es la que devuelvo al final, arranca en true y en el for se evalua para pasar a false
+    let puedoInsertar = true;
+    //Recorro los horarios del empleado
+    for (let i = 0; i < lista.length; i++) {
+      if (horaInicio <= parseInt(lista[i].HoraInicio.replace(":", ""))) {
+        //si horaFin<= parseInt(lista[i].HoraInicio.replace(":", "")) puedo insertar, entonces el que tengo que preguntar es si horaFin > parseInt(lista[i].i.replace(":", ""))
+        if (horaFin > parseInt(lista[i].HoraInicio.replace(":", ""))) {
+          puedoInsertar = false;
+        }
+      } else {
+        // caso del else: horaInicio > parseInt(lista[i].i.replace(":", ""))
+        if (horaInicio < parseInt(lista[i].HoraFin.replace(":", ""))) {
+          puedoInsertar = false;
+        }
+      }
+    }
+    return puedoInsertar;
+  } catch (error) {
+    console.log(error);
+  }
 };
-
 //Este es un metodo que dado los datos de un horario lo inserta en la base de datos
 //Es un metodo auxiliar que devuelve el id del horario en caso de que se inserte, si no devuelve -1
 const insertarHorario = async (horario) => {
   const pool = await sql.connect(conexion);
-  /*
-    ACA TIENE QUE IR EL CODIGO DE LA VERIFICACION DE SI EL HORARIO SIGUE ESTANDO DISPONIBLE
-    SE TIENE QUE REVISAR DE SI PARA EL PELUQUERO QUE MANDAN EL HORARIO DE ESA FECHA ESTA DISPONIBLE
-    EN CASO DE QUE NO ESTE DISPONIBLE  HAY QUE HACER EL RETURN ACA MISMO Y DECIS QUE EL HORARIO NO ESTA DISPONIBLE
-   */
-  //Para verificar el horario primero lo que hago traerme todos los horarios de esa fecha para ese empleado
-  const horarios = await pool
-    .request()
-    .input("ci", sql.VarChar, horario.ciEmpleado)
-    .input("fecha", sql.Date, horario.fecha)
-    .query("select * from Horario where Cedula = @ci and Fecha = @fecha")
-    .then((resultado) => console.log(resultado));
-
-  const insertHorario = await pool
-    .request()
-    .input("Cedula", sql.VarChar, horario.ciEmpleado)
-    .input("HoraInicio", sql.VarChar, horario.i)
-    .input("HoraFin", sql.VarChar, horario.f)
-    .input("Fecha", sql.Date, horario.fecha)
-    .query(
-      "insert into Horario (Cedula, HoraInicio, HoraFin, Fecha) OUTPUT inserted.IdHorario values (@Cedula, @HoraInicio, @HoraFin, @Fecha)"
-    )
+  const resultado = verificarHorario(horario)
+    .then((puedoInsertar) => {
+      if (puedoInsertar) {
+        const insertHorario = await pool
+          .request()
+          .input("Cedula", sql.VarChar, horario.ciEmpleado)
+          .input("HoraInicio", sql.VarChar, horario.i)
+          .input("HoraFin", sql.VarChar, horario.f)
+          .input("Fecha", sql.Date, horario.fecha)
+          .query(
+            "insert into Horario (Cedula, HoraInicio, HoraFin, Fecha) OUTPUT inserted.IdHorario values (@Cedula, @HoraInicio, @HoraFin, @Fecha)"
+          );
+        return insertHorario;
+      } else {
+        return -1;
+      }
+    })
     .then((resultado) => {
+      //Verifico si exploto o no
+      if (resultado === -1) {
+        return { idAgenda: -1 };
+      }
       //El objeto que me devuele el insert tiene la cantidad de filas afectadas y el idHorario del horario que acabo de insertar
       //Devuelvo el idHorario
       return resultado.recordset[0].IdHorario;
-    })
-    .catch((error) => {
-      console.log(error);
-      //Hago dejo en consola el error y por las dudas devuelvo -1 que significa que no se inserto nada
-      return {
-        error: error,
-        idAgenda: -1,
-      };
     });
   //Cuando tengo el resultado ya en la variable devuelvo el id del horario que recien se inserto
-  return insertHorario;
+  return resultado;
 };
 //Este es un metodo que dado los datos de una agenda lo inserta en la base de datos
 //Es un metodo auxiliar que devuelve el idAgenda y idHorario si se inserta, si no devuelve en cada uno -1
@@ -632,7 +655,7 @@ const agregarServiciosAgendasAceptadas = async (agendas) => {
       };
       //Recorro el listado de servicios para agregarlo a la agendaAux
       for (let j = 0; j < listadoServicios.length; j++) {
-        if(agendaAux.id === listadoServicios[j].IdAgenda){
+        if (agendaAux.id === listadoServicios[j].IdAgenda) {
           agendaAux.servicios.push(listadoServicios[j].IdServicio);
         }
       }
@@ -655,7 +678,7 @@ const getAgendasAceptadas = async () => {
       .then((listadoCompleto) => {
         return listadoCompleto;
       });
-      return retorno;
+    return retorno;
   } catch (error) {
     console.log(error);
   }
