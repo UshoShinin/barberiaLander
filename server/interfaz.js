@@ -397,7 +397,6 @@ const modificarAgenda = async (nuevaAgenda) => {
    */
     //Variable donde esta la conexion con la bd
     const pool = await sql.connect(conexion);
-    
   } catch (error) {
     return error;
   }
@@ -579,7 +578,8 @@ const crearSolicitudAgenda = async (agenda) => {
       } else {
         return "Error al insertar agenda";
       }
-    }).catch(error => {
+    })
+    .catch((error) => {
       return error;
     });
   return insertarAgendaCompleto;
@@ -659,6 +659,93 @@ const getAgendasAceptadas = async () => {
   }
 };
 
+//Metodo para devolver todos los productos
+const getListadoProductos = async () => {
+  try {
+    //variable que tiene la conexion
+    const pool = await sql.connect(conexion);
+    //Voy a buscar todos los productos
+    const productos = await pool
+      .request()
+      .query(
+        "select IdProducto as id, Nombre as nombre, Stock as stock, Precio as price from Producto"
+      );
+    //Separo el listado
+    const listadoProductos = productos.recordset;
+    return listadoProductos;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo para devolver el ci y nombre del empleado
+const getCiNombreEmpleados = async () => {
+  try {
+    //variable que tiene la conexion
+    const pool = await sql.connect(conexion);
+    //Voy a buscar todos los empleados
+    const empleados = await pool
+      .request()
+      .query("select Cedula as ci, Nombre as nombre from Empleado");
+    //Separo el listado
+    const listadoEmpleados = empleados.recordset;
+    return listadoEmpleados;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo auxiliar para agregar los empleados a un listado
+const agregarEmpleadosALIstado = async (listado) => {
+  try {
+    const resultado = getCiNombreEmpleados().then((listadoEmpleados) => {
+      let retornoAux = {
+        ...listado,
+        empleados: listadoEmpleados,
+      };
+      return retornoAux;
+    });
+    return resultado;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo auxiliar para agregar los productos a un listado
+const agregarProductosAListado = async (listado) => {
+  try {
+    const resultado = getListadoProductos().then((listadoProductos) => {
+      let retornoAux = {
+        agendas: listado,
+        productos: listadoProductos,
+      };
+      return retornoAux;
+    });
+    return resultado;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo para devolver todos los datos del formulario de caja
+const datosFormularioCaja = async () => {
+  try {
+    const resultado = getAgendasAceptadas()
+      .then((agendas) => {
+        return agregarProductosAListado(agendas);
+      })
+      .then((listadoConProductos) => {
+        return agregarEmpleadosALIstado(listadoConProductos);
+      })
+      .then((listadoCompleto) => {
+        return listadoCompleto;
+      });
+    return resultado;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 //Creo un objeto que voy a exportar para usarlo desde el index.js
 //Adentro voy a tener todos los metodos de llamar a la base
 const interfaz = {
@@ -669,6 +756,7 @@ const interfaz = {
   getAgendaPorId,
   crearSolicitudAgenda,
   getAgendasAceptadas,
+  datosFormularioCaja,
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar

@@ -66,8 +66,8 @@ app.post("/crearAgenda", (req, res) => {
   });
 });
 
-app.use("/agendasAceptadas", (req, res) => {
-  const ret = interfaz.getAgendasAceptadas();
+app.use("/datosFormularioCaja", (req, res) => {
+  const ret = interfaz.datosFormularioCaja();
   ret.then((resultado) => {
     res.json({
       mensaje: resultado,
