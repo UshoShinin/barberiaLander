@@ -1,4 +1,5 @@
 import { getElementById } from "../../components/Calendario/FuncionesAuxiliares";
+import { formatDate } from "../../FuncionesAuxiliares/FuncionesAuxiliares";
 const today = new Date();
 export const initialState = {
   idCaja: new Date(),
@@ -13,22 +14,22 @@ export const initialState = {
   montoProductos: { value: "", isValid: null },
   montoTotalProd: { value: "", isValid: null },
   productos: [
-    { id: 1, nombre: "Pan", price: 160 },
-    { id: 2, nombre: "Pan bimbo", price: 130 },
-    { id: 3, nombre: "Jamon bimbo", price: 120 },
-    { id: 4, nombre: "Banana", price: 150 },
-    { id: 5, nombre: "Uva", price: 110 },
-    { id: 6, nombre: "Naranjita", price: 100 },
-    { id: 7, nombre: "Shampoo", price: 190 },
-    { id: 8, nombre: "Lentejas", price: 170 },
-    { id: 9, nombre: "Lechuga", price: 180 },
-    { id: 10, nombre: "Tomate", price: 210 },
-    { id: 11, nombre: "", price: 120 },
-    { id: 12, nombre: "Banana", price: 140 },
-    { id: 13, nombre: "Uva", price: 105 },
-    { id: 14, nombre: "Naranjita", price: 120 },
-    { id: 15, nombre: "Shampoo", price: 140 },
-    { id: 16, nombre: "Lentejas", price: 100 },
+    { id: 1, nombre: "Pan", price: 160, stock: 10 },
+    { id: 2, nombre: "Pan bimbo", price: 130, stock: 10 },
+    { id: 3, nombre: "Jamon bimbo", price: 120, stock: 10 },
+    { id: 4, nombre: "Banana", price: 150, stock: 10 },
+    { id: 5, nombre: "Uva", price: 110, stock: 10 },
+    { id: 6, nombre: "Naranjita", price: 100, stock: 10 },
+    { id: 7, nombre: "Shampoo", price: 190, stock: 10 },
+    { id: 8, nombre: "Lentejas", price: 170, stock: 10 },
+    { id: 9, nombre: "Lechuga", price: 180, stock: 10 },
+    { id: 10, nombre: "Tomate", price: 210, stock: 10 },
+    { id: 11, nombre: "", price: 120, stock: 10 },
+    { id: 12, nombre: "Banana", price: 140, stock: 10 },
+    { id: 13, nombre: "Uva", price: 105, stock: 10 },
+    { id: 14, nombre: "Naranjita", price: 120, stock: 10 },
+    { id: 15, nombre: "Shampoo", price: 140, stock: 10 },
+    { id: 16, nombre: "Lentejas", price: 100, stock: 10 },
   ],
   servicios: {
     corte: false,
@@ -70,12 +71,23 @@ export const initialState = {
       servicios: [7, 1, 4],
     },
   ],
-  efectivo: { value: false}, 
-  debito: { value: false}, 
-  cuponera: { value: false}, 
-  montoEfectivo:{}, 
-  montoDebito:{}, 
-  montoCuponera:{}, 
+  efectivo: { value: false },
+  debito: { value: false },
+  cuponera: { value: false },
+  montoEfectivo: { value: "", isValid: null },
+  montoDebito: { value: "", isValid: null },
+  montoCuponera: { value: "", isValid: null },
+  cantidadMedios: { value: 0 },
+  montoTotal: { value: "", isValid: null },
+  showSalida: { value: false },
+  montoSalida: { value: "", isValid: null },
+  descripcionSalida: { value: "", isValid: null },
+  comboSalida: { value: 1, active: false },
+  Empleados: [
+    { id: 1, title: "Antonio" },
+    { id: 2, title: "Pablito" },
+    { id: 3, title: "Juan carlos" },
+  ],
 };
 
 const orden = (a, b) => {
@@ -88,7 +100,7 @@ const orden = (a, b) => {
 };
 
 const validarMonto = (value) => {
-  return value !== "" ? value.trim().length > 0 : null;
+  return (value !== "" ? value.trim().length > 0 : null) && parseInt(value) > 0;
 };
 
 const miFiltro = (lista, objetivo) => {
@@ -98,17 +110,35 @@ const miFiltro = (lista, objetivo) => {
     if (element.id !== objetivo.id) nuevaLista.push({ ...element });
     else encontrado = element.count;
   });
-  console.log(nuevaLista);
   if (encontrado !== null) return { lista: [...nuevaLista], count: encontrado }; //Es nueva lista
   return null; //No hay cambios
 };
 
 export const cajaReducer = (state, action) => {
-  let valido;
+  let valido = null;
   let destino;
   let total = 0;
+  let anterior;
+  let siguiente = null;
+  let cantidad;
+  let myState;
   switch (action.type) {
-    case "USER_INPUT_MONOTO_I":
+    case "CARGA_DE_DATOS":
+      const date = new Date("07-24-2021");
+      console.log(new Date());
+      formatDate(action.payload[0].fecha);
+      let newList = action.payload.filter(
+        (agenda) =>
+          formatDate(agenda.fecha).getDate() === date.getDate() &&
+          formatDate(agenda.fecha).getMonth() === date.getMonth()
+      );
+      myState = {
+        ...state,
+        agendas: [...action.payload],
+        agendasHoy: [...newList],
+      };
+      return { ...myState };
+    case "USER_INPUT_MONTO_I":
       return {
         ...state,
         montoInicial: {
@@ -116,7 +146,7 @@ export const cajaReducer = (state, action) => {
           isValid: state.montoInicial.isValid,
         },
       };
-    case "FOCUS_INPUT_MONOTO_I":
+    case "FOCUS_INPUT_MONTO_I":
       return {
         ...state,
         montoInicial: {
@@ -124,7 +154,7 @@ export const cajaReducer = (state, action) => {
           isValid: null,
         },
       };
-    case "BLUR_INPUT_MONOTO_I":
+    case "BLUR_INPUT_MONTO_I":
       valido = validarMonto(state.montoInicial.value);
       return {
         ...state,
@@ -211,7 +241,7 @@ export const cajaReducer = (state, action) => {
         comboAgenda: { value: action.value, active: false },
         servicios: { ...baseServicios },
       };
-    case "USER_INPUT_MONOTO_A":
+    case "USER_INPUT_MONTO_A":
       return {
         ...state,
         montoAgenda: {
@@ -219,7 +249,7 @@ export const cajaReducer = (state, action) => {
           isValid: state.montoAgenda.isValid,
         },
       };
-    case "FOCUS_INPUT_MONOTO_A":
+    case "FOCUS_INPUT_MONTO_A":
       return {
         ...state,
         montoAgenda: {
@@ -227,7 +257,7 @@ export const cajaReducer = (state, action) => {
           isValid: null,
         },
       };
-    case "BLUR_INPUT_MONOTO_A":
+    case "BLUR_INPUT_MONTO_A":
       valido = validarMonto(state.montoAgenda.value);
       return {
         ...state,
@@ -390,19 +420,189 @@ export const cajaReducer = (state, action) => {
         montoTotalProd: { value: total, isValid: true },
       };
     case "CLICK_EFECTIVO":
-      return {
-        ...state,
-        efectivo: { value: !state.efectivo.value },
-      };
     case "CLICK_DEBITO":
-      return {
-        ...state,
-        debito: { value: !state.debito.value },
-      };
     case "CLICK_CUPONERA":
+      switch (action.type) {
+        case "CLICK_EFECTIVO":
+          siguiente = !state.efectivo.value;
+          myState = { ...state, efectivo: { value: siguiente } };
+          break;
+        case "CLICK_DEBITO":
+          siguiente = !state.debito.value;
+          myState = { ...state, debito: { value: siguiente } };
+          break;
+        case "CLICK_CUPONERA":
+          siguiente = !state.cuponera.value;
+          myState = { ...state, cuponera: { value: siguiente } };
+          break;
+      }
+      if (siguiente) cantidad = state.cantidadMedios.value + 1;
+      else cantidad = state.cantidadMedios.value - 1;
+      if (siguiente && state.cantidadMedios.value === 1) {
+        total = state.montoTotal.value;
+        valido = state.montoTotal.isValid;
+        if (state.efectivo.value) anterior = "EFECTIVO";
+        else if (state.debito.value) anterior = "DEBITO";
+        else if (state.cuponera.value) anterior = "CUPONERA";
+      } else if (cantidad === 1) {
+        myState = {
+          ...myState,
+          montoEfectivo: { value: "", isValid: null },
+          montoDebito: { value: "", isValid: null },
+          montoCuponera: { value: "", isValid: null },
+        };
+      }
+      myState = { ...myState, cantidadMedios: { value: cantidad } };
+      switch (anterior) {
+        case "EFECTIVO":
+          myState = {
+            ...myState,
+            montoEfectivo: { value: total, isValid: valido },
+          };
+          break;
+        case "DEBITO":
+          myState = {
+            ...myState,
+            montoDebito: { value: total, isValid: valido },
+          };
+          break;
+        case "CUPONERA":
+          myState = {
+            ...myState,
+            montoCuponera: { value: total, isValid: valido },
+          };
+          break;
+      }
+      return { ...myState };
+    case "USER_INPUT_EFECTIVO":
       return {
         ...state,
-        cuponera: { value: !state.cuponera.value },
+        montoEfectivo: {
+          value: action.value,
+          isValid: state.montoEfectivo.isValid,
+        },
+      };
+    case "FOCUS_INPUT_EFECTIVO":
+      return {
+        ...state,
+        montoEfectivo: {
+          value: state.montoEfectivo.value,
+          isValid: null,
+        },
+      };
+    case "BLUR_INPUT_EFECTIVO":
+      valido = validarMonto(state.montoEfectivo.value);
+      return {
+        ...state,
+        montoEfectivo: {
+          value: state.montoEfectivo.value,
+          isValid: valido,
+        },
+      };
+    case "USER_INPUT_DEBITO":
+      return {
+        ...state,
+        montoDebito: {
+          value: action.value,
+          isValid: state.montoDebito.isValid,
+        },
+      };
+    case "FOCUS_INPUT_DEBITO":
+      return {
+        ...state,
+        montoDebito: {
+          value: state.montoDebito.value,
+          isValid: null,
+        },
+      };
+    case "BLUR_INPUT_DEBITO":
+      valido = validarMonto(state.montoDebito.value);
+      return {
+        ...state,
+        montoDebito: {
+          value: state.montoDebito.value,
+          isValid: valido,
+        },
+      };
+    case "USER_INPUT_CUPONERA":
+      return {
+        ...state,
+        montoCuponera: {
+          value: action.value,
+          isValid: state.montoCuponera.isValid,
+        },
+      };
+    case "FOCUS_INPUT_CUPONERA":
+      return {
+        ...state,
+        montoCuponera: {
+          value: state.montoCuponera.value,
+          isValid: null,
+        },
+      };
+    case "BLUR_INPUT_CUPONERA":
+      valido = validarMonto(state.montoCuponera.value);
+      return {
+        ...state,
+        montoCuponera: {
+          value: state.montoCuponera.value,
+          isValid: valido,
+        },
+      };
+    case "USER_INPUT_TOTAL":
+      return {
+        ...state,
+        montoTotal: {
+          value: action.value,
+          isValid: state.montoTotal.isValid,
+        },
+      };
+    case "FOCUS_INPUT_TOTAL":
+      return {
+        ...state,
+        montoTotal: {
+          value: state.montoTotal.value,
+          isValid: null,
+        },
+      };
+    case "BLUR_INPUT_TOTAL":
+      valido = validarMonto(state.montoTotal.value);
+      return {
+        ...state,
+        montoTotal: {
+          value: state.montoTotal.value,
+          isValid: valido,
+        },
+      };
+    case "SHOW_SALIDA":
+      return { ...state, showSalida: { value: true } };
+    case "HIDE_SALIDA":
+      return { ...state, showSalida: { value: false } };
+
+    case "USER_INPUT_MONTO_S":
+      return {
+        ...state,
+        montoSalida: {
+          value: action.value,
+          isValid: state.montoSalida.isValid,
+        },
+      };
+    case "FOCUS_INPUT_MONTO_S":
+      return {
+        ...state,
+        montoSalida: {
+          value: state.montoSalida.value,
+          isValid: null,
+        },
+      };
+    case "BLUR_INPUT_MONTO_S":
+      valido = validarMonto(state.montoSalida.value);
+      return {
+        ...state,
+        montoSalida: {
+          value: state.montoSalida.value,
+          isValid: valido,
+        },
       };
   }
 };
