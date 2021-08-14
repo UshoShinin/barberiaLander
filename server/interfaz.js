@@ -4,33 +4,42 @@ const conexion = require("./conexion");
 const sql = require("mssql");
 
 //Aceptar una agenda
-const aceptarAgenda = async (id, aceptada) => {
+const aceptarAgenda = async (id, horario) => {
   try {
-    //Creo la conexion
-    let pool = await sql.connect(conexion);
-    //Hago la query para conseguir la agenda
-    let queryAgenda = "Select Aceptada from Agenda where IdAgenda = " + id;
-    //Voy a buscar si esta aceptada la agenda
-    let agenda = await pool.request().query(queryAgenda);
-    //Si la agenda esta aceptada devuelvo eso
-    if (agenda.recordset[0].Aceptada) {
-      let ret = {
-        codigo: 400,
-        mensaje: "La agenda ya fue aceptada previamente",
-      };
-      return ret;
-    } else {
-      //Hago la query del update
-      let queryUpdate = "update Agenda set Aceptada = 1 where IdAgenda = " + id;
-      //Hago update de la agenda
-      let empleados = await pool.request().query(queryUpdate);
-      //Si salio todo bien y no fue al catch se confirma de que fue aceptada
-      let ret = {
-        codigo: 200,
-        mensaje: "La agenda fue aceptada",
-      };
-      return ret;
-    }
+    //Verifico que el horario siga estando disponible
+    const horarioDisponible = verificarHorario(horario).then((disponible) => {
+      if (!disponible) {
+        return "El horario ya esta ocupado";
+      } else {
+        //Creo la conexion
+        let pool = await sql.connect(conexion);
+        //Hago la query para conseguir la agenda
+        let queryAgenda = "Select Aceptada from Agenda where IdAgenda = " + id;
+        //Voy a buscar si esta aceptada la agenda
+        let agenda = await pool.request().query(queryAgenda);
+        //Si la agenda esta aceptada devuelvo eso
+        if (agenda.recordset[0].Aceptada) {
+          let ret = {
+            codigo: 400,
+            mensaje: "La agenda ya fue aceptada previamente",
+          };
+          return ret;
+        } else {
+          //Hago la query del update
+          let queryUpdate =
+            "update Agenda set Aceptada = 1 where IdAgenda = " + id;
+          //Hago update de la agenda
+          let empleados = await pool.request().query(queryUpdate);
+          //Si salio todo bien y no fue al catch se confirma de que fue aceptada
+          let ret = {
+            codigo: 200,
+            mensaje: "La agenda fue aceptada",
+          };
+          return ret;
+        }
+      }
+    });
+    return horarioDisponible;
   } catch (error) {
     //Mensaje de error en caso de que haya pasado algo
     let ret = {
@@ -386,22 +395,6 @@ const getAgendaPorId = async (idAgenda) => {
   }
 };
 
-//Modificar una agenda
-//Modificar una agenda deberia ser. Modifico todos los datos del Horario, despues modifico todo de la Agenda y despues Modifico todo de los servicios
-const modificarAgenda = async (nuevaAgenda) => {
-  try {
-    /*
-    ACA TIENE QUE IR EL CODIGO DE LA VERIFICACION DE SI EL HORARIO SIGUE ESTANDO DISPONIBLE
-    SE TIENE QUE REVISAR DE SI PARA EL PELUQUERO QUE MANDAN EL HORARIO DE ESA FECHA ESTA DISPONIBLE
-    EN CASO DE QUE NO ESTE DISPONIBLE  HAY QUE HACER EL RETURN ACA MISMO Y DECIS QUE EL HORARIO NO ESTA DISPONIBLE
-   */
-    //Variable donde esta la conexion con la bd
-    const pool = await sql.connect(conexion);
-  } catch (error) {
-    return error;
-  }
-};
-
 //Metodo auxiliar para verificar que un horario siga disponible
 //Devuelve una promesa con true o false
 const verificarHorario = async (horario) => {
@@ -741,6 +734,40 @@ const datosFormularioCaja = async () => {
         return listadoCompleto;
       });
     return resultado;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Modificar una agenda
+//Modificar una agenda deberia ser. Modifico todos los datos del Horario, despues modifico todo de la Agenda y despues Modifico todo de los servicios
+const modificarAgenda = async (nuevaAgenda) => {
+  try {
+    const resultado = verificarHorario(nuevaAgenda.horario).then(
+      (horarioLibre) => {
+        if (!horarioLibre) {
+          return "El horario ya esta ocupado";
+        } else {
+          return updatesAgendaEntero();
+        }
+      }
+    );
+    //Variable donde esta la conexion con la bd
+    const pool = await sql.connect(conexion);
+  } catch (error) {
+    return error;
+  }
+};
+
+//Metodo auxiliar para hacer los update para modificar una agenda
+const updatesAgendaEntero = async () => {
+  //Llamo a todos los metodos de update individuales
+};
+
+//Metodo auxiliar para hacer update a la tabla Horario
+//
+const updateHorario = async (horario) => {
+  try {
   } catch (error) {
     console.log(error);
   }
