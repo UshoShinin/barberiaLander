@@ -186,3 +186,21 @@
 .MontoTotal > h2{
   margin-right: 10px;
 }
+
+.salidaDinero{
+  text-align: center;
+}
+.salidaDinero>h1{
+  margin-bottom: 10px;
+}
+.montoSalida{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.montoSalida > label{
+  margin-right: 10px;
+}
+.salidaDinero > div+div{
+  margin-top: 16px;
+}

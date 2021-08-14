@@ -4,9 +4,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faSearch, faTimes } from "@fortawesome/free-solid-svg-icons";
 const Item = (props) => {
   const item = props.item;
-  const buscar=()=>{
-    props.select(props.item.idAgenda)
-  }
   return (
     <li className={classes.item}>
       <div className={classes.content}>
@@ -22,12 +19,26 @@ const Item = (props) => {
       </div>
       <div className={classes.contentBotones}>
         <div className={classes.info}>
-          <SimpleButton color="white" action={buscar}>
+          <SimpleButton
+            color="white"
+            action={() => {
+              props.select(item.idAgenda);
+            }}
+          >
             <FontAwesomeIcon icon={faSearch} />
           </SimpleButton>
         </div>
         <div className={classes.actions}>
-          <SimpleButton>
+          <SimpleButton
+            action={() => {
+              props.aceptar({
+                idAgenda: item.idAgenda,
+                ciEmpleado: item.ciEmpleado,
+                horario: { i: item.horaInicio, f: item.horaFin },
+                fecha: item.fecha
+              });
+            }}
+          >
             <FontAwesomeIcon icon={faCheck} />
           </SimpleButton>
           <SimpleButton color="red">

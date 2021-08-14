@@ -98,22 +98,6 @@ export const inputReducer = (state, action) => {
           isValid: state.Descripcion.isValid,
         },
       };
-    case "FOCUS_INPUT_DESC":
-      return {
-        ...state,
-        Descripcion: {
-          value: state.Descripcion.value,
-          isValid: state.Descripcion.value.trim().length > 5,
-        },
-      };
-    case "RESET_DESC_IS_VALID":
-      return {
-        ...state,
-        Descripcion: {
-          value: state.Descripcion.value,
-          isValid: null,
-        },
-      };
     case "USER_INPUT_REFERENCIA":
       return {
         ...state,
@@ -141,7 +125,6 @@ export const inputReducer = (state, action) => {
           active: !state.ComboBox.active,
         },
       };
-
     case "HORARIOS_SELECT":
       return {
         ...state,
@@ -168,44 +151,24 @@ export const inputReducer = (state, action) => {
     case "MAQUINA":
       myState = {
         ...state,
-        HorariosFiltrados: filtrarHorarios(
-          state.Horarios,
-          noManeja,
-          state.maquina.id
-        ),
         maquina: { active: !state.maquina.active, id: state.maquina.id },
       };
       break;
     case "BARBA":
       myState = {
         ...state,
-        HorariosFiltrados: filtrarHorarios(
-          state.Horarios,
-          noManeja,
-          state.barba.id
-        ),
         barba: { active: !state.barba.active, id: state.barba.id },
       };
       break;
     case "BRUSHING":
       myState = {
         ...state,
-        HorariosFiltrados: filtrarHorarios(
-          state.Horarios,
-          noManeja,
-          state.brushing.id
-        ),
         brushing: { active: !state.brushing.active, id: state.brushing.id },
       };
       break;
     case "DECOLORACION":
       myState = {
         ...state,
-        HorariosFiltrados: filtrarHorarios(
-          state.Horarios,
-          noManeja,
-          state.decoloracion.id
-        ),
         decoloracion: {
           active: !state.decoloracion.active,
           id: state.decoloracion.id,
@@ -233,7 +196,6 @@ export const inputReducer = (state, action) => {
       decoloracion: myState.decoloracion,
       claritos: myState.claritos,
     });
-    console.log(servicios);
     let horariosAuxiliares = [...myState.Horarios];
     servicios.forEach(s => {
       if(s.active){
@@ -246,10 +208,10 @@ export const inputReducer = (state, action) => {
     });
     myState = {
       ...myState,
-      HorariosFiltrados:horariosAuxiliares ,
-      Employee: { value: myState.HorariosFiltrados[0].id },
+      Calendario:{value:null,dia:null},
+      HorariosFiltrados:[...horariosAuxiliares] ,
+      Employee: { value: horariosAuxiliares[0].id },
     };
   }
-  console.log(myState);
   return myState;
 };

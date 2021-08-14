@@ -39,7 +39,7 @@ const ModalOveryLay = (props) => {
       <div className={classes.Modal}>
         {props.children}
         <SimpleButton type="button" action={props.closed} color={"red"}>
-          Salir
+          X
         </SimpleButton>
       </div>
     </CSSTransition>

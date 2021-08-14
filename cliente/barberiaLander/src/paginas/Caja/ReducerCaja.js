@@ -205,6 +205,7 @@ export const cajaReducer = (state, action) => {
           active: !state.comboAgenda.active,
         },
       };
+
     case "CHANGE_COMBO_AGENDA":
       let baseServicios = {
         corte: false,
@@ -240,6 +241,19 @@ export const cajaReducer = (state, action) => {
         ...state,
         comboAgenda: { value: action.value, active: false },
         servicios: { ...baseServicios },
+      };
+    case "CLICK_COMBO_SALIDA":
+      return {
+        ...state,
+        comboSalida: {
+          value: state.comboSalida.value,
+          active: !state.comboSalida.active,
+        },
+      };
+    case "CHANGE_COMBO_SALIDA":
+      return {
+        ...state,
+        comboSalida: { value: action.value, active: false },
       };
     case "USER_INPUT_MONTO_A":
       return {
@@ -392,7 +406,7 @@ export const cajaReducer = (state, action) => {
         productosAgregados: [...destino],
         montoProductos: { value: "", isValid: null },
         productosSAg: [],
-        montoTotalProd: { value: total, isValid: true },
+        montoTotalProd: { value: String(total), isValid: true },
       };
     case "QUITAR":
       destino = [...state.productosAgregados];
@@ -578,7 +592,6 @@ export const cajaReducer = (state, action) => {
       return { ...state, showSalida: { value: true } };
     case "HIDE_SALIDA":
       return { ...state, showSalida: { value: false } };
-
     case "USER_INPUT_MONTO_S":
       return {
         ...state,
@@ -601,6 +614,32 @@ export const cajaReducer = (state, action) => {
         ...state,
         montoSalida: {
           value: state.montoSalida.value,
+          isValid: valido,
+        },
+      };
+
+    case "USER_DESCRIPCION_SALIDA":
+      return {
+        ...state,
+        descripcionSalida: {
+          value: action.value,
+          isValid: state.descripcionSalida.isValid,
+        },
+      };
+    case "FOCUS_DESCRIPCION_SALIDA":
+      return {
+        ...state,
+        descripcionSalida: {
+          value: state.descripcionSalida.value,
+          isValid: null,
+        },
+      };
+    case "BLUR_DESCRIPCION_SALIDA":
+      valido = validarMonto(state.descripcionSalida.value);
+      return {
+        ...state,
+        descripcionSalida: {
+          value: state.descripcionSalida.value,
           isValid: valido,
         },
       };

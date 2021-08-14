@@ -88,9 +88,14 @@ const PreAgendas = () => {
     });
     setAgendasState(misAgendas);
   };
+
+  const getRespuesta =(res) =>{
+    console.log(res);
+  }
   
   const { isLoadingPreAgendas, errorPreAgendas, sendRequest: fetchAgendas } = useHttp();
   const {isLoadingHorarios,errorHorarios,sendRequest:fetchHorarios} = useHttp();
+  const {isLoadingAceptar,errorAceptar,sendRequest:aceptar} = useHttp();
   useEffect(() => {
     fetchAgendas({ url: "/listadoPreAgendas" }, obtenerAgendas);
   }, []);
@@ -103,6 +108,11 @@ const PreAgendas = () => {
     setAgendaAModificar({...agendita,fecha:{d:parseInt(agendita.fecha.slice(8,10),10),m:parseInt(agendita.fecha.slice(5,7),10)}})
     fetchHorarios({ url: "/datosFormularioAgenda"},obtenerHorarios);
   };
+
+  const aceptarAgenda = (agenda) =>{
+    console.log(agenda)
+    aceptar({ url: "/aceptarAgenda",method:'PUT',headers:{'Content-Type':'application/json'},body:agenda},getRespuesta);
+  }
 
   return (
     <>
@@ -119,7 +129,7 @@ const PreAgendas = () => {
             <div className={classes.container}>
               <div className={classes.listado}>
                 {agendasState !== null && (
-                  <Lista items={agendasState} select={setIdAgenda} />
+                  <Lista items={agendasState} select={setIdAgenda} aceptar={aceptarAgenda}/>
                 )}
                 <div className={classes.opciones}>
                   <div className={classes.label}>

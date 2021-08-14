@@ -132,45 +132,8 @@ const FormularioAgenda = (props) => {
   const nombreRef = useRef();
   const telefonoRef = useRef();
   const descripcionRef = useRef();
-  
-  console.log(inputState);
-  /* Eventos reducer */
-  const nombreChangeHandler = (event) => {
-    dispatchInput({ type: "USER_INPUT_NAME", value: event.target.value });
-  };
-  const nombreOnFocus = () => {
-    dispatchInput({ type: "FOCUS_INPUT_NAME" });
-  };
-  const nombreOnBlur = () => {
-    dispatchInput({ type: "RESET_NAME_IS_VALID" });
-  };
-  const telefonoChangeHandler = (event) => {
-    dispatchInput({ type: "USER_INPUT_PHONE", value: event.target.value });
-  };
-  const telefonoOnFocus = () => {
-    dispatchInput({ type: "FOCUS_INPUT_PHONE" });
-  };
-  const telefonoOnBlur = () => {
-    dispatchInput({ type: "RESET_PHONE_IS_VALID" });
-  };
-  const descripcionChangeHandler = (event) => {
-    dispatchInput({ type: "USER_INPUT_DESC", value: event.target.value });
-  };
-  const descripcionOnFocus = () => {
-    dispatchInput({ type: "FOCUS_INPUT_DESC" });
-  };
-  const descripcionOnBlur = () => {
-    dispatchInput({ type: "RESET_DESC_IS_VALID" });
-  };
-  const corteChangeHandler = (event) => {
-    dispatchInput({ type: "USER_INPUT_CORTE", value: event.target.value });
-  };
-  const peloChangeHandler = (event) => {
-    dispatchInput({ type: "USER_INPUT_PELO", value: event.target.value });
-  };
 
   const calendarioHandler = (horarios) => {
-    console.log(horarios);
     let misHorarios = [];
     let i = 1;
     if (horarios.value.length > 0) {
@@ -202,14 +165,6 @@ const FormularioAgenda = (props) => {
       value: misHorarios,
       dia: horarios.dia,
     });
-  };
-
-  const horariosHandler = (id) => {
-    dispatchInput({ type: "HORARIOS_SELECT", value: id });
-  };
-
-  const clickHorariosHandler = () => {
-    dispatchInput({ type: "HORARIOS_CLICK" });
   };
 
   /* Aqui se procesa y se manda la info en caso de esta correcta */
@@ -247,6 +202,8 @@ const FormularioAgenda = (props) => {
         inputState.Calendario.dia.m < date.getMonth() + 1
           ? new Date().getFullYear() + 1
           : new Date().getFullYear();
+      const dia = String(inputState.Calendario.dia.d);
+      const mes = String(inputState.Calendario.dia.m);
       const datosAgenda = {
         nombreCliente: inputState.Nombre.value,
         telefono: inputState.Telefono.value,
@@ -254,7 +211,7 @@ const FormularioAgenda = (props) => {
         imagenEjemplo: inputState.Referencia.value,
         ciEmpleado:inputState.Employee.value,
         servicios: services,
-        fecha: `${year}-${inputState.Calendario.dia.m}-${inputState.Calendario.dia.d}`,
+        fecha: `${year}-${mes.length>1?mes:'0'+mes}-${dia.length>1?dia:'0'+dia}`,
         horario: { i: inicio, f: fin },
       };
       props.onSaveDatosAgenda(datosAgenda);
@@ -312,9 +269,9 @@ const FormularioAgenda = (props) => {
         <ComboBox
           height={4.8}
           current={inputState.ComboBox.value}
-          onChange={horariosHandler}
+          onChange={(id)=>{dispatchInput({ type: "HORARIOS_SELECT", value: id });}}
           opciones={inputState.Calendario.value}
-          onClick={clickHorariosHandler}
+          onClick={()=>{dispatchInput({ type: "HORARIOS_CLICK" });}}
           active={inputState.ComboBox.active}
         />
       </div>
@@ -338,8 +295,6 @@ const FormularioAgenda = (props) => {
       />
     );
   }
-
-  console.log(inputState.HorariosFiltrados);
   return (
     <>
       {isLoading && <LoaddingSpinner />}
@@ -383,9 +338,9 @@ const FormularioAgenda = (props) => {
                           type: "text",
                           value: inputState.Nombre.value,
                           placeholder: "Ingrese su nombre",
-                          onChange: nombreChangeHandler,
-                          onBlur: nombreOnFocus,
-                          onFocus: nombreOnBlur,
+                          onChange: (event)=>{dispatchInput({ type: "USER_INPUT_NAME", value: event.target.value });},
+                          onBlur: ()=>{dispatchInput({ type: "FOCUS_INPUT_NAME" });},
+                          onFocus: ()=>{dispatchInput({ type: "RESET_NAME_IS_VALID" });},
                         }}
                       />
                     </td>
@@ -406,9 +361,9 @@ const FormularioAgenda = (props) => {
                           max: "99999999",
                           value: inputState.Telefono.value,
                           placeholder: "Ingrese su telefono",
-                          onChange: telefonoChangeHandler,
-                          onBlur: telefonoOnFocus,
-                          onFocus: telefonoOnBlur,
+                          onChange: (event)=>{dispatchInput({ type: "USER_INPUT_PHONE", value: event.target.value });},
+                          onBlur: ()=>{dispatchInput({ type: "FOCUS_INPUT_PHONE" });},
+                          onFocus: ()=>{dispatchInput({ type: "RESET_PHONE_IS_VALID" });},
                         }}
                       />
                     </td>
@@ -421,16 +376,14 @@ const FormularioAgenda = (props) => {
                     <td>
                       <TextArea
                         ref={descripcionRef}
-                        isValid={inputState.Descripcion.isValid}
+                        isValid={null}
                         input={{
                           id: 3,
                           rows: 4,
                           value: inputState.Descripcion.value,
                           placeholder:
                             "Ingrese una descripción de lo que quiere hacerse",
-                          onChange: descripcionChangeHandler,
-                          onBlur: descripcionOnFocus,
-                          onFocus: descripcionOnBlur,
+                          onChange: (event)=>{dispatchInput({ type: "USER_INPUT_DESC", value: event.target.value });}
                         }}
                       />
                     </td>
@@ -438,12 +391,8 @@ const FormularioAgenda = (props) => {
                 </tbody>
               </table>
               <InputFile
-                input={{ id: 4, onChange: corteChangeHandler }}
+                input={{ id: 4, onChange: (event)=>{dispatchInput({ type: "USER_INPUT_REFERENCIA", value: event.target.value });} }}
                 label="Seleccione una foto de referencia"
-              />
-              <InputFile
-                input={{ id: 5, onChange: peloChangeHandler }}
-                label="Suba una foto de como se ve su pelo"
               />
             </div>
             {document.getElementById("root").clientWidth > 979 && (

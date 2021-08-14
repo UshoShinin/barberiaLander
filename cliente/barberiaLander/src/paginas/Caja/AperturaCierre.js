@@ -5,6 +5,7 @@ import Input from "../../components/UI/Input/Input";
 import ComboBox from "../../components/ComboBox/ComboBox";
 import Card from "../../components/UI/Card/Card";
 import Note from "../../components/UI/Note/Note";
+import TextArea from "../../components/UI/TextArea/TextArea";
 import Modal from "../../components/UI/Modal/Modal";
 import classes from "./AperturaCierre.module.css";
 import Checkbox from "../../components/UI/Checkbox/Checkbox";
@@ -208,6 +209,24 @@ const AperturaCierre = () => {
         dispatchCaja({ type: "FOCUS_INPUT_MONTO_S" });
       },
     },
+    {
+      id: 11,
+      rows: 4,
+      value: cajaState.descripcionSalida.value,
+      placeholder: "Escribe la razón de esta salida de dinero",
+      onChange: (event) => {
+        dispatchCaja({
+          type: "USER_DESCRIPCION_SALIDA",
+          value: event.target.value,
+        });
+      },
+      onBlur: () => {
+        dispatchCaja({ type: "BLUR_DESCRIPCION_SALIDA" });
+      },
+      onFocus: () => {
+        dispatchCaja({ type: "FOCUS_DESCRIPCION_SALIDA" });
+      },
+    },
   ];
 
   const obtenerAgendas = (mensaje) => {
@@ -236,24 +255,36 @@ const AperturaCierre = () => {
         }}
         show={cajaState.showSalida.value}
       >
-        <h1>Salida de dinero</h1>
-        <label>Monto Inicial</label>
-        <Input
-          ref={montoSalida}
-          isValid={cajaState.montoSalida.isValid}
-          input={INPUTS[9]}
-        />
-        <ComboBox
-          opciones={cajaState.Empleados}
-          current={cajaState.comboAgenda.value}
-          active={cajaState.comboAgenda.active}
-          onClick={() => {
-            dispatchCaja({ type: "CLICK_COMBO_AGENDA" });
-          }}
-          onChange={(id) => {
-            dispatchCaja({ type: "CHANGE_COMBO_AGENDA", value: id });
-          }}
-        />
+        <div className={classes.salidaDinero}>
+          <h1>Salida de dinero</h1>
+          <div className={classes.montoSalida}>
+            <label>Monto Inicial</label>
+            <Input
+              ref={montoSalida}
+              isValid={cajaState.montoSalida.isValid}
+              input={INPUTS[9]}
+            />
+          </div>
+          <div style={{height:'40px'}}>
+            <ComboBox
+              opciones={cajaState.Empleados}
+              current={cajaState.comboSalida.value}
+              active={cajaState.comboSalida.active}
+              onClick={() => {
+                dispatchCaja({ type: "CLICK_COMBO_SALIDA" });
+              }}
+              onChange={(id) => {
+                dispatchCaja({ type: "CHANGE_COMBO_SALIDA", value: id });
+              }}
+            />
+          </div>
+          <div>
+            <TextArea ref={null} isValid={null} input={INPUTS[10]} />
+          </div>
+          <div>
+            <SimpleButton>Cargar gasto</SimpleButton>
+          </div>
+        </div>
       </Modal>
       <div className={classes.container}>
         {/*<Note show={cajaState.jornal.show}>{cajaState.jornal.value}</Note>
