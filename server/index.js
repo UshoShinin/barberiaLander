@@ -19,8 +19,12 @@ app.use("/datosFormularioAgenda", (req, res) => {
 
 app.use("/aceptarAgenda", (req, res) => {
   let id = req.query.id;
-  let aceptada = req.query.aceptada;
-  let ret = interfaz.aceptarAgenda(id, aceptada);
+  let horario = {
+    ciEmpleado: req.query.ciEmpleado,
+    horario: req.query.horario,
+    fecha: req.query.fecha,
+  };
+  let ret = interfaz.aceptarAgenda(id, horario);
   ret.then((resultado) => {
     res.json({
       mensaje: resultado,
