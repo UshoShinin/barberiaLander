@@ -12,11 +12,11 @@ const aceptarAgenda = async (id, horario) => {
         return "El horario ya esta ocupado";
       } else {
         //Creo la conexion
-        let pool = await sql.connect(conexion);
+        let pool = sql.connect(conexion);
         //Hago la query para conseguir la agenda
         let queryAgenda = "Select Aceptada from Agenda where IdAgenda = " + id;
         //Voy a buscar si esta aceptada la agenda
-        let agenda = await pool.request().query(queryAgenda);
+        let agenda = pool.request().query(queryAgenda);
         //Si la agenda esta aceptada devuelvo eso
         if (agenda.recordset[0].Aceptada) {
           let ret = {
@@ -29,7 +29,7 @@ const aceptarAgenda = async (id, horario) => {
           let queryUpdate =
             "update Agenda set Aceptada = 1 where IdAgenda = " + id;
           //Hago update de la agenda
-          let empleados = await pool.request().query(queryUpdate);
+          let empleados = pool.request().query(queryUpdate);
           //Si salio todo bien y no fue al catch se confirma de que fue aceptada
           let ret = {
             codigo: 200,
