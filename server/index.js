@@ -18,11 +18,11 @@ app.use("/datosFormularioAgenda", (req, res) => {
 });
 
 app.use("/aceptarAgenda", (req, res) => {
-  let id = req.query.id;
+  let id = req.body.idAgenda;
   let horario = {
-    ciEmpleado: req.query.ciEmpleado,
-    horario: req.query.horario,
-    fecha: req.query.fecha,
+    ciEmpleado: req.body.ciEmpleado,
+    horario: req.body.horario,
+    fecha: req.body.fecha,
   };
   let ret = interfaz.aceptarAgenda(id, horario);
   ret.then((resultado) => {

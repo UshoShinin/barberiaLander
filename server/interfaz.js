@@ -7,16 +7,17 @@ const sql = require("mssql");
 const aceptarAgenda = async (id, horario) => {
   try {
     //Verifico que el horario siga estando disponible
-    const horarioDisponible = verificarHorario(horario).then((disponible) => {
+    const horarioDisponible = verificarHorario(horario).then(async (disponible) => {
+      console.log(disponible);
       if (!disponible) {
         return "El horario ya esta ocupado";
       } else {
         //Creo la conexion
-        let pool = sql.connect(conexion);
+        let pool = await sql.connect(conexion);
         //Hago la query para conseguir la agenda
         let queryAgenda = "Select Aceptada from Agenda where IdAgenda = " + id;
         //Voy a buscar si esta aceptada la agenda
-        let agenda = pool.request().query(queryAgenda);
+        let agenda = await pool.request().query(queryAgenda);
         //Si la agenda esta aceptada devuelvo eso
         if (agenda.recordset[0].Aceptada) {
           let ret = {
@@ -29,7 +30,7 @@ const aceptarAgenda = async (id, horario) => {
           let queryUpdate =
             "update Agenda set Aceptada = 1 where IdAgenda = " + id;
           //Hago update de la agenda
-          let empleados = pool.request().query(queryUpdate);
+          let empleados = await pool.request().query(queryUpdate);
           //Si salio todo bien y no fue al catch se confirma de que fue aceptada
           let ret = {
             codigo: 200,
@@ -408,13 +409,13 @@ const verificarHorario = async (horario) => {
       .input("ci", sql.VarChar, horario.ciEmpleado)
       .input("fecha", sql.Date, horario.fecha)
       .query(
-        "select HoraInicio, HoraFin from Horario where Cedula = @ci and Fecha = @fecha"
+        "select HoraInicio, HoraFin from Horario H, Agenda A where Cedula = @ci and Fecha = @fecha and A.IdHorario = H.IdHorario and A.Aceptada = 1"
       );
     //Separo el listado
     const lista = horarios.recordset;
     //Paso a valores numericos los datos del horario que me pasan por parametro para poder trabajar mejor
-    let horaInicio = parseInt(horario.i.replace(":", ""));
-    let horaFin = parseInt(horario.f.replace(":", ""));
+    let horaInicio = parseInt(horario.horario.i.replace(":", ""));
+    let horaFin = parseInt(horario.horario.f.replace(":", ""));
     //Esta variable es la que devuelvo al final, arranca en true y en el for se evalua para pasar a false
     let puedoInsertar = true;
     //Recorro los horarios del empleado
