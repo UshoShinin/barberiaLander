@@ -11,6 +11,9 @@ const Item = (props) => {
         <h4>
           Inicio:{item.horaInicio} Fin:{item.horaFin}
         </h4>
+        <h4>
+          {item.nombreEmpleado}
+        </h4>
         {item.descripcion.length > 0 && (
           <p>
             <span>Descripción:</span> {item.descripcion}

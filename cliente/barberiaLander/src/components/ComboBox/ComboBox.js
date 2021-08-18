@@ -10,16 +10,10 @@ const getObjectById = (list, id) => {
 };
 const ComboBox = (props) => {
   const currentData = getObjectById(props.opciones, props.current);
-  const clickHandler = () => {
-    props.onClick();
-  };
-  const selectedOptionHandler = (id) => {
-    props.onChange(id);
-  };
   return (
     <div className={classes.ComboBox}>
       <div
-        onClick={clickHandler}
+        onClick={props.onClick}
         className={`${classes.select} ${props.active ? classes.active : ""}`}
       >
         <div className="contenido-select">
@@ -34,7 +28,7 @@ const ComboBox = (props) => {
         {(state) => (
           <Opciones
             height={props.height}
-            mostrar={selectedOptionHandler}
+            mostrar={props.onChange}
             show={state}
             opciones={props.opciones}
           />

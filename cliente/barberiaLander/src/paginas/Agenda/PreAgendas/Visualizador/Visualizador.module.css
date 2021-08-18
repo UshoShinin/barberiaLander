@@ -1,9 +1,5 @@
 .container {
-  padding: 1em;
-  border: 2px var(--clr-inActive) solid;
-  border-radius: 5px;
-  height: 100%;
-  transition: color 200ms linear;
+  
 }
 
 .container > div > div > h2 + h2{
@@ -19,6 +15,12 @@
 .container > div > div > h2 {
   color: var(--clr-inActive);
   transition: color 200ms linear;
+}
+
+.container>button{
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
 }
 .datos {
   color: var(--clr-inActive);

@@ -1,5 +1,5 @@
 import FormularioAgenda from "./FormularioAgenda/FormularioAgenda";
-import Card from "../../components/UI/Card/Card";
+import NormalCard from "../../components/UI/Card/NormalCard";
 import useHttp from "../../hooks/useHttp";
 
 const getRespuesta = (res) => {
@@ -14,9 +14,9 @@ const CrearAgenda = (props) => {
 
   return (
     <div className="nuevaAgenda">
-      <Card>
-        <FormularioAgenda onSaveDatosAgenda={guardarDatosAgendaHandler} />
-      </Card>
+      <NormalCard>
+        <FormularioAgenda onSaveDatosAgenda={guardarDatosAgendaHandler} agenda={null} />
+      </NormalCard>
     </div>
   );
 };

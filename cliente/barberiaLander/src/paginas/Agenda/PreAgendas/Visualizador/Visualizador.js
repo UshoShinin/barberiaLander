@@ -4,6 +4,7 @@ import LoaddingSpinner from "../../../../components/LoaddingSpinner/LoaddingSpin
 import classes from "./Visualizador.module.css";
 import useHttp from "../../../../hooks/useHttp";
 import SimpleButton from "../../../../components/UI/SimpleButton/SimpleButton";
+import Border from '../../../../components/UI/Border/Border';
 import { Redirect, Route } from "react-router-dom";
 const Visualizador = React.memo((props) => {
   const { isLoading, error, sendRequest: getAgenda } = useHttp();
@@ -55,7 +56,6 @@ const Visualizador = React.memo((props) => {
       getAgenda({ url: "/agendaPorId?idAgenda=" + props.id }, obtenerAgenda);
     }
   }, [props.id]);
-  console.log(agenda);
   const sendAgendas = () =>{
     props.mostrarAgenda(agenda);
   }
@@ -63,7 +63,7 @@ const Visualizador = React.memo((props) => {
     <>
       {/* {isLoading && <LoaddingSpinner />}
       {!isLoading && ( */}
-      <div className={classes.container}>
+      <Border className={classes.container}>
         <div>
           <div>
             <h1
@@ -212,11 +212,8 @@ const Visualizador = React.memo((props) => {
             />
           </div>
         </div>
-      </div>
-      <div>
-        <SimpleButton action={sendAgendas} />
-      </div>
-      {/* )} */}
+        <SimpleButton active={false} action={sendAgendas}>Comenzar a modificar</SimpleButton>
+      </Border>
     </>
   );
 });

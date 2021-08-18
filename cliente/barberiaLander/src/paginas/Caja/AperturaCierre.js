@@ -3,6 +3,7 @@ import SimpleButton from "../../components/UI/SimpleButton/SimpleButton";
 import Switch from "../../components/UI/Switch/Switch";
 import Input from "../../components/UI/Input/Input";
 import ComboBox from "../../components/ComboBox/ComboBox";
+import Border from '../../components/UI/Border/Border';
 import Card from "../../components/UI/Card/Card";
 import Note from "../../components/UI/Note/Note";
 import TextArea from "../../components/UI/TextArea/TextArea";
@@ -32,6 +33,7 @@ const AperturaCierre = () => {
       type: "number",
       value: cajaState.montoInicial.value,
       placeholder: "0",
+      disabled:!cajaState.cajaAbierta,
       onChange: (event) => {
         dispatchCaja({
           type: "USER_INPUT_MONTO_I",
@@ -50,6 +52,7 @@ const AperturaCierre = () => {
       type: "number",
       value: cajaState.montoAgenda.value,
       placeholder: "0",
+      disabled:!cajaState.cajaAbierta,
       onChange: (event) => {
         dispatchCaja({
           type: "USER_INPUT_MONTO_A",
@@ -68,6 +71,7 @@ const AperturaCierre = () => {
       type: "number",
       value: cajaState.propinaAgenda.value,
       placeholder: "0",
+      disabled:!cajaState.cajaAbierta,
       onChange: (event) => {
         dispatchCaja({
           type: "USER_INPUT_PROPINA_A",
@@ -86,6 +90,7 @@ const AperturaCierre = () => {
       type: "number",
       value: cajaState.montoProductos.value,
       placeholder: "1",
+      disabled:!cajaState.cajaAbierta,
       onChange: (event) => {
         dispatchCaja({
           type: "USER_INPUT_MONTO_PRODUCTO",
@@ -104,6 +109,7 @@ const AperturaCierre = () => {
       type: "number",
       value: cajaState.montoTotalProd.value,
       placeholder: "0",
+      disabled:!cajaState.cajaAbierta,
       onChange: (event) => {
         dispatchCaja({
           type: "USER_INPUT_MONTO_TOTAL_PRODUCTO",
@@ -124,6 +130,7 @@ const AperturaCierre = () => {
       type: "number",
       value: cajaState.montoEfectivo.value,
       placeholder: "0",
+      disabled:!cajaState.cajaAbierta,
       onChange: (event) => {
         dispatchCaja({
           type: "USER_INPUT_EFECTIVO",
@@ -142,6 +149,7 @@ const AperturaCierre = () => {
       type: "number",
       value: cajaState.montoDebito.value,
       placeholder: "0",
+      disabled:!cajaState.cajaAbierta,
       onChange: (event) => {
         dispatchCaja({
           type: "USER_INPUT_DEBITO",
@@ -160,6 +168,7 @@ const AperturaCierre = () => {
       type: "number",
       value: cajaState.montoCuponera.value,
       placeholder: "0",
+      disabled:!cajaState.cajaAbierta,
       onChange: (event) => {
         dispatchCaja({
           type: "USER_INPUT_CUPONERA",
@@ -178,6 +187,7 @@ const AperturaCierre = () => {
       type: "number",
       value: cajaState.montoTotal.value,
       placeholder: "0",
+      disabled:!cajaState.cajaAbierta,
       onChange: (event) => {
         dispatchCaja({
           type: "USER_INPUT_TOTAL",
@@ -196,6 +206,7 @@ const AperturaCierre = () => {
       type: "number",
       value: cajaState.montoSalida.value,
       placeholder: "0",
+      disabled:!cajaState.cajaAbierta,
       onChange: (event) => {
         dispatchCaja({
           type: "USER_INPUT_MONTO_S",
@@ -214,6 +225,7 @@ const AperturaCierre = () => {
       rows: 4,
       value: cajaState.descripcionSalida.value,
       placeholder: "Escribe la razón de esta salida de dinero",
+      disabled:!cajaState.cajaAbierta,
       onChange: (event) => {
         dispatchCaja({
           type: "USER_DESCRIPCION_SALIDA",
@@ -227,8 +239,36 @@ const AperturaCierre = () => {
         dispatchCaja({ type: "FOCUS_DESCRIPCION_SALIDA" });
       },
     },
+    {
+      id: 12,
+      type: "number",
+      value: cajaState.codCuponera.value,
+      placeholder: "Codigo cuponera",
+      disabled:!cajaState.cajaAbierta,
+      onChange: (event) => {
+        dispatchCaja({
+          type: "USER_COD_CUPONERA",
+          value: event.target.value,
+        });
+      },
+      onBlur: () => {
+        dispatchCaja({ type: "BLUR_COD_CUPONERA" });
+      },
+      onFocus: () => {
+        dispatchCaja({ type: "FOCUS_COD_CUPONERA" });
+      },
+    },
   ];
 
+  const salidaSubmitHandler = (e) => {
+    e.preventDefault();
+    const data = {
+      monto: cajaState.montoSalida.value,
+      descripcion: cajaState.descripcionSalida.value,
+      empleados: cajaState.comboSalida,
+    };
+    console.log(data);
+  };
   const obtenerAgendas = (mensaje) => {
     dispatchCaja({ type: "CARGA_DE_DATOS", payload: mensaje.mensaje });
   };
@@ -255,17 +295,17 @@ const AperturaCierre = () => {
         }}
         show={cajaState.showSalida.value}
       >
-        <div className={classes.salidaDinero}>
+        <form className={classes.salidaDinero} onSubmit={salidaSubmitHandler}>
           <h1>Salida de dinero</h1>
           <div className={classes.montoSalida}>
-            <label>Monto Inicial</label>
+            <label>Monto Salida</label>
             <Input
               ref={montoSalida}
               isValid={cajaState.montoSalida.isValid}
               input={INPUTS[9]}
             />
           </div>
-          <div style={{height:'40px'}}>
+          <div style={{ height: "40px" }}>
             <ComboBox
               opciones={cajaState.Empleados}
               current={cajaState.comboSalida.value}
@@ -282,9 +322,9 @@ const AperturaCierre = () => {
             <TextArea ref={null} isValid={null} input={INPUTS[10]} />
           </div>
           <div>
-            <SimpleButton>Cargar gasto</SimpleButton>
+            <SimpleButton type="submit">Cargar gasto</SimpleButton>
           </div>
-        </div>
+        </form>
       </Modal>
       <div className={classes.container}>
         {/*<Note show={cajaState.jornal.show}>{cajaState.jornal.value}</Note>
@@ -303,15 +343,15 @@ const AperturaCierre = () => {
           <SimpleButton>Calcular Propinas</SimpleButton>
         </div> */}
         <div className={classes.caja}>
-          <div className={`${classes.cajaContainer} ${classes.abrirCerrar}`}>
-            <label>Monto Inicial</label>
+          <Border disabled={!cajaState.cajaAbierta} className={`${classes.cajaContainer} ${classes.abrirCerrar}`}>
+            <label className={`${cajaState.cajaAbierta?classes.text:classes.textDisabled}`}>Monto Inicial</label>
             <Input
               ref={montoIniRef}
               isValid={cajaState.montoInicial.isValid}
               input={INPUTS[0]}
             />
-            <SimpleButton className={classes.Abrir}>Abrir Caja</SimpleButton>
-            <SimpleButton
+            <SimpleButton disabled={cajaState.cajaAbierta} className={classes.Abrir} action={()=>{dispatchCaja({type:'ABRIR_CAJA'})}}>Abrir Caja</SimpleButton>
+            <SimpleButton disabled={!cajaState.cajaAbierta}
               color="red"
               className={classes.Salida}
               action={() => {
@@ -320,37 +360,39 @@ const AperturaCierre = () => {
             >
               Salida de dinero
             </SimpleButton>
-            <SimpleButton className={classes.Cerrar}>Cerrar Caja</SimpleButton>
-          </div>
+            <SimpleButton disabled={!cajaState.cajaAbierta} action={()=>{dispatchCaja({type:'CERRAR_CAJA'})}} className={classes.Cerrar}>Cerrar Caja</SimpleButton>
+          </Border>
           <div className={classes.agendaProductos}>
-            <div className={classes.cajaContainer}>
+            <Border disabled={!cajaState.cajaAbierta} className={classes.cajaContainer}>
               <div className={classes.agenda}>
                 <div className={classes.dobleFild}>
                   <div>
-                    <label>Sin agendar</label>
+                    <label className={`${cajaState.cajaAbierta?classes.text:classes.textDisabled}`}>Sin agendar</label>
                     <Switch
                       active={cajaState.sinAgendar.value}
                       onCheck={() => {
                         dispatchCaja({ type: "CLICK_S_A" });
                       }}
+                      disabled={true}
                     />
                   </div>
                   <div>
                     {!cajaState.sinAgendar.value && (
                       <>
-                        <label>Solo hoy</label>
+                        <label className={`${cajaState.cajaAbierta?classes.text:classes.textDisabled}`}>Solo hoy</label>
                         <Switch
                           active={cajaState.soloHoy.value}
                           onCheck={() => {
                             dispatchCaja({ type: "CLICK_S_H" });
                           }}
+                          disabled={true}
                         />
                       </>
                     )}
                   </div>
                 </div>
                 <div className={classes.comboAgenda}>
-                  <label>{`${
+                  <label className={`${cajaState.cajaAbierta?classes.text:classes.textDisabled}`}>{`${
                     cajaState.sinAgendar.value ? "Empleado" : "Agenda"
                   }`}</label>
                   <ComboBox
@@ -369,7 +411,7 @@ const AperturaCierre = () => {
                     }}
                   />
                 </div>
-                <h1>Servicios</h1>
+                <h1 className={`${cajaState.cajaAbierta?classes.text:classes.textDisabled}`}>Servicios</h1>
                 <div className={classes.servicios}>
                   <div>
                     <h2
@@ -420,7 +462,7 @@ const AperturaCierre = () => {
                 </div>
                 <div className={classes.dobleFild}>
                   <div>
-                    <label>Monto</label>
+                    <label className={`${cajaState.cajaAbierta?classes.text:classes.textDisabled}`}>Monto</label>
                     <Input
                       ref={montoAgendaRef}
                       isValid={cajaState.montoAgenda.isValid}
@@ -428,7 +470,7 @@ const AperturaCierre = () => {
                     />
                   </div>
                   <div>
-                    <label>Propina</label>
+                    <label className={`${cajaState.cajaAbierta?classes.text:classes.textDisabled}`}>Propina</label>
                     <Input
                       ref={propinaAgendaRef}
                       isValid={cajaState.propinaAgenda.isValid}
@@ -437,12 +479,12 @@ const AperturaCierre = () => {
                   </div>
                 </div>
               </div>
-            </div>
-            <div className={`${classes.cajaContainer} ${classes.productos}`}>
-              <h2>Productos</h2>
+            </Border>
+            <Border disabled={!cajaState.cajaAbierta} className={`${classes.cajaContainer} ${classes.productos}`}>
+              <h2 className={`${cajaState.cajaAbierta?classes.text:classes.textDisabled}`}>Productos</h2>
               <div className={classes.alinearCampos}>
                 <div className={classes.label}>
-                  <label>Cantidad productos</label>
+                  <label className={`${cajaState.cajaAbierta?classes.text:classes.textDisabled}`}>Cantidad productos</label>
                 </div>
                 <div>
                   <Input
@@ -465,6 +507,7 @@ const AperturaCierre = () => {
                 <div>
                   <div className={classes.productosActions}>
                     <SimpleButton
+                    disabled={!cajaState.cajaAbierta}
                       action={() => {
                         dispatchCaja({
                           type: "AGREGAR",
@@ -480,6 +523,7 @@ const AperturaCierre = () => {
                   </div>
                   <div className={classes.productosActions}>
                     <SimpleButton
+                    disabled={!cajaState.cajaAbierta}
                       color="red"
                       action={() => {
                         dispatchCaja({
@@ -507,7 +551,7 @@ const AperturaCierre = () => {
               </div>
               <div className={classes.alinearCampos}>
                 <div className={classes.label}>
-                  <label>Monto Total</label>
+                  <label className={`${cajaState.cajaAbierta?classes.text:classes.textDisabled}`}>Monto Total</label>
                 </div>
                 <div>
                   <Input
@@ -517,13 +561,13 @@ const AperturaCierre = () => {
                   />
                 </div>
               </div>
-            </div>
+            </Border>
           </div>
           <div>
             <div className={classes.total}>
               <div>
                 <div>
-                  <label>Efectivo</label>
+                  <label className={`${cajaState.cajaAbierta?classes.text:classes.textDisabled}`}>Efectivo</label>
                   {cajaState.cantidadMedios.value > 1 && (
                     <Input
                       ref={montoEfectivo}
@@ -534,6 +578,7 @@ const AperturaCierre = () => {
                 </div>
                 <div>
                   <Checkbox
+                  disabled={!cajaState.cajaAbierta}
                     id={11}
                     checked={cajaState.efectivo.value}
                     onChange={() => {
@@ -544,7 +589,7 @@ const AperturaCierre = () => {
               </div>
               <div>
                 <div>
-                  <label>Debito</label>
+                  <label className={`${cajaState.cajaAbierta?classes.text:classes.textDisabled}`}>Debito</label>
                   {cajaState.cantidadMedios.value > 1 && (
                     <Input
                       ref={montoDebito}
@@ -556,6 +601,7 @@ const AperturaCierre = () => {
 
                 <div>
                   <Checkbox
+                  disabled={!cajaState.cajaAbierta}
                     id={12}
                     checked={cajaState.debito.value}
                     onChange={() => {
@@ -566,7 +612,7 @@ const AperturaCierre = () => {
               </div>
               <div>
                 <div>
-                  <label>Cuponera</label>
+                  <label className={`${cajaState.cajaAbierta?classes.text:classes.textDisabled}`}>Cuponera</label>
                   {cajaState.cantidadMedios.value > 1 && (
                     <Input
                       ref={montoCuponera}
@@ -577,6 +623,7 @@ const AperturaCierre = () => {
                 </div>
                 <div>
                   <Checkbox
+                  disabled={!cajaState.cajaAbierta}
                     id={13}
                     checked={cajaState.cuponera.value}
                     onChange={() => {
@@ -584,9 +631,19 @@ const AperturaCierre = () => {
                     }}
                   />
                 </div>
+                {cajaState.cuponera.value && (
+                  <div>
+                    <label>Codigo cuponera</label>
+                    <Input
+                      ref={montoCuponera}
+                      isValid={cajaState.montoCuponera.isValid}
+                      input={INPUTS[11]}
+                    />
+                  </div>
+                )}
               </div>
               <div className={classes.MontoTotal}>
-                <h2>Total</h2>
+                <h2 className={`${cajaState.cajaAbierta?classes.text:classes.textDisabled}`}>Total</h2>
                 <Input
                   ref={montoTotal}
                   isValid={cajaState.montoTotal.isValid}

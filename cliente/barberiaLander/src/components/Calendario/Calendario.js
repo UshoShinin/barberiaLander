@@ -17,7 +17,9 @@ const Calendario = (props) => {
     props.getHorarios(horarios);
   }
   const lostFocus =()=>{
-    document.getElementById('Calendario').classList.remove('FormularioAgenda_invalidCal__1yd0j');
+    const element = document.getElementById('Calendario');
+    if(element.classList[1]!==undefined) element.classList.remove(element.classList[1]);
+    
   }
   /* Necesito comentar esta funcion */
   const { cantidadMeses, content } = days(props.date,props.diasAMostrar,props.actividad,obtenerHorarios,lostFocus);

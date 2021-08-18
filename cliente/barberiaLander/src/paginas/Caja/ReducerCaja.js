@@ -3,6 +3,7 @@ import { formatDate } from "../../FuncionesAuxiliares/FuncionesAuxiliares";
 const today = new Date();
 export const initialState = {
   idCaja: new Date(),
+  cajaAbierta: false,
   desc: "AbrirCaja",
   montoInicial: { value: "", isValid: null },
   jornal: { value: "", show: false },
@@ -77,6 +78,7 @@ export const initialState = {
   montoEfectivo: { value: "", isValid: null },
   montoDebito: { value: "", isValid: null },
   montoCuponera: { value: "", isValid: null },
+  codCuponera: { value: "", isValid: null },
   cantidadMedios: { value: 0 },
   montoTotal: { value: "", isValid: null },
   showSalida: { value: false },
@@ -123,6 +125,10 @@ export const cajaReducer = (state, action) => {
   let cantidad;
   let myState;
   switch (action.type) {
+    case "ABRIR_CAJA":
+      return { ...state, cajaAbierta: true };
+    case "CERRAR_CAJA":
+      return { ...state, cajaAbierta: false };
     case "CARGA_DE_DATOS":
       const date = new Date("07-24-2021");
       console.log(new Date());
@@ -205,7 +211,6 @@ export const cajaReducer = (state, action) => {
           active: !state.comboAgenda.active,
         },
       };
-
     case "CHANGE_COMBO_AGENDA":
       let baseServicios = {
         corte: false,
@@ -617,7 +622,6 @@ export const cajaReducer = (state, action) => {
           isValid: valido,
         },
       };
-
     case "USER_DESCRIPCION_SALIDA":
       return {
         ...state,
@@ -626,6 +630,7 @@ export const cajaReducer = (state, action) => {
           isValid: state.descripcionSalida.isValid,
         },
       };
+    //Posiblemente tenga que sacarlos
     case "FOCUS_DESCRIPCION_SALIDA":
       return {
         ...state,
@@ -640,6 +645,31 @@ export const cajaReducer = (state, action) => {
         ...state,
         descripcionSalida: {
           value: state.descripcionSalida.value,
+          isValid: valido,
+        },
+      };
+    case "USER_COD_CUPONERA":
+      return {
+        ...state,
+        codCuponera: {
+          value: action.value,
+          isValid: state.codCuponera.isValid,
+        },
+      };
+    case "FOCUS_COD_CUPONERA":
+      return {
+        ...state,
+        codCuponera: {
+          value: state.codCuponera.value,
+          isValid: null,
+        },
+      };
+    case "BLUR_COD_CUPONERA":
+      valido = validarMonto(state.codCuponera.value);
+      return {
+        ...state,
+        codCuponera: {
+          value: state.codCuponera.value,
           isValid: valido,
         },
       };

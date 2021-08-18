@@ -25,7 +25,6 @@ export const initialBaseState = {
   HorariosFiltrados: null,
   Telefono: { value: "", isValid: null },
   Descripcion: { value: "", isValid: null },
-  Checkboxes: { value: null },
   Referencia: { value: "" },
   Calendario: { value: null, dia: null },
   ComboBox: { value: null, active: false },
@@ -46,7 +45,7 @@ export const inputReducer = (state, action) => {
         ...state,
         Horarios: action.value,
         HorariosFiltrados: action.value,
-        Employee: { value: action.value[0].id },
+        Employee: { value: state.Employee.value===null?action.value[0].id:state.Employee.value },
       };
     case "USER_INPUT_NAME":
       return {

@@ -18,10 +18,7 @@ import {
   transformNumberString,
 } from "../../../components/Calendario/FuncionesAuxiliares";
 
-import {
-  inputReducer,
-  initialBaseState,
-} from "./ReduerFormularioAgenda";
+import { inputReducer, initialBaseState } from "./ReduerFormularioAgenda";
 import ComboBox from "../../../components/ComboBox/ComboBox";
 
 /* const DUMMY_HORARIOS_EMPLEADOS = [
@@ -83,19 +80,20 @@ import ComboBox from "../../../components/ComboBox/ComboBox";
   { id: 4, title: "Three", foto: three, fechas: [] },
 ]; */
 
-
 const FormularioAgenda = (props) => {
-  /* console.log(props.agenda);
-  console.log(props.horario); */
-  /* let initialState;
-  if(false){ props.agenda !==null&&props.horario!==null 
-    
+  console.log(props.agenda);
+  /* console.log(props.horario); */
+  let initialState;
+  if (props.agenda !== null /* &&props.horario!==null */) {
     initialState = {
       Nombre: { value: props.agenda.nombreCliente, isValid: true },
       Horarios: null,
       HorariosFiltrados: null,
       Telefono: { value: props.agenda.tel, isValid: true },
-      Descripcion: { value: props.agenda.descripcion, isValid: props.agenda.descripcion.length!==0?true:null },
+      Descripcion: {
+        value: props.agenda.descripcion,
+        isValid: props.agenda.descripcion.length !== 0 ? true : null,
+      },
       Referencia: { value: props.agenda.img },
       Calendario: { value: null, dia: props.agenda.fecha },
       ComboBox: { value: null, active: false },
@@ -106,10 +104,11 @@ const FormularioAgenda = (props) => {
       claritos: { active: props.agenda.claritos, id: 6 },
       decoloracion: { active: props.agenda.decoloracion, id: 7 },
       brushing: { active: props.agenda.brushing, id: 8 },
-    }
-  }else{
+    };
+    console.log(initialState.Employee.value);
+  } else {
     initialState = initialBaseState;
-  } */
+  }
   /* Carga inicial de datos */
   const obtenerHorarios = (horarios) => {
     dispatchInput({
@@ -128,7 +127,9 @@ const FormularioAgenda = (props) => {
     fetchHorarios({ url: "/datosFormularioAgenda" }, obtenerHorarios);
   }, []);
 
-  const [inputState, dispatchInput] = useReducer(inputReducer, initialBaseState);
+  const [inputState, dispatchInput] = useReducer(inputReducer, initialState);
+  console.log("Estado real");
+  console.log(inputState);
   const nombreRef = useRef();
   const telefonoRef = useRef();
   const descripcionRef = useRef();
@@ -204,19 +205,39 @@ const FormularioAgenda = (props) => {
           : new Date().getFullYear();
       const dia = String(inputState.Calendario.dia.d);
       const mes = String(inputState.Calendario.dia.m);
-      const datosAgenda = {
-        nombreCliente: inputState.Nombre.value,
-        telefono: inputState.Telefono.value,
-        descripcion: inputState.Descripcion.value,
-        imagenEjemplo: inputState.Referencia.value,
-        ciEmpleado:inputState.Employee.value,
-        servicios: services,
-        fecha: `${year}-${mes.length>1?mes:'0'+mes}-${dia.length>1?dia:'0'+dia}`,
-        horario: { i: inicio, f: fin },
-      };
-      props.onSaveDatosAgenda(datosAgenda);
+
+      let datosAgenda;
+      if (props.agenda === null) {
+        datosAgenda = {
+          nombreCliente: inputState.Nombre.value,
+          telefono: inputState.Telefono.value,
+          descripcion: inputState.Descripcion.value,
+          imagenEjemplo: inputState.Referencia.value,
+          ciEmpleado: inputState.Employee.value,
+          servicios: services,
+          fecha: `${year}-${mes.length > 1 ? mes : "0" + mes}-${
+            dia.length > 1 ? dia : "0" + dia
+          }`,
+          horario: { i: inicio, f: fin },
+        };
+      } else {
+        datosAgenda = {
+          nombreCliente: inputState.Nombre.value,
+          telefono: inputState.Telefono.value,
+          descripcion: inputState.Descripcion.value,
+          imagenEjemplo: inputState.Referencia.value,
+          servicios: services,
+          fecha: `${year}-${mes.length > 1 ? mes : "0" + mes}-${
+            dia.length > 1 ? dia : "0" + dia
+          }`,
+          horario: { i: inicio, f: fin, ciEmpleado: inputState.Employee.value },
+        };
+      }
+      /* props.onSaveDatosAgenda(datosAgenda); */
+      console.log(datosAgenda);
     }
   };
+
   let diasMostrar;
   let diasSeleccionables = [];
   let tiempoNecesario;
@@ -226,7 +247,10 @@ const FormularioAgenda = (props) => {
     realDate.getMonth() - 1,
     realDate.getDate()
   );
-  if (inputState.HorariosFiltrados !== null && inputState.Employee.value !== null) {
+  if (
+    inputState.HorariosFiltrados !== null &&
+    inputState.Employee.value !== null
+  ) {
     tiempoNecesario = calcularTiempo(
       inputState.Employee.value,
       inputState,
@@ -236,10 +260,13 @@ const FormularioAgenda = (props) => {
       date.getDate(),
       date.getMonth() + 1,
       date.getFullYear(),
-      getElementById(inputState.HorariosFiltrados, inputState.Employee.value).fechas,
+      getElementById(inputState.HorariosFiltrados, inputState.Employee.value)
+        .fechas,
       tiempoNecesario
     );
-    if (inputState.Calendario.value !== null) {
+
+    //Activación de día
+    if (inputState.Calendario.dia !== null) {
       const diaSelect = inputState.Calendario.dia.d;
       const mesSelect = inputState.Calendario.dia.m;
       for (let i = 0; i < diasMostrar.length; i++) {
@@ -261,6 +288,69 @@ const FormularioAgenda = (props) => {
     }
   }
 
+  //Inputs del sistema
+  const INPUTS = [
+    {
+      id: 1,
+      type: "text",
+      value: inputState.Nombre.value,
+      placeholder: "Ingrese su nombre",
+      onChange: (event) => {
+        dispatchInput({
+          type: "USER_INPUT_NAME",
+          value: event.target.value,
+        });
+      },
+      onBlur: () => {
+        dispatchInput({ type: "FOCUS_INPUT_NAME" });
+      },
+      onFocus: () => {
+        dispatchInput({ type: "RESET_NAME_IS_VALID" });
+      },
+    },
+    {
+      id: 2,
+      type: "number",
+      min: "2000000",
+      max: "99999999",
+      value: inputState.Telefono.value,
+      placeholder: "Ingrese su telefono",
+      onChange: (event) => {
+        dispatchInput({
+          type: "USER_INPUT_PHONE",
+          value: event.target.value,
+        });
+      },
+      onBlur: () => {
+        dispatchInput({ type: "FOCUS_INPUT_PHONE" });
+      },
+      onFocus: () => {
+        dispatchInput({ type: "RESET_PHONE_IS_VALID" });
+      },
+    },
+    {
+      id: 3,
+      rows: 4,
+      value: inputState.Descripcion.value,
+      placeholder: "Ingrese una descripción de lo que quiere hacerse",
+      onChange: (event) => {
+        dispatchInput({
+          type: "USER_INPUT_DESC",
+          value: event.target.value,
+        });
+      },
+    },
+    {
+      id: 4,
+      onChange: (event) => {
+        dispatchInput({
+          type: "USER_INPUT_REFERENCIA",
+          value: event.target.value,
+        });
+      },
+    },
+  ];
+
   /* Este es el combo que aparece cuando se selecciona un día del calendario */
   /* En caso que no se haya hecho la precara de datos el combo es null */
   const combo =
@@ -269,15 +359,19 @@ const FormularioAgenda = (props) => {
         <ComboBox
           height={4.8}
           current={inputState.ComboBox.value}
-          onChange={(id)=>{dispatchInput({ type: "HORARIOS_SELECT", value: id });}}
+          onChange={(id) => {
+            dispatchInput({ type: "HORARIOS_SELECT", value: id });
+          }}
           opciones={inputState.Calendario.value}
-          onClick={()=>{dispatchInput({ type: "HORARIOS_CLICK" });}}
+          onClick={() => {
+            dispatchInput({ type: "HORARIOS_CLICK" });
+          }}
           active={inputState.ComboBox.active}
         />
       </div>
     );
 
-    /* Calendario con todas sus empleados y horarios */
+  /* Calendario con todas sus empleados y horarios */
   /* Si no se hizo la precarga de datos se carga null */
   let calendarioContent = null;
   if (inputState.HorariosFiltrados !== null) {
@@ -310,9 +404,12 @@ const FormularioAgenda = (props) => {
                   inputState.HorariosFiltrados
                 )}
                 myAction={(action) => {
-                  document
-                    .getElementById("timeLeft")
-                    .classList.remove("FormularioAgenda_invalidCombo__1XMtB");
+                  const element = document.getElementById("timeLeft");
+                  if (element.classList[1] !== undefined) {
+                    document
+                      .getElementById("timeLeft")
+                      .classList.remove(element.classList[1]);
+                  }
                   dispatchInput(action);
                 }}
               />
@@ -323,75 +420,35 @@ const FormularioAgenda = (props) => {
                   {inputState.Calendario.value !== null && combo}
                 </div>
               )}
-              <table className={classes.inputsTasble}>
-                <tbody>
-                  <tr>
-                    <td className={classes.label}>
-                      <label htmlFor="1">Nombre:</label>
-                    </td>
-                    <td>
-                      <Input
-                        ref={nombreRef}
-                        isValid={inputState.Nombre.isValid}
-                        input={{
-                          id: 1,
-                          type: "text",
-                          value: inputState.Nombre.value,
-                          placeholder: "Ingrese su nombre",
-                          onChange: (event)=>{dispatchInput({ type: "USER_INPUT_NAME", value: event.target.value });},
-                          onBlur: ()=>{dispatchInput({ type: "FOCUS_INPUT_NAME" });},
-                          onFocus: ()=>{dispatchInput({ type: "RESET_NAME_IS_VALID" });},
-                        }}
-                      />
-                    </td>
-                  </tr>
+              <div className={classes.inputsGrid}>
+                <div className={classes.label}>
+                  <label htmlFor="1">Nombre:</label>
+                </div>
+                <Input
+                  ref={nombreRef}
+                  isValid={inputState.Nombre.isValid}
+                  input={INPUTS[0]}
+                />
+                <div className={classes.label}>
+                  <label htmlFor="2">Teléfono:</label>
+                </div>
+                <Input
+                  ref={telefonoRef}
+                  isValid={inputState.Telefono.isValid}
+                  input={INPUTS[1]}
+                />
 
-                  <tr>
-                    <td className={classes.label}>
-                      <label htmlFor="2">Teléfono:</label>
-                    </td>
-                    <td>
-                      <Input
-                        ref={telefonoRef}
-                        isValid={inputState.Telefono.isValid}
-                        input={{
-                          id: 2,
-                          type: "number",
-                          min: "2000000",
-                          max: "99999999",
-                          value: inputState.Telefono.value,
-                          placeholder: "Ingrese su telefono",
-                          onChange: (event)=>{dispatchInput({ type: "USER_INPUT_PHONE", value: event.target.value });},
-                          onBlur: ()=>{dispatchInput({ type: "FOCUS_INPUT_PHONE" });},
-                          onFocus: ()=>{dispatchInput({ type: "RESET_PHONE_IS_VALID" });},
-                        }}
-                      />
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td className={classes.label}>
-                      <label htmlFor="3">Descripción:</label>
-                    </td>
-                    <td>
-                      <TextArea
-                        ref={descripcionRef}
-                        isValid={null}
-                        input={{
-                          id: 3,
-                          rows: 4,
-                          value: inputState.Descripcion.value,
-                          placeholder:
-                            "Ingrese una descripción de lo que quiere hacerse",
-                          onChange: (event)=>{dispatchInput({ type: "USER_INPUT_DESC", value: event.target.value });}
-                        }}
-                      />
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                <div className={classes.label}>
+                  <label htmlFor="3">Descripción:</label>
+                </div>
+                <TextArea
+                  ref={descripcionRef}
+                  isValid={null}
+                  input={INPUTS[2]}
+                />
+              </div>
               <InputFile
-                input={{ id: 4, onChange: (event)=>{dispatchInput({ type: "USER_INPUT_REFERENCIA", value: event.target.value });} }}
+                input={INPUTS[3]}
                 label="Seleccione una foto de referencia"
               />
             </div>
@@ -402,7 +459,9 @@ const FormularioAgenda = (props) => {
               </div>
             )}
           </div>
-          <Button type="submit">Agregar Reserva</Button>
+          <Button type="submit">{`${
+            props.agenda === null ? "Agregar Reserva" : "Modificar Reserva"
+          }`}</Button>
         </form>
       )}
     </>

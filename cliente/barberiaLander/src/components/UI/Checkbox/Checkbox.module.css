@@ -3,8 +3,13 @@
   font-size: 1.4em;
   transition: color 180ms linear;
 }
-
-.checkbox {
+.checkbox{
+  box-shadow: 0 0 0.1em 0 var(--clr-inActive);
+  cursor: pointer;
+  transition: border 180ms linear, box-shadow 200ms linear;
+  
+}
+.checkbox,.disabled {
   position: relative;
   display: flex;
   width: 38px;
@@ -12,9 +17,7 @@
   background-color: transparent;
   border: var(--clr-inActive) 0.18em solid;
   border-radius: 0.6em;
-  box-shadow: 0 0 0.1em 0 var(--clr-inActive);
   position: relative;
-  transition: border 180ms linear, box-shadow 200ms linear;
   justify-content: center;
   align-items: center;
   position: relative;
