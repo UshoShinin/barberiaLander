@@ -79,6 +79,16 @@ app.use("/datosFormularioCaja", (req, res) => {
   });
 });
 
+app.post("/modificarAgenda", (req, res) => {
+  const ret = interfaz.modificarAgenda(req.body);
+  ret.then((resultado) => {
+    res.json({
+      mensaje: resultado,
+    });
+  });
+});
+
+
 //No escribir nada por debajo de esto
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);

@@ -7,39 +7,42 @@ const sql = require("mssql");
 const aceptarAgenda = async (id, horario) => {
   try {
     //Verifico que el horario siga estando disponible
-    const horarioDisponible = verificarHorario(horario).then(async (disponible) => {
-      console.log(disponible);
-      if (!disponible) {
-        return "El horario ya esta ocupado";
-      } else {
-        //Creo la conexion
-        let pool = await sql.connect(conexion);
-        //Hago la query para conseguir la agenda
-        let queryAgenda = "Select Aceptada from Agenda where IdAgenda = " + id;
-        //Voy a buscar si esta aceptada la agenda
-        let agenda = await pool.request().query(queryAgenda);
-        //Si la agenda esta aceptada devuelvo eso
-        if (agenda.recordset[0].Aceptada) {
-          let ret = {
-            codigo: 400,
-            mensaje: "La agenda ya fue aceptada previamente",
-          };
-          return ret;
+    const horarioDisponible = verificarHorario(horario).then(
+      async (disponible) => {
+        console.log(disponible);
+        if (!disponible) {
+          return "El horario ya esta ocupado";
         } else {
-          //Hago la query del update
-          let queryUpdate =
-            "update Agenda set Aceptada = 1 where IdAgenda = " + id;
-          //Hago update de la agenda
-          let empleados = await pool.request().query(queryUpdate);
-          //Si salio todo bien y no fue al catch se confirma de que fue aceptada
-          let ret = {
-            codigo: 200,
-            mensaje: "La agenda fue aceptada",
-          };
-          return ret;
+          //Creo la conexion
+          let pool = await sql.connect(conexion);
+          //Hago la query para conseguir la agenda
+          let queryAgenda =
+            "Select Aceptada from Agenda where IdAgenda = " + id;
+          //Voy a buscar si esta aceptada la agenda
+          let agenda = await pool.request().query(queryAgenda);
+          //Si la agenda esta aceptada devuelvo eso
+          if (agenda.recordset[0].Aceptada) {
+            let ret = {
+              codigo: 400,
+              mensaje: "La agenda ya fue aceptada previamente",
+            };
+            return ret;
+          } else {
+            //Hago la query del update
+            let queryUpdate =
+              "update Agenda set Aceptada = 1 where IdAgenda = " + id;
+            //Hago update de la agenda
+            let empleados = await pool.request().query(queryUpdate);
+            //Si salio todo bien y no fue al catch se confirma de que fue aceptada
+            let ret = {
+              codigo: 200,
+              mensaje: "La agenda fue aceptada",
+            };
+            return ret;
+          }
         }
       }
-    });
+    );
     return horarioDisponible;
   } catch (error) {
     //Mensaje de error en caso de que haya pasado algo
@@ -398,6 +401,7 @@ const getAgendaPorId = async (idAgenda) => {
 };
 
 //Metodo auxiliar para verificar que un horario siga disponible
+//Este metodo es utilizado para verificar el horario al momento de aceptar una agenda y crearla
 //Devuelve una promesa con true o false
 const verificarHorario = async (horario) => {
   try {
@@ -437,6 +441,51 @@ const verificarHorario = async (horario) => {
     console.log(error);
   }
 };
+
+//Metodo auxiliar para verificar que un horario siga disponible
+//Este metodo es utilizado para cuando se modifica una agenda, porque tiene un comportamiento en particular
+//En lugar de ir a buscar todos los horarios del empleado, aca lo que hace es buscar todos sacando un horario en particular del listado que es el horario actual de la agenda
+//Devuelve una promesa con true o false
+const verificarHorarioModificarAgenda = async (horario) => {
+  try {
+    //variable que tiene la conexion
+    const pool = await sql.connect(conexion);
+    //Voy a buscar todos los horarios del empleado que me mandaron
+    const horarios = await pool
+      .request()
+      .input("ci", sql.VarChar, horario.ciEmpleado)
+      .input("fecha", sql.Date, horario.fecha)
+      .input("idHorario", sql.Int, horario.idHorario)
+      .query(
+        "select HoraInicio, HoraFin from Horario H, Agenda A where Cedula = @ci and Fecha = @fecha and A.IdHorario = H.IdHorario and A.Aceptada = 1 and H.IdHorario <> @idHorario"
+      );
+    //Separo el listado
+    const lista = horarios.recordset;
+    //Paso a valores numericos los datos del horario que me pasan por parametro para poder trabajar mejor
+    let horaInicio = parseInt(horario.horario.i.replace(":", ""));
+    let horaFin = parseInt(horario.horario.f.replace(":", ""));
+    //Esta variable es la que devuelvo al final, arranca en true y en el for se evalua para pasar a false
+    let puedoInsertar = true;
+    //Recorro los horarios del empleado
+    for (let i = 0; i < lista.length; i++) {
+      if (horaInicio <= parseInt(lista[i].HoraInicio.replace(":", ""))) {
+        //si horaFin<= parseInt(lista[i].HoraInicio.replace(":", "")) puedo insertar, entonces el que tengo que preguntar es si horaFin > parseInt(lista[i].i.replace(":", ""))
+        if (horaFin > parseInt(lista[i].HoraInicio.replace(":", ""))) {
+          puedoInsertar = false;
+        }
+      } else {
+        // caso del else: horaInicio > parseInt(lista[i].i.replace(":", ""))
+        if (horaInicio < parseInt(lista[i].HoraFin.replace(":", ""))) {
+          puedoInsertar = false;
+        }
+      }
+    }
+    return puedoInsertar;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 //Este es un metodo que dado los datos de un horario lo inserta en la base de datos
 //Es un metodo auxiliar que devuelve el id del horario en caso de que se inserte, si no devuelve -1
 const insertarHorario = async (horario) => {
@@ -507,7 +556,15 @@ const insertarAgenda = async (agenda) => {
   return insertAgenda;
 };
 //Este es un metodo que dado los datos de una agenda y un servicio lo inserta en la base de datos
-//Es un metodo auxiliar que devuelve
+//Es un metodo auxiliar que devuelve la cantida de filas afectadas
+//Este metodo espera un objeto de este estilo
+/*
+  {
+   servicios:[1, 3, 4],
+   idAgenda: 1,
+   idHorario: 1,
+  }
+*/
 const insertarServicioAgenda = async (servicioAgenda) => {
   //Variable que tiene la conexion
   const pool = await sql.connect(conexion);
@@ -745,31 +802,163 @@ const datosFormularioCaja = async () => {
 //Modificar una agenda deberia ser. Modifico todos los datos del Horario, despues modifico todo de la Agenda y despues Modifico todo de los servicios
 const modificarAgenda = async (nuevaAgenda) => {
   try {
-    const resultado = verificarHorario(nuevaAgenda.horario).then(
-      (horarioLibre) => {
+    const resultado = verificarHorarioModificarAgenda(nuevaAgenda.horario)
+      .then((horarioLibre) => {
         if (!horarioLibre) {
           return "El horario ya esta ocupado";
         } else {
-          return updatesAgendaEntero();
+          return updatesAgendaEntero(nuevaAgenda);
         }
-      }
-    );
-    //Variable donde esta la conexion con la bd
-    const pool = await sql.connect(conexion);
+      })
+      .then((mensajeRespuesta) => {
+        return mensajeRespuesta;
+      });
+    return resultado;
   } catch (error) {
     return error;
   }
 };
 
 //Metodo auxiliar para hacer los update para modificar una agenda
-const updatesAgendaEntero = async () => {
+const updatesAgendaEntero = async (nuevaAgenda) => {
   //Llamo a todos los metodos de update individuales
+  const resultado = updateHorario(nuevaAgenda.horario)
+    .then((filasAfectadasHorario) => {
+      if (filasAfectadasHorario < 1) {
+        return "Error al actualizar el Horario";
+      } else {
+        return updateAgenda(nuevaAgenda);
+      }
+    })
+    .then((filasAfectadasAgenda) => {
+      if (filasAfectadasAgenda < 1) {
+        return "Error al actualizar Agenda";
+      } else {
+        let servicios = {
+          idAgenda: nuevaAgenda.idAgenda,
+          servicios: nuevaAgenda.servicios,
+          idHorario: nuevaAgenda.idHorario,
+        };
+        return modificarServicioAgenda(servicios);
+      }
+    })
+    .then((serviciosModificados) => {
+      if (isNaN(serviciosModificados)) {
+        return serviciosModificados;
+      } else {
+        return (
+          serviciosModificados +
+          " ahora son los que tienen la agenda modificada"
+        );
+      }
+    });
 };
 
 //Metodo auxiliar para hacer update a la tabla Horario
-//
+//Esto tiene que recibir un objeto de esta manera
+// {
+//   i: "20:00",
+//   f: "20:30",
+//   ciEmpleado: "12345678",
+//   fecha: "2021-07-23"
+// }
 const updateHorario = async (horario) => {
   try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el update del horario
+    let updateHorario = await pool
+      .request()
+      .input("idHorario", sql.Int, horario.idHorario)
+      .input("horaInicio", sql.VarChar, horario.i)
+      .input("horaFin", sql.VarChar, horario.f)
+      .input("fecha", sql.Date, horario.fecha)
+      .input("ci", sql.VarChar, horario.ciEmpleado)
+      .query(
+        "update Horario set Cedula = @ci, HoraInicio = @horaInicio, HoraFin = @horaFin, Fecha = @fecha where IdHorario = @idHorario"
+      );
+    return updateHorario.rowsAffected;
+    //Si la agenda esta aceptada devuelvo eso
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo auxiliar para hacerle update a la tabla Agenda
+const updateAgenda = async (agenda) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el update del Agenda
+    let updateAgenda = await pool
+      .request()
+      .input("idAgenda", sql.Int, agenda.idAgenda)
+      .input("nombreCliente", sql.VarChar, agenda.nombreCliente)
+      .input("desc", sql.VarChar, agenda.descripcion)
+      .input("img", sql.VarChar, agenda.imagenEjemplo)
+      .input("tel", sql.Date, agenda.fecha)
+      .query(
+        "update Agenda set NombreCliente = @nombreCliente, Descripcion = @desc, Img = @img, Tel = @tel where IdAgenda = @idAgenda"
+      );
+    return updateAgenda.rowsAffected;
+    //Si la agenda esta aceptada devuelvo eso
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo auxiliar para modificar los servicios de una agenda
+//Espero que me llegue un objeto de la siguiente manera
+// {
+//   idAgenda: 1,
+//   servicios: [1, 4, 6],
+//   idHorario: 1
+// }
+const modificarServicioAgenda = async (nuevosServicios) => {
+  try {
+    //Llamo al metodo que elimina todos las filas de la tabla Servicio Agenda para un idAgenda dado
+    const resultado = eliminarServicioAgendaPorIdAgenda(
+      nuevosServicios.idAgenda
+    )
+      .then((serviciosEliminados) => {
+        //Verifico cuantas filas fueron afectadas por  el delete
+        //Si no se afecto ninguna fila (0 afectadas) devuelvo error
+        if (serviciosEliminados <= 0) {
+          return "No se pudieron eliminar los servicios";
+        } else {
+          //Si hubo filas afectadas entonces se eliminaron todos los servicios de esa agenda y ahora hay que insertar los nuevos
+          return insertarServicioAgenda(nuevosServicios);
+        }
+      })
+      .then((serviciosInsertados) => {
+        //Verifico que se hayan insertado los nuevos servicios
+        //Si la cantidad de filas afectadas no es la misma que la cantidad de servicios que me mandan, devuelvo error
+        if (serviciosInsertados !== nuevosServicios.servicios.length) {
+          return "No se pudieron insertar los nuevos servicios";
+        } else {
+          return serviciosInsertados;
+        }
+      });
+    return resultado;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo auxiliar para eliminar todos los servicios de una agenda dada
+const eliminarServicioAgendaPorIdAgenda = async (idAgenda) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el delete de los servicios
+    const deleteAgendaServicio = await pool
+      .request()
+      .input("idAgenda", sql.Int, idAgenda)
+      .query("delete from Agenda_Servicio where IdAgenda = @idAgenda");
+    //Separo la cantidad de filas afectadas
+    const filasAfectadas = deleteAgendaServicio.rowsAffected;
+    //Devuelvo la cantidad de filas afectadas
+    return filasAfectadas;
   } catch (error) {
     console.log(error);
   }
@@ -786,6 +975,7 @@ const interfaz = {
   crearSolicitudAgenda,
   getAgendasAceptadas,
   datosFormularioCaja,
+  modificarAgenda,
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar
