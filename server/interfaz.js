@@ -55,6 +55,85 @@ const aceptarAgenda = async (id, horario) => {
   }
 };
 
+//Metodo para rechazar/cancelar una agenda
+const cancelarAgenda = async (idAgenda, idHorario) => {
+  try {
+    //Aca va la verificacion de si tiene permisos para hacer esta accion
+    //Llamo al metodo que elimina todos los datos
+    const resultado = eliminarDatosAgenda(idAgenda, idHorario).then(
+      (mensaje) => mensaje
+    );
+    return resultado;
+  } catch (error) {
+    console.log(error);
+  }
+};
+//Metodo auxiliar que llama a los metodos de eliminar individuales
+const eliminarDatosAgenda = async (idAgenda, idHorario) => {
+  try {
+    //Aca hago las llamadas a todos los metodos individuales
+    const resultado = eliminarServicioAgendaPorIdAgenda(idAgenda)
+      .then((serviciosBorrados) => {
+        //Aca llamo al eliminar los datos de la agenda (HAY QUE VER EL TEMA DE ELIMINAR LA AGENDA DE UN CLIENTE)
+        if (serviciosBorrados < 0) {
+          return "Error al eliminar los servicios";
+        }
+        return eliminarAgenda(idAgenda);
+      })
+      .then((agendaEliminada) => {
+        if (agendaEliminada < 0) {
+          return "Error al eliminar la agenda";
+        }
+        return eliminarHorario(idHorario);
+      })
+      .then((horarioEliminado) => {
+        if (horarioEliminado < 0) {
+          return "Error al eliminar el horario";
+        }
+        return "Agenda eliminada correctamente";
+      });
+    return resultado;
+  } catch (error) {
+    console.log(error);
+  }
+};
+//Metodo para eliminar de la tabla Agenda
+const eliminarAgenda = async (idAgenda) => {
+  try {
+    //variable que tiene la conexion
+    const pool = await sql.connect(conexion);
+    //Hago el delete de la agenda
+    const deleteAgenda = await pool
+      .request()
+      .input("idAgenda", sql.Int, idAgenda)
+      .query("delete from Agenda where IdAgenda = @idAgenda");
+    //Separo la cantidad de filas afectadas
+    const filasAfectadas = deleteAgenda.rowsAffected;
+    //Devuelvo la cantidad de filas afectadas
+    return filasAfectadas;
+  } catch (error) {
+    console.log(error);
+  }
+};
+//Metodo para eliminar de la tabla Horario
+const eliminarHorario = async (idHorario) => {
+  try {
+    //variable que tiene la conexion
+    const pool = await sql.connect(conexion);
+    //Hago el delete de la agenda
+    const deleteHorario = await pool
+      .request()
+      .input("idHorario", sql.Int, idHorario)
+      .query("delete from Agenda where IdHorario = @idHorario");
+    //Separo la cantidad de filas afectadas
+    const filasAfectadas = deleteHorario.rowsAffected;
+    //Devuelvo la cantidad de filas afectadas
+    return filasAfectadas;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 //Conseguir datos para el listado de agendas
 const getDatosListadoAgendas = async () => {
   //variable que tiene la conexion
@@ -976,6 +1055,7 @@ const interfaz = {
   getAgendasAceptadas,
   datosFormularioCaja,
   modificarAgenda,
+  cancelarAgenda,
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar
