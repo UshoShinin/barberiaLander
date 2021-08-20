@@ -342,7 +342,8 @@ const agregarHorariosEmpleado = async (listadoEmpleados) => {
             listadoEmpleados[k].fechas[j].dia ===
               horarios.recordset[i].Fecha.getUTCDate() &&
             listadoEmpleados[k].fechas[j].mes ===
-              horarios.recordset[i].Fecha.getMonth() + 1
+              horarios.recordset[i].Fecha.getMonth() + 1 &&
+            horarios.recordset[i].Cedula == listadoEmpleados[k].id
           ) {
             //Creo objeto auxiliar horario para agregar
             let horarioAux = {
