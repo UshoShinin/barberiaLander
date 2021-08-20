@@ -400,7 +400,7 @@ const getPreAgendas = async () => {
   const consultaPreAgendas = await pool
     .request()
     .query(
-      "select A.IdAgenda, H.Fecha, A.NombreCliente, H.HoraInicio, H.HoraFin, A.Descripcion, H.Cedula, E.Nombre from Agenda A, Horario H, Empleado E where A.IdHorario = H.IdHorario and A.Aceptada = 0 and H.Cedula = E.Cedula"
+      "select A.IdAgenda, H.Fecha, A.NombreCliente, H.HoraInicio, H.HoraFin, A.Descripcion, H.Cedula, E.Nombre, A.IdHorario from Agenda A, Horario H, Empleado E where A.IdHorario = H.IdHorario and A.Aceptada = 0 and H.Cedula = E.Cedula"
     );
   //Separo las preagendas de los resultados de la consulta
   const preAgendas = consultaPreAgendas.recordset;
@@ -413,6 +413,7 @@ const getPreAgendas = async () => {
     //Creo la preagenda que agrego al array de retorno
     let preAgendaAux = {
       idAgenda: preAgendas[i].IdAgenda,
+      idHorario: preAgendas[i].IdHorario,
       ciEmpleado: preAgendas[i].Cedula,
       nombreEmpleado: preAgendas[i].Nombre,
       fecha: preAgendas[i].Fecha,
