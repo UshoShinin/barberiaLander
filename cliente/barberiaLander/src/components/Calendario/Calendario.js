@@ -35,7 +35,7 @@ const Calendario = (props) => {
   };
   return (
     <div className={classes.container} tabIndex={-1} id="Calendario">
-      <Fotos fotos={empleadosFotos} currentEmployee = {props.currentEmployee} changeEmployee = {props.changeEmployee}/>
+      <Fotos fotos={empleadosFotos} currentEmployee = {props.currentEmployee} changeEmployee = {props.changeEmployee} onClick={props.onClick} active={props.comboEmployeeActive}/>
       <Mes
         month={props.date.getMonth()}
         prev={prevCalendar}
@@ -56,7 +56,7 @@ const Calendario = (props) => {
         style={{
           marginLeft:
             currentCalendar >= 0 ? `-${currentCalendar * 19}em` : undefined,
-        }}
+        }} 
       >
         {content}
       </div>

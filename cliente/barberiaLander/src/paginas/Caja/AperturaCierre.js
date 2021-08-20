@@ -305,7 +305,7 @@ const AperturaCierre = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
   };
-  console.log(cajaState.cantidadMedios);
+  console.log(cajaState);
   return (
     <>
       <Modal
@@ -468,6 +468,7 @@ const AperturaCierre = () => {
                   <ComboBox
                     disabled={!cajaState.cajaAbierta}
                     opciones={
+                      cajaState.sinAgendar.value ? cajaState.Empleados:
                       cajaState.soloHoy.value
                         ? cajaState.agendasHoy
                         : cajaState.agendas

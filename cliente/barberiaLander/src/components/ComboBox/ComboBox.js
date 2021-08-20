@@ -9,7 +9,8 @@ const getObjectById = (list, id) => {
   }
 };
 const ComboBox = (props) => {
-  const currentData = getObjectById(props.opciones, props.current);
+  let currentData = null;
+  if (props.current!==null) currentData = getObjectById(props.opciones, props.current);
   return (
     <div className={classes.ComboBox}>
       <div
@@ -17,7 +18,7 @@ const ComboBox = (props) => {
         className={`${!props.disabled?classes.select:classes.disabled} ${props.active ? classes.active : ""}`}
       >
         <div className="contenido-select">
-          <h1 className={`${classes.title} ${props.active ? classes.titleActive:""}`}>{!props.disabled?currentData.title:'Desactivado'}</h1>
+          <h1 className={`${classes.title} ${props.active ? classes.titleActive:""}`}>{!props.disabled?currentData===null?'Ver opciones':currentData.title:'Desactivado'}</h1>
         </div>
         <FontAwesomeIcon
           className={`${classes.button} ${props.active ? classes.active : ""}`}

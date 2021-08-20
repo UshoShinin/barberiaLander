@@ -1,6 +1,6 @@
 import classes from "./Fotos.module.css";
 import ComboBox from "./../../components/ComboBox/ComboBox";
-import { useReducer, useState } from "react";
+import { useReducer } from "react"; 
 import { CSSTransition } from "react-transition-group";
 import { getElementById } from "./FuncionesAuxiliares";
 const Fotos = (props) => {
@@ -8,7 +8,6 @@ const Fotos = (props) => {
     Actual: { value: props.fotos[0].foto, mostrar: true },
     Siguiente: { value: null, mostrar: false },
   };
-  const [active, setActive] = useState(false);
   const reducer = (state, action) => {
     switch (action.type) {
       case "CHANGE_I":
@@ -107,10 +106,8 @@ const Fotos = (props) => {
         <div style={{ width: "60%", margin: "0 auto" }}>
           <ComboBox
             height={5.75}
-            active={active}
-            onClick={() => {
-              setActive((prev) => !prev);
-            }}
+            active={props.active}
+            onClick={props.onClick}
             current={props.currentEmployee}
             onChange={comboChangeHandler}
             opciones={props.fotos}

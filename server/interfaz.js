@@ -484,6 +484,7 @@ const getAgendaPorId = async (idAgenda) => {
 //Este metodo es utilizado para verificar el horario al momento de aceptar una agenda y crearla
 //Devuelve una promesa con true o false
 const verificarHorario = async (horario) => {
+  console.log(horario);
   try {
     //variable que tiene la conexion
     const pool = await sql.connect(conexion);
@@ -498,8 +499,8 @@ const verificarHorario = async (horario) => {
     //Separo el listado
     const lista = horarios.recordset;
     //Paso a valores numericos los datos del horario que me pasan por parametro para poder trabajar mejor
-    let horaInicio = parseInt(horario.horario.i.replace(":", ""));
-    let horaFin = parseInt(horario.horario.f.replace(":", ""));
+    let horaInicio = parseInt(horario.i.replace(":", ""));
+    let horaFin = parseInt(horario.f.replace(":", ""));
     //Esta variable es la que devuelvo al final, arranca en true y en el for se evalua para pasar a false
     let puedoInsertar = true;
     //Recorro los horarios del empleado
@@ -569,6 +570,7 @@ const verificarHorarioModificarAgenda = async (horario) => {
 //Este es un metodo que dado los datos de un horario lo inserta en la base de datos
 //Es un metodo auxiliar que devuelve el id del horario en caso de que se inserte, si no devuelve -1
 const insertarHorario = async (horario) => {
+  console.log(horario);
   const pool = await sql.connect(conexion);
   const resultado = await verificarHorario(horario)
     .then((puedoInsertar) => {

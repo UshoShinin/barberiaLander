@@ -7,7 +7,7 @@ export const initialState = {
   desc: "AbrirCaja",
   montoInicial: { value: "", isValid: null },
   jornal: { value: "", show: false },
-  comboAgenda: { value: 1, active: false },
+  comboAgenda: { value: null, active: false },
   sinAgendar: { value: false },
   soloHoy: { value: false },
   montoAgenda: { value: "", isValid: null },
@@ -117,6 +117,16 @@ const miFiltro = (lista, objetivo) => {
   return null; //No hay cambios
 };
 
+const calcularAgenda = (servicios) =>{
+  let total;
+  Object.values(servicios).forEach((serv)=>{
+    if(serv){
+      total+=40;
+    }
+  });
+  return total;
+}
+
 export const cajaReducer = (state, action) => {
   let valido = null;
   let destino;
@@ -149,7 +159,7 @@ export const cajaReducer = (state, action) => {
         agendas: [...action.payload.agendas],
         agendasHoy: [...newList],
         Empleados:[...action.payload.empleados],
-        /* productos:[...action.payload.productos] */
+        productos:[...action.payload.productos]
       };
       return { ...myState };
     case "CLICK_CORTE":
@@ -202,13 +212,13 @@ export const cajaReducer = (state, action) => {
       };
     case "CLICK_S_A":
       nuevoEstado = !state.sinAgendar.value;
-      posicion = state.comboAgenda.value;
       if (nuevoEstado) {
         listaBase = [...state.Empleados];
       } else {
         listaBase = [...state.agendas];
       }
       posicion = listaBase[0].id;
+      console.log(posicion);
       return {
         ...state,
         sinAgendar: { value: nuevoEstado },

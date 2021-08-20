@@ -68,8 +68,8 @@ export const horarioEnMinutos = (hora) => {
 export const minutosAHorarios = (minutos) => {
   return { h: (minutos - (minutos % 60)) / 60, m: minutos % 60 };
 };
-/* Carga todos los horarios disponibles dentro de una lista de gorarios y una cantidad de tiempo que es necesario ocupar */
-const horariosAgendarDisponibles = (horarios, timeNeed) => {
+/* Carga todos los horarios disponibles dentro de una lista de ghrarios y una cantidad de tiempo que es necesario ocupar */
+export const horariosAgendarDisponibles = (horarios, timeNeed) => {
   let hora = "08:00";
   const horaCierre = "22:00";
   let horariosDisponibles = [];

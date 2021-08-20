@@ -1,3 +1,5 @@
+import { getElementById } from "../../../components/Calendario/FuncionesAuxiliares";
+
 const noManeja = [
   { id: 6, idEmpleados: [{ id: "50098037" }, { id: "48279578" }] },
   { id: 7, idEmpleados: [{ id: "50098037" }, { id: "48279578" }] },
@@ -19,34 +21,10 @@ const filtrarHorarios = (empleados, noManeja, id) => {
     );
   return empleados;
 };
-export const initialBaseState = {
-  Nombre: { value: "", isValid: null },
-  Horarios: null,
-  HorariosFiltrados: null,
-  Telefono: { value: "", isValid: null },
-  Descripcion: { value: "", isValid: null },
-  Referencia: { value: "" },
-  Calendario: { value: null, dia: null },
-  ComboBox: { value: null, active: false },
-  Employee: { value: null },
-  corte: { active: false, id: 1 },
-  barba: { active: false, id: 4 },
-  maquina: { active: false, id: 5 },
-  claritos: { active: false, id: 6 },
-  decoloracion: { active: false, id: 7 },
-  brushing: { active: false, id: 8 },
-};
 
 export const inputReducer = (state, action) => {
   let myState = null; //Esta variable se usa para los servicios
   switch (action.type) {
-    case "HORARIOS_CARGADOS":
-      return {
-        ...state,
-        Horarios: action.value,
-        HorariosFiltrados: action.value,
-        Employee: { value: state.Employee.value===null?action.value[0].id:state.Employee.value },
-      };
     case "USER_INPUT_NAME":
       return {
         ...state,
@@ -110,11 +88,13 @@ export const inputReducer = (state, action) => {
         ComboBox: {
           value: 1,
           active: false,
+          title: getElementById(action.value, 1).title,
         },
         Calendario: {
           value: action.value,
           dia: action.dia,
         },
+        Employee:{value:state.Employee.value,active:false}
       };
     case "HORARIOS_CLICK":
       return {
@@ -130,14 +110,20 @@ export const inputReducer = (state, action) => {
         ComboBox: {
           value: action.value,
           active: false,
+          title: getElementById(state.Calendario.value, action.value).title,
         },
       };
     case "CHANGE_EMPLOYEE":
       return {
         ...state,
-        Employee: { value: action.value },
+        Employee: { value: action.value,active:false },
         Calendario: { value: null },
         ComboBox: { value: null, active: false },
+      };
+    case "CLICK_EMPLOYEE":
+      return {
+        ...state,
+        Employee: { value:state.Employee.value,active:!state.Employee.active},
       };
     case "CHANGE_TIME":
       return { ...state, Time: { value: action.time } };
@@ -177,11 +163,6 @@ export const inputReducer = (state, action) => {
     case "CLARITOS":
       myState = {
         ...state,
-        HorariosFiltrados: filtrarHorarios(
-          state.Horarios,
-          noManeja,
-          state.claritos.id
-        ),
         claritos: { active: !state.claritos.active, id: state.claritos.id },
       };
       break;
@@ -196,20 +177,28 @@ export const inputReducer = (state, action) => {
       claritos: myState.claritos,
     });
     let horariosAuxiliares = [...myState.Horarios];
-    servicios.forEach(s => {
-      if(s.active){
-        const miniServicio = buscar(s.id,noManeja);
-        if(miniServicio!==null){
-          horariosAuxiliares = filtrarHorarios(horariosAuxiliares,
-            noManeja,miniServicio.id)
+    servicios.forEach((s) => {
+      if (s.active) {
+        const miniServicio = buscar(s.id, noManeja);
+        if (miniServicio !== null) {
+          horariosAuxiliares = filtrarHorarios(
+            horariosAuxiliares,
+            noManeja,
+            miniServicio.id
+          );
         }
       }
     });
     myState = {
       ...myState,
-      Calendario:{value:null,dia:null},
-      HorariosFiltrados:[...horariosAuxiliares] ,
-      Employee: { value: horariosAuxiliares[0].id },
+      Calendario: { value: null, dia: null },
+      ComboBox: {
+        value: 1,
+        active: false,
+        title: " ",
+      },
+      HorariosFiltrados: [...horariosAuxiliares],
+      Employee: { value: horariosAuxiliares[0].id ,active:false},
     };
   }
   return myState;

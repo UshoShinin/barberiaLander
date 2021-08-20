@@ -1,5 +1,5 @@
 import classes from "./FormularioAgenda.module.css";
-import React, { useState, useRef, useReducer, useEffect } from "react";
+import React, { useRef, useReducer } from "react";
 import Button from "../../../components/UI/Button/Button";
 import Input from "../../../components/UI/Input/Input";
 import InputFile from "../../../components/UI/InputFile/InputFile";
@@ -7,84 +7,25 @@ import TextArea from "../../../components/UI/TextArea/TextArea";
 import Calendario from "../../../components/Calendario/Calendario";
 
 import CheckBoxAgenda from "./CheckBoxAgenda";
-import useHttp from "./../../../hooks/useHttp";
 import { DaysGenerator } from "../../../components/Calendario/Dias/GeneradorDias";
-import LoaddingSpinner from "../../../components/LoaddingSpinner/LoaddingSpinner";
 import {
   getElementById,
   transformStringNumber,
   horarioEnMinutos,
   minutosAHorarios,
   transformNumberString,
+  horariosAgendarDisponibles,
 } from "../../../components/Calendario/FuncionesAuxiliares";
 
-import { inputReducer, initialBaseState } from "./ReduerFormularioAgenda";
+import { inputReducer } from "./ReduerFormularioAgenda";
 import ComboBox from "../../../components/ComboBox/ComboBox";
 
-/* const DUMMY_HORARIOS_EMPLEADOS = [
-  {
-    id: 1,
-    title: "Perrujo trujo",
-    foto: doggo,
-    fechas: [
-      {
-        dia: 26,
-        mes: 7,
-        horarios: [
-          { i: "10:00", f: "12:00" }, //Una hora libre
-          { i: "13:00", f: "15:00" },
-          { i: "15:00", f: "16:30" }, //Dos horas
-          { i: "18:30", f: "19:00" }, //Una hora
-          { i: "20:00", f: "22:00" },
-        ],
-      },
-      {
-        dia: 27,
-        mes: 7,
-        horarios: [
-          { i: "15:00", f: "16:30" }, //Dos horas
-          { i: "18:30", f: "19:00" }, //Una hora
-          { i: "20:00", f: "22:00" },
-        ],
-      },
-    ],
-  },
-  {
-    id: 2,
-    title: "One",
-    foto: one,
-    fechas: [
-      {
-        dia: 26,
-        mes: 7,
-        horarios: [
-          { i: "10:00", f: "12:00" }, //Una hora libre
-          { i: "13:00", f: "15:00" },
-          { i: "15:00", f: "16:30" }, //Dos horas
-          { i: "18:30", f: "19:00" }, //Una hora
-          { i: "20:00", f: "22:00" },
-        ],
-      },
-      {
-        dia: 27,
-        mes: 7,
-        horarios: [
-          { i: "15:00", f: "16:30" }, //Dos horas
-          { i: "18:30", f: "19:00" }, //Una hora
-          { i: "20:00", f: "22:00" },
-        ],
-      },
-    ],
-  },
-  { id: 3, title: "Two", foto: two, fechas: [] },
-  { id: 4, title: "Three", foto: three, fechas: [] },
-]; */
-
 const FormularioAgenda = (props) => {
-  console.log(props.agenda);
-  /* console.log(props.horario); */
-  let initialState;
-  if (props.agenda !== null /* &&props.horario!==null */) {
+  /* console.log(props.agenda); */
+  console.log(props.initialState)
+  /* let initialState;
+  if (props.agenda !== null) {
+    const misHorarios = horariosAgendarDisponibles
     initialState = {
       Nombre: { value: props.agenda.nombreCliente, isValid: true },
       Horarios: null,
@@ -108,28 +49,9 @@ const FormularioAgenda = (props) => {
     console.log(initialState.Employee.value);
   } else {
     initialState = initialBaseState;
-  }
-  /* Carga inicial de datos */
-  const obtenerHorarios = (horarios) => {
-    dispatchInput({
-      type: "HORARIOS_CARGADOS",
-      value: horarios.mensaje.empleados,
-    });
-  };
-  const {
-    isLoading,
-    error,
-    sendRequest: fetchHorarios /* Alias */,
-  } = useHttp();
+  } */
 
-  /* Se ejecuta al inicio para que se cargen los datos */
-  useEffect(() => {
-    fetchHorarios({ url: "/datosFormularioAgenda" }, obtenerHorarios);
-  }, []);
-
-  const [inputState, dispatchInput] = useReducer(inputReducer, initialState);
-  console.log("Estado real");
-  console.log(inputState);
+  const [inputState, dispatchInput] = useReducer(inputReducer, props.initialState);
   const nombreRef = useRef();
   const telefonoRef = useRef();
   const descripcionRef = useRef();
@@ -167,9 +89,7 @@ const FormularioAgenda = (props) => {
       dia: horarios.dia,
     });
   };
-
   /* Aqui se procesa y se manda la info en caso de esta correcta */
-
   const submitHandler = (event) => {
     event.preventDefault();
     let services = [];
@@ -186,26 +106,26 @@ const FormularioAgenda = (props) => {
       nombreRef.current.focus();
     } else if (!inputState.Telefono.isValid) {
       telefonoRef.current.focus();
-    } else if (inputState.Calendario.value === null) {
+    } else if (inputState.Calendario.dia === null) {
       const cal = document.getElementById("Calendario");
       cal.className = `${cal.className} ${classes.invalidCal}`;
       cal.focus();
     } else {
-      console.log(inputState);
-      const inicio =
-        "0" + inputState.Calendario.value[inputState.ComboBox.value - 1].title;
-      const fin = transformNumberString(
-        minutosAHorarios(
-          horarioEnMinutos(transformStringNumber(inicio)) + tiempoNecesario
-        )
-      );
       const year =
         inputState.Calendario.dia.m < date.getMonth() + 1
           ? new Date().getFullYear() + 1
           : new Date().getFullYear();
       const dia = String(inputState.Calendario.dia.d);
       const mes = String(inputState.Calendario.dia.m);
-
+      const inicio =
+        inputState.ComboBox.title.length < 5
+          ? "0" + inputState.ComboBox.title
+          : inputState.ComboBox.title;
+      const fin = transformNumberString(
+        minutosAHorarios(
+          horarioEnMinutos(transformStringNumber(inicio)) + tiempoNecesario
+        )
+      );
       let datosAgenda;
       if (props.agenda === null) {
         //Crear
@@ -225,21 +145,25 @@ const FormularioAgenda = (props) => {
         //Modificar
         const fechita = `${year}-${mes.length > 1 ? mes : "0" + mes}-${
           dia.length > 1 ? dia : "0" + dia
-        }`
+        }`;
         datosAgenda = {
-          idAgenda:props.idagenda,
-          idHorario:props.idHorario,
+          idAgenda: props.agenda.idagenda,
+          idHorario: props.agenda.idHorario,
           nombreCliente: inputState.Nombre.value,
           telefono: inputState.Telefono.value,
           descripcion: inputState.Descripcion.value,
           imagenEjemplo: inputState.Referencia.value,
           servicios: services,
           fecha: fechita,
-          horario: { i: inicio, f: fin, ciEmpleado: inputState.Employee.value ,fecha:fechita},
+          horario: {
+            i: inicio,
+            f: fin,
+            ciEmpleado: inputState.Employee.value,
+            fecha: fechita,
+          },
         };
       }
-      /* props.onSaveDatosAgenda(datosAgenda); */
-      console.log(datosAgenda);
+      props.onSaveDatosAgenda(datosAgenda);
     }
   };
 
@@ -271,7 +195,10 @@ const FormularioAgenda = (props) => {
     );
 
     //Activación de día
-    if (inputState.Calendario.dia !== null&&inputState.Calendario.dia !== undefined) {
+    if (
+      inputState.Calendario.dia !== null &&
+      inputState.Calendario.dia !== undefined
+    ) {
       const diaSelect = inputState.Calendario.dia.d;
       const mesSelect = inputState.Calendario.dia.m;
       for (let i = 0; i < diasMostrar.length; i++) {
@@ -388,87 +315,84 @@ const FormularioAgenda = (props) => {
         empleados={inputState.HorariosFiltrados}
         diasAMostrar={diasMostrar}
         currentEmployee={inputState.Employee.value}
+        comboEmployeeActive={inputState.Employee.active}
         changeEmployee={(id) => {
           dispatchInput({ type: "CHANGE_EMPLOYEE", value: id });
+        }}
+        onClick={() => {
+          dispatchInput({ type: "CLICK_EMPLOYEE" });
         }}
       />
     );
   }
   return (
     <>
-      {isLoading && <LoaddingSpinner />}
-      {!isLoading && (
-        <form onSubmit={submitHandler}>
-          <div className={classes.nuevaAgenda}>
-            <div className={classes.Inputs}>
-              <CheckBoxAgenda
-                state={inputState}
-                time={calcularTiempo(
-                  inputState.Employee.value,
-                  inputState,
-                  inputState.HorariosFiltrados
-                )}
-                myAction={(action) => {
-                  const element = document.getElementById("timeLeft");
-                  if (element.classList[1] !== undefined) {
-                    document
-                      .getElementById("timeLeft")
-                      .classList.remove(element.classList[1]);
-                  }
-                  dispatchInput(action);
-                }}
-              />
-
-              {document.getElementById("root").clientWidth < 980 && (
-                <div className={classes.Cal}>
-                  {calendarioContent}
-                  {inputState.Calendario.value !== null && combo}
-                </div>
+      <form onSubmit={submitHandler}>
+        <div className={classes.nuevaAgenda}>
+          <div className={classes.Inputs}>
+            <CheckBoxAgenda
+              state={inputState}
+              time={calcularTiempo(
+                inputState.Employee.value,
+                inputState,
+                inputState.HorariosFiltrados
               )}
-              <div className={classes.inputsGrid}>
-                <div className={classes.label}>
-                  <label htmlFor="1">Nombre:</label>
-                </div>
-                <Input
-                  ref={nombreRef}
-                  isValid={inputState.Nombre.isValid}
-                  input={INPUTS[0]}
-                />
-                <div className={classes.label}>
-                  <label htmlFor="2">Teléfono:</label>
-                </div>
-                <Input
-                  ref={telefonoRef}
-                  isValid={inputState.Telefono.isValid}
-                  input={INPUTS[1]}
-                />
+              myAction={(action) => {
+                const element = document.getElementById("timeLeft");
+                if (element.classList[1] !== undefined) {
+                  document
+                    .getElementById("timeLeft")
+                    .classList.remove(element.classList[1]);
+                }
+                dispatchInput(action);
+              }}
+            />
 
-                <div className={classes.label}>
-                  <label htmlFor="3">Descripción:</label>
-                </div>
-                <TextArea
-                  ref={descripcionRef}
-                  isValid={null}
-                  input={INPUTS[2]}
-                />
-              </div>
-              <InputFile
-                input={INPUTS[3]}
-                label="Seleccione una foto de referencia"
-              />
-            </div>
-            {document.getElementById("root").clientWidth > 979 && (
+            {document.getElementById("root").clientWidth < 980 && (
               <div className={classes.Cal}>
                 {calendarioContent}
                 {inputState.Calendario.value !== null && combo}
               </div>
             )}
+            <div className={classes.inputsGrid}>
+              <div className={classes.label}>
+                <label htmlFor="1">Nombre:</label>
+              </div>
+              <Input
+                ref={nombreRef}
+                isValid={inputState.Nombre.isValid}
+                input={INPUTS[0]}
+              />
+              <div className={classes.label}>
+                <label htmlFor="2">Teléfono:</label>
+              </div>
+              <Input
+                ref={telefonoRef}
+                isValid={inputState.Telefono.isValid}
+                input={INPUTS[1]}
+              />
+
+              <div className={classes.label}>
+                <label htmlFor="3">Descripción:</label>
+              </div>
+              <TextArea ref={descripcionRef} isValid={null} input={INPUTS[2]} />
+            </div>
+            <InputFile
+              input={INPUTS[3]}
+              label="Seleccione una foto de referencia"
+            />
           </div>
-          <Button type="submit">{`${
-            props.agenda === null ? "Agregar Reserva" : "Modificar Reserva"
-          }`}</Button>
-        </form>
-      )}
+          {document.getElementById("root").clientWidth > 979 && (
+            <div className={classes.Cal}>
+              {calendarioContent}
+              {inputState.Calendario.value !== null && combo}
+            </div>
+          )}
+        </div>
+        <Button type="submit">{`${
+          props.agenda === null ? "Agregar Reserva" : "Modificar Reserva"
+        }`}</Button>
+      </form>
     </>
   );
 };
@@ -476,7 +400,9 @@ export default FormularioAgenda;
 
 //Esto hay que borrarlo cuando tengamos en el backend esta info
 const calcularTiempo = (id, serv, horariosState) => {
+  console.log(id, serv, horariosState); 
   let total = 0;
+
   if (horariosState !== null) {
     if (id === horariosState[0].id) {
       if (serv.corte.active) total += 30;
