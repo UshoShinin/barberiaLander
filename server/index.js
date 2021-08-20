@@ -88,6 +88,16 @@ app.post("/modificarAgenda", (req, res) => {
   });
 });
 
+app.delete("/eliminarAgenda", (req, res) => {
+  let idAgenda = req.body.idAgenda;
+  let idHorario = req.body.idHorario;
+  const ret = interfaz.cancelarAgenda(idAgenda, idHorario);
+  ret.then((resultado) => {
+    res.json({
+      mensaje: resultado,
+    });
+  });
+});
 
 //No escribir nada por debajo de esto
 app.listen(PORT, () => {
