@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faSearch, faTimes } from "@fortawesome/free-solid-svg-icons";
 const Item = (props) => {
   const item = props.item;
+  console.log(item);
   return (
     <li className={classes.item}>
       <div className={classes.content}>
@@ -11,9 +12,7 @@ const Item = (props) => {
         <h4>
           Inicio:{item.horaInicio} Fin:{item.horaFin}
         </h4>
-        <h4>
-          {item.nombreEmpleado}
-        </h4>
+        <h4>{item.nombreEmpleado}</h4>
         {item.descripcion.length > 0 && (
           <p>
             <span>Descripción:</span> {item.descripcion}
@@ -38,13 +37,21 @@ const Item = (props) => {
                 idAgenda: item.idAgenda,
                 ciEmpleado: item.ciEmpleado,
                 horario: { i: item.horaInicio, f: item.horaFin },
-                fecha: item.fecha
+                fecha: item.fecha,
               });
             }}
           >
             <FontAwesomeIcon icon={faCheck} />
           </SimpleButton>
-          <SimpleButton color="red">
+          <SimpleButton
+            color="red"
+            action={() => {
+              props.rechazar({
+                idAgenda: item.idAgenda,
+                idHorario:item.idHorario,
+              });
+            }}
+          >
             <FontAwesomeIcon icon={faTimes} />
           </SimpleButton>
         </div>

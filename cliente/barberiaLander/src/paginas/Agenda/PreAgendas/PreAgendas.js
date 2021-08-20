@@ -108,7 +108,9 @@ const PreAgendas = () => {
   const getRespuesta = (res) => {
     console.log(res);
   };
-
+  const getRespuestaEliminar = (res) =>{
+    console.log(res);
+  }
   const {
     isLoadingPreAgendas,
     errorPreAgendas,
@@ -120,6 +122,7 @@ const PreAgendas = () => {
     sendRequest: fetchHorarios,
   } = useHttp();
   const { isLoadingAceptar, errorAceptar, sendRequest: aceptar } = useHttp();
+  const { isLoadingRechazar, errorRechazar, sendRequest: rechazar } = useHttp();
   useEffect(() => {
     fetchAgendas({ url: "/listadoPreAgendas" }, obtenerAgendas);
   }, []);
@@ -152,6 +155,19 @@ const PreAgendas = () => {
     );
   };
 
+  const rechazarAgenda = (agenda) => {
+    /* console.log(agenda); */
+    rechazar(
+      {
+        url: "/eliminarAgenda",
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: agenda,
+      },
+      getRespuestaEliminar
+    );
+  };
+
   return (
     <>
       {" "}
@@ -171,6 +187,7 @@ const PreAgendas = () => {
                     items={agendasState}
                     select={setIdAgenda}
                     aceptar={aceptarAgenda}
+                    rechazar={rechazarAgenda}
                   />
                 )}
                 <div className={classes.opciones}>

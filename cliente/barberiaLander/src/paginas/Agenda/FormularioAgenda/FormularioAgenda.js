@@ -130,6 +130,7 @@ const FormularioAgenda = (props) => {
       if (props.agenda === null) {
         //Crear
         datosAgenda = {
+          ciCliente:-1,
           nombreCliente: inputState.Nombre.value,
           telefono: inputState.Telefono.value,
           descripcion: inputState.Descripcion.value,
