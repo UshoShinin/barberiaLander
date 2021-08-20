@@ -16,15 +16,19 @@
   box-sizing: border-box;
   text-decoration: none;
 }
-
-.select {
+.select{
+  cursor:pointer;
+}
+.disabled{
+  cursor:default;
+}
+.select,.disabled {
   width: 100%;
   box-shadow: inset 0 0 0.1em 0 var(--clr-inActive),
     0 0 0.1em 0 var(--clr-inActive);
   border: var(--clr-inActive) 0.125em solid;
   border-radius: 0.25em;
   transition: box-shadow 250ms linear, border 250ms linear;
-  cursor:pointer;
   display:flex;
   justify-content: space-between;
   align-items: center;
@@ -67,9 +71,6 @@
     0 0 0.8em 0 var(--clr-neon-white);
   border: var(--clr-neon-white) 0.125em solid;
 }
-
-
-
 
 /* width */
 .ComboBox ::-webkit-scrollbar {

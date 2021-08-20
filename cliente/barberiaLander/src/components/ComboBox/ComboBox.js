@@ -13,11 +13,11 @@ const ComboBox = (props) => {
   return (
     <div className={classes.ComboBox}>
       <div
-        onClick={props.onClick}
-        className={`${classes.select} ${props.active ? classes.active : ""}`}
+        onClick={!props.disabled?props.onClick:null}
+        className={`${!props.disabled?classes.select:classes.disabled} ${props.active ? classes.active : ""}`}
       >
         <div className="contenido-select">
-          <h1 className={`${classes.title} ${props.active ? classes.titleActive:""}`}>{currentData.title}</h1>
+          <h1 className={`${classes.title} ${props.active ? classes.titleActive:""}`}>{!props.disabled?currentData.title:'Desactivado'}</h1>
         </div>
         <FontAwesomeIcon
           className={`${classes.button} ${props.active ? classes.active : ""}`}

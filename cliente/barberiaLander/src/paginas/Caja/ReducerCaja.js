@@ -77,6 +77,7 @@ export const initialState = {
   cuponera: { value: false },
   montoEfectivo: { value: "", isValid: null },
   montoDebito: { value: "", isValid: null },
+  ticketDebito: { value: "", isValid: null },
   montoCuponera: { value: "", isValid: null },
   codCuponera: { value: "", isValid: null },
   cantidadMedios: { value: 0 },
@@ -124,26 +125,46 @@ export const cajaReducer = (state, action) => {
   let siguiente = null;
   let cantidad;
   let myState;
+  let nuevoEstado;
+  let listaBase;
+  let posicion;
   switch (action.type) {
     case "ABRIR_CAJA":
       return { ...state, cajaAbierta: true };
     case "CERRAR_CAJA":
-      return { ...state, cajaAbierta: false };
+      return {
+        ...initialState,
+      };
     case "CARGA_DE_DATOS":
+      console.log(action.payload);
       const date = new Date("07-24-2021");
-      console.log(new Date());
-      formatDate(action.payload[0].fecha);
-      let newList = action.payload.filter(
+      formatDate(action.payload.agendas[0].fecha);
+      let newList = action.payload.agendas.filter(
         (agenda) =>
           formatDate(agenda.fecha).getDate() === date.getDate() &&
           formatDate(agenda.fecha).getMonth() === date.getMonth()
       );
       myState = {
         ...state,
-        agendas: [...action.payload],
+        agendas: [...action.payload.agendas],
         agendasHoy: [...newList],
+        Empleados:[...action.payload.empleados],
+        /* productos:[...action.payload.productos] */
       };
       return { ...myState };
+    case "CLICK_CORTE":
+      return{...state,servicios:{...state.servicios,corte:!state.servicios.corte}}
+    case "CLICK_BARBA":
+      return{...state,servicios:{...state.servicios,barba:!state.servicios.barba}}
+    case "CLICK_MAQUINA":
+      return{...state,servicios:{...state.servicios,maquina:!state.servicios.maquina}}
+    case "CLICK_BRUSHING":
+      return{...state,servicios:{...state.servicios,brushing:!state.servicios.brushing}}
+    case "CLICK_DECOLORACION":
+      return{...state,servicios:{...state.servicios,decoloracion:!state.servicios.decoloracion}}
+    case "CLICK_CLARITOS":
+      return{...state,servicios:{...state.servicios,claritos:!state.servicios.claritos}}
+
     case "USER_INPUT_MONTO_I":
       return {
         ...state,
@@ -180,16 +201,24 @@ export const cajaReducer = (state, action) => {
         jornal: { value: state.jornal.value, show: false },
       };
     case "CLICK_S_A":
+      nuevoEstado = !state.sinAgendar.value;
+      posicion = state.comboAgenda.value;
+      if (nuevoEstado) {
+        listaBase = [...state.Empleados];
+      } else {
+        listaBase = [...state.agendas];
+      }
+      posicion = listaBase[0].id;
       return {
         ...state,
-        sinAgendar: { value: !state.sinAgendar.value },
+        sinAgendar: { value: nuevoEstado },
         soloHoy: { value: false },
+        comboAgenda: { value: posicion, active: false },
         propinaAgenda: { value: "", isValid: null },
       };
     case "CLICK_S_H":
-      const nuevoEstado = !state.soloHoy.value;
-      let listaBase;
-      let posicion = state.comboAgenda.value;
+      nuevoEstado = !state.soloHoy.value;
+      posicion = state.comboAgenda.value;
       if (nuevoEstado) {
         listaBase = [...state.agendasHoy];
       } else {
@@ -402,10 +431,8 @@ export const cajaReducer = (state, action) => {
       });
       destino.sort(orden);
       destino.forEach((p) => {
-        console.log(p);
         total += p.price * p.count;
       });
-      console.log(total);
       return {
         ...state,
         productosAgregados: [...destino],
@@ -670,6 +697,31 @@ export const cajaReducer = (state, action) => {
         ...state,
         codCuponera: {
           value: state.codCuponera.value,
+          isValid: valido,
+        },
+      };
+    case "USER_TICK_DEBITO":
+      return {
+        ...state,
+        ticketDebito: {
+          value: action.value,
+          isValid: state.ticketDebito.isValid,
+        },
+      };
+    case "FOCUS_TICK_DEBITO":
+      return {
+        ...state,
+        ticketDebito: {
+          value: state.ticketDebito.value,
+          isValid: null,
+        },
+      };
+    case "BLUR_TICK_DEBITO":
+      valido = validarMonto(state.ticketDebito.value);
+      return {
+        ...state,
+        ticketDebito: {
+          value: state.ticketDebito.value,
           isValid: valido,
         },
       };

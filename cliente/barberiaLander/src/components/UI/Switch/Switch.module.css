@@ -10,10 +10,14 @@
   width: 0;
   height: 0;
 }
-
+.slider{
+  cursor: pointer;
+}
+.disabled{
+  cursor:default;
+}
 .slider,.disabled {
   position: absolute;
-  cursor: pointer;
   inset: 0;
   background-color: transparent;
   -webkit-transition: 0.4s;
@@ -23,6 +27,7 @@
   box-shadow: 0 0 0.1em 0 var(--clr-inActive);
 }
 
+.disabled::before,
 .slider::before {
   position: absolute;
   content: "";
@@ -50,14 +55,12 @@ input:focus + .slider::before {
 }
 .disabled:hover + .slider,
 .disabled:focus + .slider {
-  /* background-color: var(--clr-inActive); */
   border: var(--clr-inActive) 0.125em solid;
-  box-shadow: 0 0 0.1em 0 var(--clr-inActive);
+  box-shadow: 0 0 0em 0 var(--clr-inActive);
 }
 .disabled:hover + .slider::before,
 .disabled:focus + .slider::before {
   background-color: var(--clr-inActive);
-  border: var(--clr-inActive) 0.125em solid;
   box-shadow: 0 0 0.1em 0 var(--clr-inActive);
 }
 

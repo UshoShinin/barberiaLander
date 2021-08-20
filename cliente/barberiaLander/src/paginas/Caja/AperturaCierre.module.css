@@ -141,6 +141,13 @@
   color: var(--clr-neon-white);
   transition: color 200ms ease-out;
 }
+.servicios > div >h2{
+  cursor: pointer;
+}
+.textDisabled{
+  cursor: default !important;
+}
+
 .servicios > div >h2,.textDisabled{
   color: var(--clr-inActive);
   transition: color 200ms ease-out;

@@ -24,7 +24,6 @@ const SimpleButton = (props) => {
       type={props.type || "button"} //Si el tipo no es especificado será automaticamente button
       onClick={props.action} // Se le pasa al acción asosciada del onClick a este botón
       className={classesButton}
-      /* disabled={!props.active} */
     >
       {
         props.children /* Lo que sea que esté dentro del del etiqueta Button entrará dentro del botón  */

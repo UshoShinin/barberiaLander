@@ -11,8 +11,6 @@
   text-shadow: 0 0 0.18em hsl(240 100% 78%/0.3), 0 0 0.45em var(--clr-neon-blue);
   box-shadow: inset 0 0 0.8em 0 var(--clr-neon-blue),
     0 0 0.8em 0 var(--clr-neon-blue);
-  transition: background-color 100ms linear, color 100ms linear,
-    text-shadow 100ms linear;
 }
 
 .button,
@@ -26,10 +24,13 @@
   padding: 0 0.6em;
   height: 2em;
   background-color: transparent;
-  position: relative;  
+  position: relative;
+  transition: background-color 100ms linear, color 100ms linear,
+    text-shadow 100ms linear, border 100ms linear;
 }
 
-.button::after,.disabled::after {
+.button::after,
+.disabled::after {
   content: "";
   position: absolute;
   inset: 0;

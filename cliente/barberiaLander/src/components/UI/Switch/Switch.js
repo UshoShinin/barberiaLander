@@ -7,11 +7,9 @@ const Switch = (props) => {
       <input disabled={props.disabled}
         type="checkbox"
         onClick={props.onCheck}
-        className={`${classes.normalInput} ${props.disabled?classes.disabled:''} ${
-          props.active ? classes.active : ""
-        }`}
+        className={`${classes.normalInput} ${props.active ? classes.active : ""}`}
       />
-      <span className={classes.slider}></span>
+      <span className={`${props.disabled?classes.disabled:classes.slider}`}></span>
     </label>
   );
 };

@@ -208,6 +208,7 @@ const FormularioAgenda = (props) => {
 
       let datosAgenda;
       if (props.agenda === null) {
+        //Crear
         datosAgenda = {
           nombreCliente: inputState.Nombre.value,
           telefono: inputState.Telefono.value,
@@ -221,16 +222,20 @@ const FormularioAgenda = (props) => {
           horario: { i: inicio, f: fin },
         };
       } else {
+        //Modificar
+        const fechita = `${year}-${mes.length > 1 ? mes : "0" + mes}-${
+          dia.length > 1 ? dia : "0" + dia
+        }`
         datosAgenda = {
+          idAgenda:props.idagenda,
+          idHorario:props.idHorario,
           nombreCliente: inputState.Nombre.value,
           telefono: inputState.Telefono.value,
           descripcion: inputState.Descripcion.value,
           imagenEjemplo: inputState.Referencia.value,
           servicios: services,
-          fecha: `${year}-${mes.length > 1 ? mes : "0" + mes}-${
-            dia.length > 1 ? dia : "0" + dia
-          }`,
-          horario: { i: inicio, f: fin, ciEmpleado: inputState.Employee.value },
+          fecha: fechita,
+          horario: { i: inicio, f: fin, ciEmpleado: inputState.Employee.value ,fecha:fechita},
         };
       }
       /* props.onSaveDatosAgenda(datosAgenda); */
@@ -266,7 +271,7 @@ const FormularioAgenda = (props) => {
     );
 
     //Activación de día
-    if (inputState.Calendario.dia !== null) {
+    if (inputState.Calendario.dia !== null&&inputState.Calendario.dia !== undefined) {
       const diaSelect = inputState.Calendario.dia.d;
       const mesSelect = inputState.Calendario.dia.m;
       for (let i = 0; i < diasMostrar.length; i++) {
