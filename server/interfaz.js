@@ -818,7 +818,7 @@ const getCiNombreEmpleados = async () => {
     //Voy a buscar todos los empleados
     const empleados = await pool
       .request()
-      .query("select Cedula as ci, Nombre as nombre from Empleado");
+      .query("select Cedula as id, Nombre as title from Empleado");
     //Separo el listado
     const listadoEmpleados = empleados.recordset;
     return listadoEmpleados;
