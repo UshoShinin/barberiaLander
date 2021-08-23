@@ -99,6 +99,16 @@ app.delete("/eliminarAgenda", (req, res) => {
   });
 });
 
+app.post("/entradaCaja", (req, res) => {
+  // const ret = interfaz.crearSolicitudAgenda(req.body);
+  // ret.then((resultado) => {
+  //   res.json({
+  //     mensaje: resultado,
+  //   });
+  // });
+  return req.body;
+});
+
 //No escribir nada por debajo de esto
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
