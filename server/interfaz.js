@@ -202,8 +202,9 @@ const getServicios = async () => {
     //Agrego los servicios al array de retorno
     for (let u = 0; u < listadoServicios.recordset.length; u++) {
       let servicioAux = {
-        idServicio: listadoServicios.recordset[u].IdServicio,
+        id: listadoServicios.recordset[u].IdServicio,
         nombre: listadoServicios.recordset[u].Nombre,
+        precio: listadoServicios.recordset[u].Precio,
       };
       arrayRetorno.push(servicioAux);
     }
@@ -862,6 +863,20 @@ const agregarProductosAListado = async (listado) => {
   }
 };
 
+//Metodo para agregar los servicios al array que devuelvo
+//Devuelvo una promesa
+const agregarServiciosParaCaja = async (listado) => {
+  let retorno = getServicios().then((resultado) => {
+    //Armo el array entero con todo
+    let objetoRetorno = {
+      ...listado,
+      servicios: resultado,
+    };
+    return objetoRetorno;
+  });
+  return retorno;
+};
+
 //Metodo para devolver todos los datos del formulario de caja
 const datosFormularioCaja = async () => {
   try {
@@ -871,6 +886,9 @@ const datosFormularioCaja = async () => {
       })
       .then((listadoConProductos) => {
         return agregarEmpleadosALIstado(listadoConProductos);
+      })
+      .then((listadoCompletoSinServicios) => {
+        return agregarServiciosParaCaja(listadoCompletoSinServicios);
       })
       .then((listadoCompleto) => {
         return listadoCompleto;
