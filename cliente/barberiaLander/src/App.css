@@ -55,3 +55,6 @@
   width: 100%;
   overflow: hidden;
 }
+*:focus-visible{
+  outline: none;
+}

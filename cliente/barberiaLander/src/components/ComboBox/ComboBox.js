@@ -11,6 +11,7 @@ const getObjectById = (list, id) => {
 const ComboBox = (props) => {
   let currentData = null;
   if (props.current!==null) currentData = getObjectById(props.opciones, props.current);
+  console.log(props.current);
   return (
     <div className={classes.ComboBox}>
       <div

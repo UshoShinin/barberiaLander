@@ -7,12 +7,13 @@ import ComboBox from "../../components/ComboBox/ComboBox";
 import Border from "../../components/UI/Border/Border";
 import classesBorder from "../../components/UI/Border/Border.module.css";
 import Card from "../../components/UI/Card/Card";
-import Note from "../../components/UI/Note/Note";
+import SimpleNote from "../../components/UI/Note/SimpleNote";
 import TextArea from "../../components/UI/TextArea/TextArea";
 import Modal from "../../components/UI/Modal/Modal";
 import classes from "./AperturaCierre.module.css";
 import Checkbox from "../../components/UI/Checkbox/Checkbox";
 import ListadoProductos from "./ListadoProductos/ListadoProductos";
+import { resetAgendaProductos } from "./AuxiliaresCaja/reseteos";
 import { initialState, cajaReducer } from "./ReducerCaja";
 import useHttp from "../../hooks/useHttp";
 import inputs from "./AuxiliaresCaja/inputs";
@@ -44,19 +45,53 @@ const AperturaCierre = () => {
   const obtenerAgendas = (mensaje) => {
     dispatchCaja({ type: "CARGA_DE_DATOS", payload: mensaje.mensaje });
   };
+  const {
+    isLoadingModificar,
+    errorModificar,
+    sendRequest: cobrarCaja,
+  } = useHttp();
 
+  const getRespuesta = (res) => {
+    console.log(res);
+  };
   const submitHandler = (e) => {
     e.preventDefault();
+    /* let agenda;
+    let productos;
     if (cajaState.comboAgenda.value === null) {
-      const agenda = document.getElementById("Agenda");
+      agenda = document.getElementById("Agenda");
       agenda.className = `${agenda.className} ${classesBorder.invalid}`;
-    } else if (!cajaState.montoAgenda.isValid&&cajaState.montoAgenda.isValid!==null) montoAgendaRef.current.focus();
-    else if (!cajaState.propinaAgenda.isValid&&cajaState.propinaAgenda.isValid!==null) propinaAgendaRef.current.focus();
-    else if (!cajaState.montoProductos.isValid&&cajaState.montoProductos.isValid!==null)
+    } else if (
+      !cajaState.montoAgenda.isValid &&
+      cajaState.montoAgenda.isValid !== null
+    )
+      montoAgendaRef.current.focus();
+    else if (
+      !cajaState.propinaAgenda.isValid &&
+      cajaState.propinaAgenda.isValid !== null
+    )
+      propinaAgendaRef.current.focus();
+    else if (
+      !cajaState.montoProductos.isValid &&
+      cajaState.montoProductos.isValid !== null
+    )
       montoProductoRef.current.focus();
-    else if (!cajaState.montoTotalProd.isValid&&cajaState.montoTotalProd.isValid!==null)
+    else if (
+      !cajaState.montoTotalProd.isValid &&
+      cajaState.montoTotalProd.isValid !== null
+    )
       montoTotalProdRef.current.focus();
-    else if (cajaState.cantidadMedios.value === 0) {
+    else if (
+      (cajaState.montoAgenda.value === "" ||
+        cajaState.montoAgenda.value === "0") &&
+      (cajaState.montoTotalProd.value === "" ||
+        cajaState.montoTotalProd.value === "0")
+    ) {
+      agenda = document.getElementById("Agenda");
+      agenda.className = `${agenda.className} ${classesBorder.invalid2}`;
+      productos = document.getElementById("Productos");
+      productos.className = `${productos.className} ${classesBorder.invalid2}`;
+    } else if (cajaState.cantidadMedios.value === 0) {
       const efectivo = document.getElementById("Efectivo");
       efectivo.className = `${efectivo.className} ${classes.invalid}`;
 
@@ -66,8 +101,18 @@ const AperturaCierre = () => {
       const cuponera = document.getElementById("Cuponera");
       cuponera.className = `${cuponera.className} ${classes.invalid}`;
     } else if (!cajaState.montoTotal.isValid) montoTotal.current.focus();
-
-    console.log("me tocaron");
+    else {
+      cobrarCaja(
+        {
+          url: "/entradaCaja",
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: cajaState,
+        },
+        getRespuesta
+        );
+      } */
+      dispatchCaja({ type: "SHOW_JORNAL" });
   };
 
   const {
@@ -123,6 +168,7 @@ const AperturaCierre = () => {
         </form>
       </Modal>
       <div className={classes.container}>
+        <SimpleNote show={cajaState.jornal.show} close={()=>{dispatchCaja({type:'HIDE_JORNAL'})}}>¿Está seguro?</SimpleNote>
         <form className={classes.caja} onSubmit={submitHandler}>
           <Border
             disabled={!cajaState.cajaAbierta}
@@ -263,9 +309,14 @@ const AperturaCierre = () => {
                 <div className={classes.servicios}>
                   <div>
                     <h2
-                      onClick={() => {
-                        dispatchCaja({ type: "CLICK_CORTE" });
-                      }}
+                      onClick={
+                        !cajaState.cajaAbierta
+                          ? null
+                          : () => {
+                              resetAgendaProductos();
+                              dispatchCaja({ type: "CLICK_CORTE" });
+                            }
+                      }
                       className={`${
                         !cajaState.cajaAbierta
                           ? classes.textDisabled
@@ -277,9 +328,14 @@ const AperturaCierre = () => {
                       Corte
                     </h2>
                     <h2
-                      onClick={() => {
-                        dispatchCaja({ type: "CLICK_BARBA" });
-                      }}
+                      onClick={
+                        !cajaState.cajaAbierta
+                          ? null
+                          : () => {
+                              resetAgendaProductos();
+                              dispatchCaja({ type: "CLICK_BARBA" });
+                            }
+                      }
                       className={`${
                         !cajaState.cajaAbierta
                           ? classes.textDisabled
@@ -291,9 +347,14 @@ const AperturaCierre = () => {
                       Barba
                     </h2>
                     <h2
-                      onClick={() => {
-                        dispatchCaja({ type: "CLICK_MAQUINA" });
-                      }}
+                      onClick={
+                        !cajaState.cajaAbierta
+                          ? null
+                          : () => {
+                              resetAgendaProductos();
+                              dispatchCaja({ type: "CLICK_MAQUINA" });
+                            }
+                      }
                       className={`${
                         !cajaState.cajaAbierta
                           ? classes.textDisabled
@@ -307,9 +368,14 @@ const AperturaCierre = () => {
                   </div>
                   <div>
                     <h2
-                      onClick={() => {
-                        dispatchCaja({ type: "CLICK_BRUSHING" });
-                      }}
+                      onClick={
+                        !cajaState.cajaAbierta
+                          ? null
+                          : () => {
+                              resetAgendaProductos();
+                              dispatchCaja({ type: "CLICK_BRUSHING" });
+                            }
+                      }
                       className={`${
                         !cajaState.cajaAbierta
                           ? classes.textDisabled
@@ -321,9 +387,14 @@ const AperturaCierre = () => {
                       Brushing
                     </h2>
                     <h2
-                      onClick={() => {
-                        dispatchCaja({ type: "CLICK_DECOLORACION" });
-                      }}
+                      onClick={
+                        !cajaState.cajaAbierta
+                          ? null
+                          : () => {
+                              resetAgendaProductos();
+                              dispatchCaja({ type: "CLICK_DECOLORACION" });
+                            }
+                      }
                       className={`${
                         !cajaState.cajaAbierta
                           ? classes.textDisabled
@@ -335,9 +406,14 @@ const AperturaCierre = () => {
                       Decoloración
                     </h2>
                     <h2
-                      onClick={() => {
-                        dispatchCaja({ type: "CLICK_CLARITOS" });
-                      }}
+                      onClick={
+                        !cajaState.cajaAbierta
+                          ? null
+                          : () => {
+                              resetAgendaProductos();
+                              dispatchCaja({ type: "CLICK_CLARITOS" });
+                            }
+                      }
                       className={`${
                         !cajaState.cajaAbierta
                           ? classes.textDisabled
@@ -389,6 +465,7 @@ const AperturaCierre = () => {
             <Border
               disabled={!cajaState.cajaAbierta}
               className={`${classes.cajaContainer} ${classes.productos}`}
+              id="Productos"
             >
               <h2
                 className={`${
@@ -524,7 +601,7 @@ const AperturaCierre = () => {
                     id={11}
                     checked={cajaState.efectivo.value}
                     onChange={() => {
-                      resetChecks()
+                      resetChecks();
                       dispatchCaja({ type: "CLICK_EFECTIVO" });
                     }}
                   />
@@ -557,7 +634,7 @@ const AperturaCierre = () => {
                     id={12}
                     checked={cajaState.debito.value}
                     onChange={() => {
-                      resetChecks()
+                      resetChecks();
                       dispatchCaja({ type: "CLICK_DEBITO" });
                     }}
                   />
@@ -599,7 +676,7 @@ const AperturaCierre = () => {
                     id={13}
                     checked={cajaState.cuponera.value}
                     onChange={() => {
-                      resetChecks()
+                      resetChecks();
                       dispatchCaja({ type: "CLICK_CUPONERA" });
                     }}
                   />

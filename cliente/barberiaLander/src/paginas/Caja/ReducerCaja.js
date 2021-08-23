@@ -3,6 +3,7 @@ import {
   getElementById,
 } from "../../FuncionesAuxiliares/FuncionesAuxiliares";
 import { formatDate } from "../../FuncionesAuxiliares/FuncionesAuxiliares";
+import { resetAgendaProductos } from "./AuxiliaresCaja/reseteos";
 const today = new Date();
 export const initialState = {
   idCaja: new Date(),
@@ -71,7 +72,7 @@ export const initialState = {
   showSalida: { value: false },
   montoSalida: { value: "", isValid: null },
   descripcionSalida: { value: "", isValid: null },
-  comboSalida: { value: 1, active: false },
+  comboSalida: { value: null, active: false },
   Empleados: [
     { id: 1, title: "Antonio" },
     { id: 2, title: "Pablito" },
@@ -107,6 +108,7 @@ const miFiltro = (lista, objetivo) => {
 
 export const cajaReducer = (state, action) => {
   let valido = null;
+  let validoTotal = null;
   let origen;
   let destino;
   let resultadoOrigen;
@@ -209,9 +211,9 @@ export const cajaReducer = (state, action) => {
       nuevoEstado = !state.soloHoy.value;
       posicion = state.comboAgenda.value;
       resto = { ...state.servicios };
-      mAgenda = parseInt(state.montoAgenda.value,10);
-      mPropina = parseInt(state.propinaAgenda.value,10);
-      total=parseInt(state.montoTotal.value,10);
+      mAgenda = parseInt(state.montoAgenda.value, 10);
+      mPropina = parseInt(state.propinaAgenda.value, 10);
+      total = parseInt(state.montoTotal.value, 10);
       if (nuevoEstado) {
         listaBase = [...state.agendasHoy];
       } else {
@@ -220,26 +222,32 @@ export const cajaReducer = (state, action) => {
       if (listaBase.length > 0) {
         if (getElementById(listaBase, posicion) === null) {
           posicion = null;
-          resto={...initialState.servicios};
-          mAgenda='';
-          mPropina = '';
-          total=state.montoTotalProd.value;
+          resto = { ...initialState.servicios };
+          mAgenda = "";
+          mPropina = "";
+          total = state.montoTotalProd.value;
         }
       } else {
         posicion = null;
-        resto={...initialState.servicios};
-        mAgenda='';
-        mPropina = '';
-        total=state.montoTotalProd.value;
+        resto = { ...initialState.servicios };
+        mAgenda = "";
+        mPropina = "";
+        total = state.montoTotalProd.value;
       }
       return {
         ...state,
         soloHoy: { value: nuevoEstado },
         servicios: { ...resto },
         comboAgenda: { value: posicion, active: false },
-        montoAgenda:{value:String(mAgenda),isValid:validarMonto(String(mAgenda))},
-        propinaAgenda : {value:String(mPropina),isValid:validarMonto(String(mPropina))},
-        montoTotal:{value:String(total),isValid:String(total)}
+        montoAgenda: {
+          value: String(mAgenda),
+          isValid: validarMonto(String(mAgenda)),
+        },
+        propinaAgenda: {
+          value: String(mPropina),
+          isValid: validarMonto(String(mPropina)),
+        },
+        montoTotal: { value: String(total), isValid: String(total) },
       };
     case "CLICK_COMBO_AGENDA":
       return {
@@ -314,6 +322,7 @@ export const cajaReducer = (state, action) => {
         comboSalida: { value: action.value, active: false },
       };
     case "USER_INPUT_MONTO_A":
+      if (state.montoAgenda.value.length === 0) resetAgendaProductos();
       mAgenda = action.value.length > 0 ? parseInt(action.value, 10) : 0;
       mProducto =
         state.montoTotalProd.value.length > 0
@@ -323,7 +332,14 @@ export const cajaReducer = (state, action) => {
         state.propinaAgenda.value.length > 0
           ? parseInt(state.propinaAgenda.value, 10)
           : 0;
-      total = String(mAgenda + mProducto + mPropina);
+      total = mAgenda + mProducto + mPropina;
+      if (total === 0) {
+        total = "";
+        validoTotal = null;
+      } else {
+        total = String(total);
+        validoTotal = validarMonto(total);
+      }
       return {
         ...state,
         cantidadMedios: { value: 0 },
@@ -336,7 +352,7 @@ export const cajaReducer = (state, action) => {
         },
         montoTotal: {
           value: total,
-          isValid: validarMonto(total),
+          isValid: validoTotal,
         },
       };
     case "FOCUS_INPUT_MONTO_A":
@@ -366,7 +382,14 @@ export const cajaReducer = (state, action) => {
         state.montoAgenda.value.length > 0
           ? parseInt(state.montoAgenda.value, 10)
           : 0;
-      total = String(mPropina + mProducto + mAgenda);
+      total = mPropina + mProducto + mAgenda;
+      if (total === 0) {
+        total = "";
+        validoTotal = null;
+      } else {
+        total = String(total);
+        validoTotal = validarMonto(total);
+      }
       return {
         ...state,
         cantidadMedios: { value: 0 },
@@ -379,7 +402,7 @@ export const cajaReducer = (state, action) => {
         },
         montoTotal: {
           value: total,
-          isValid: validarMonto(total),
+          isValid: validoTotal,
         },
       };
     case "FOCUS_INPUT_PROPINA_A":
@@ -425,6 +448,7 @@ export const cajaReducer = (state, action) => {
         },
       };
     case "USER_INPUT_MONTO_TOTAL_PRODUCTO":
+      if (state.montoTotalProd.value.length === 0) resetAgendaProductos();
       mProducto = action.value.length > 0 ? parseInt(action.value, 10) : 0;
       mPropina =
         state.propinaAgenda.value.length > 0
@@ -434,7 +458,14 @@ export const cajaReducer = (state, action) => {
         state.montoAgenda.value.length > 0
           ? parseInt(state.montoAgenda.value, 10)
           : 0;
-      total = String(mProducto + mPropina + mAgenda);
+      total = mProducto + mPropina + mAgenda;
+      if (total === 0) {
+        total = "";
+        validoTotal = null;
+      } else {
+        total = String(total);
+        validoTotal = validarMonto(total);
+      }
       return {
         ...state,
         cantidadMedios: { value: 0 },
@@ -447,7 +478,7 @@ export const cajaReducer = (state, action) => {
         },
         montoTotal: {
           value: total,
-          isValid: validarMonto(total),
+          isValid: validoTotal,
         },
       };
     case "FOCUS_INPUT_MONTO_TOTAL_PRODUCTO":
@@ -496,6 +527,7 @@ export const cajaReducer = (state, action) => {
     case "AGREGAR":
       origen = [...state.productos];
       destino = [...state.productosAgregados];
+      if (state.productosSAg.length > 0) resetAgendaProductos();
       state.productosSAg.forEach((p) => {
         resultadoOrigen = miFiltro(origen, p);
         resultadoDestino = miFiltro(destino, p);
@@ -529,7 +561,21 @@ export const cajaReducer = (state, action) => {
         state.propinaAgenda.value.length > 0
           ? parseInt(state.propinaAgenda.value, 10)
           : 0;
-      total = String(mAgenda + mProducto + mPropina);
+      total = mAgenda + mProducto + mPropina;
+      if (total === 0) {
+        total = "";
+        validoTotal = null;
+      } else {
+        total = String(total);
+        validoTotal = validarMonto(total);
+      }
+      if (mProducto === 0) {
+        mProducto = "";
+        valido = null;
+      } else {
+        mProducto = String(mProducto);
+        valido = validarMonto(mProducto);
+      }
       return {
         ...state,
         cantidadMedios: { value: 0 },
@@ -539,8 +585,8 @@ export const cajaReducer = (state, action) => {
         productosAgregados: [...destino],
         montoProductos: { value: "", isValid: null },
         productosSAg: [],
-        montoTotalProd: { value: String(mProducto), isValid: true },
-        montoTotal: { value: total, isValid: validarMonto(total) },
+        montoTotalProd: { value: mProducto, isValid: valido },
+        montoTotal: { value: total, isValid: validoTotal },
         productos: [...origen],
       };
     case "QUITAR":
@@ -962,17 +1008,31 @@ export const cajaReducer = (state, action) => {
       state.propinaAgenda.value.length > 0
         ? parseInt(state.propinaAgenda.value, 10)
         : 0;
-    total = String(mProducto + mAgenda + mPropina);
+    total = mProducto + mAgenda + mPropina;
+    if (total === 0) {
+      total = "";
+      validoTotal = null;
+    } else {
+      total = String(total);
+      validoTotal = validarMonto(total);
+    }
+    if (mAgenda === 0) {
+      mAgenda = "";
+      valido = null;
+    } else {
+      mAgenda = String(mAgenda);
+      valido = validarMonto(mAgenda);
+    }
     myState = {
       ...myState,
       cantidadMedios: { value: 0 },
       efectivo: { value: false },
       debito: { value: false },
       cuponera: { value: false },
-      montoAgenda: { value: mAgenda, isValid: true },
+      montoAgenda: { value: mAgenda, isValid: valido },
       montoTotal: {
         value: total,
-        isValid: validarMonto(total),
+        isValid: validoTotal,
       },
     };
     return { ...myState };

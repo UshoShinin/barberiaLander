@@ -64,7 +64,7 @@
 
 .Backdrop {
   position: fixed;
-  z-index: 100;
+  z-index: 190;
   top: 0;
   left: 0;
   width: 100%;
@@ -73,7 +73,7 @@
 }
 
 .BackdropOpen {
-  display: block;
+  display: block;  
 }
 
 .BackdropClose {
