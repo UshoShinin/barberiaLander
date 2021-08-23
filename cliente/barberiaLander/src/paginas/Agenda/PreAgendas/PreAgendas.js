@@ -8,10 +8,8 @@ import LoaddingSpinner from "../../../components/LoaddingSpinner/LoaddingSpinner
 import Switch from "../../../components/UI/Switch/Switch";
 import Visualizador from "./Visualizador/Visualizador";
 import FormularioAgenda from "../FormularioAgenda/FormularioAgenda";
-import {
-  getElementById,
-  obtenerHorariosDeDia,
-} from "../../../components/Calendario/FuncionesAuxiliares";
+import {obtenerHorariosDeDia} from "../../../components/Calendario/FuncionesAuxiliares";
+import { getElementById } from "../../../FuncionesAuxiliares/FuncionesAuxiliares";
 /* const DUMMY_AGENDAS = [
   {
     idAgenda: 1,

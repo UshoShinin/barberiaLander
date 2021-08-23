@@ -1,4 +1,7 @@
-import { getElementById } from "../../components/Calendario/FuncionesAuxiliares";
+import {
+  calcularPrecio,
+  getElementById,
+} from "../../FuncionesAuxiliares/FuncionesAuxiliares";
 import { formatDate } from "../../FuncionesAuxiliares/FuncionesAuxiliares";
 const today = new Date();
 export const initialState = {
@@ -14,31 +17,14 @@ export const initialState = {
   propinaAgenda: { value: "", isValid: null },
   montoProductos: { value: "", isValid: null },
   montoTotalProd: { value: "", isValid: null },
-  productos: [
-    { id: 1, nombre: "Pan", price: 160, stock: 10 },
-    { id: 2, nombre: "Pan bimbo", price: 130, stock: 10 },
-    { id: 3, nombre: "Jamon bimbo", price: 120, stock: 10 },
-    { id: 4, nombre: "Banana", price: 150, stock: 10 },
-    { id: 5, nombre: "Uva", price: 110, stock: 10 },
-    { id: 6, nombre: "Naranjita", price: 100, stock: 10 },
-    { id: 7, nombre: "Shampoo", price: 190, stock: 10 },
-    { id: 8, nombre: "Lentejas", price: 170, stock: 10 },
-    { id: 9, nombre: "Lechuga", price: 180, stock: 10 },
-    { id: 10, nombre: "Tomate", price: 210, stock: 10 },
-    { id: 11, nombre: "", price: 120, stock: 10 },
-    { id: 12, nombre: "Banana", price: 140, stock: 10 },
-    { id: 13, nombre: "Uva", price: 105, stock: 10 },
-    { id: 14, nombre: "Naranjita", price: 120, stock: 10 },
-    { id: 15, nombre: "Shampoo", price: 140, stock: 10 },
-    { id: 16, nombre: "Lentejas", price: 100, stock: 10 },
-  ],
+  productos: [],
   servicios: {
-    corte: false,
-    barba: false,
-    maquina: false,
-    claritos: false,
-    decoloracion: false,
-    brushing: false,
+    corte: { id: 1, active: false },
+    barba: { id: 4, active: false },
+    maquina: { id: 5, active: false },
+    claritos: { id: 6, active: false },
+    decoloracion: { id: 7, active: false },
+    brushing: { id: 8, active: false },
   },
   productosSAg: [],
   productosAgregados: [],
@@ -103,7 +89,9 @@ const orden = (a, b) => {
 };
 
 const validarMonto = (value) => {
-  return (value !== "" ? value.trim().length > 0 : null) && parseInt(value) > 0;
+  return (
+    (value !== "" ? value.trim().length > 0 : null) && parseInt(value) >= 0
+  );
 };
 
 const miFiltro = (lista, objetivo) => {
@@ -111,43 +99,46 @@ const miFiltro = (lista, objetivo) => {
   let encontrado = null;
   lista.forEach((element) => {
     if (element.id !== objetivo.id) nuevaLista.push({ ...element });
-    else encontrado = element.count;
+    else encontrado = element.stock;
   });
-  if (encontrado !== null) return { lista: [...nuevaLista], count: encontrado }; //Es nueva lista
+  if (encontrado !== null) return { lista: [...nuevaLista], stock: encontrado }; //Es nueva lista
   return null; //No hay cambios
 };
 
-const calcularAgenda = (servicios) =>{
-  let total;
-  Object.values(servicios).forEach((serv)=>{
-    if(serv){
-      total+=40;
-    }
-  });
-  return total;
-}
-
 export const cajaReducer = (state, action) => {
   let valido = null;
+  let origen;
   let destino;
+  let resultadoOrigen;
+  let resultadoDestino;
   let total = 0;
+  let mAgenda;
+  let mPropina;
+  let mProducto = 0;
   let anterior;
   let siguiente = null;
   let cantidad;
-  let myState;
+  let myState = null;
+  let myStateMedios;
   let nuevoEstado;
   let listaBase;
   let posicion;
+  let resto;
+  let mEfectivo = null;
+  let mDebito = null;
+  let mCuponera = null;
   switch (action.type) {
     case "ABRIR_CAJA":
       return { ...state, cajaAbierta: true };
     case "CERRAR_CAJA":
       return {
         ...initialState,
+        productos: [...state.productos],
+        agendas: [...state.agendas],
+        agendasHoy: [...state.agendasHoy],
       };
     case "CARGA_DE_DATOS":
-      console.log(action.payload);
-      const date = new Date("07-24-2021");
+      const date = new Date();
       formatDate(action.payload.agendas[0].fecha);
       let newList = action.payload.agendas.filter(
         (agenda) =>
@@ -158,23 +149,10 @@ export const cajaReducer = (state, action) => {
         ...state,
         agendas: [...action.payload.agendas],
         agendasHoy: [...newList],
-        Empleados:[...action.payload.empleados],
-        productos:[...action.payload.productos]
+        Empleados: [...action.payload.empleados],
+        productos: [...action.payload.productos],
       };
       return { ...myState };
-    case "CLICK_CORTE":
-      return{...state,servicios:{...state.servicios,corte:!state.servicios.corte}}
-    case "CLICK_BARBA":
-      return{...state,servicios:{...state.servicios,barba:!state.servicios.barba}}
-    case "CLICK_MAQUINA":
-      return{...state,servicios:{...state.servicios,maquina:!state.servicios.maquina}}
-    case "CLICK_BRUSHING":
-      return{...state,servicios:{...state.servicios,brushing:!state.servicios.brushing}}
-    case "CLICK_DECOLORACION":
-      return{...state,servicios:{...state.servicios,decoloracion:!state.servicios.decoloracion}}
-    case "CLICK_CLARITOS":
-      return{...state,servicios:{...state.servicios,claritos:!state.servicios.claritos}}
-
     case "USER_INPUT_MONTO_I":
       return {
         ...state,
@@ -214,10 +192,11 @@ export const cajaReducer = (state, action) => {
       nuevoEstado = !state.sinAgendar.value;
       if (nuevoEstado) {
         listaBase = [...state.Empleados];
+        posicion = listaBase[0].id;
       } else {
         listaBase = [...state.agendas];
+        posicion = null;
       }
-      posicion = listaBase[0].id;
       console.log(posicion);
       return {
         ...state,
@@ -229,18 +208,38 @@ export const cajaReducer = (state, action) => {
     case "CLICK_S_H":
       nuevoEstado = !state.soloHoy.value;
       posicion = state.comboAgenda.value;
+      resto = { ...state.servicios };
+      mAgenda = parseInt(state.montoAgenda.value,10);
+      mPropina = parseInt(state.propinaAgenda.value,10);
+      total=parseInt(state.montoTotal.value,10);
       if (nuevoEstado) {
         listaBase = [...state.agendasHoy];
       } else {
         listaBase = [...state.agendas];
       }
-      if (getElementById(listaBase, posicion) === null) {
-        posicion = listaBase[0].id;
+      if (listaBase.length > 0) {
+        if (getElementById(listaBase, posicion) === null) {
+          posicion = null;
+          resto={...initialState.servicios};
+          mAgenda='';
+          mPropina = '';
+          total=state.montoTotalProd.value;
+        }
+      } else {
+        posicion = null;
+        resto={...initialState.servicios};
+        mAgenda='';
+        mPropina = '';
+        total=state.montoTotalProd.value;
       }
       return {
         ...state,
         soloHoy: { value: nuevoEstado },
+        servicios: { ...resto },
         comboAgenda: { value: posicion, active: false },
+        montoAgenda:{value:String(mAgenda),isValid:validarMonto(String(mAgenda))},
+        propinaAgenda : {value:String(mPropina),isValid:validarMonto(String(mPropina))},
+        montoTotal:{value:String(total),isValid:String(total)}
       };
     case "CLICK_COMBO_AGENDA":
       return {
@@ -252,39 +251,54 @@ export const cajaReducer = (state, action) => {
       };
     case "CHANGE_COMBO_AGENDA":
       let baseServicios = {
-        corte: false,
-        barba: false,
-        maquina: false,
-        claritos: false,
-        decoloracion: false,
-        brushing: false,
+        corte: { active: false, id: 1 },
+        barba: { active: false, id: 4 },
+        maquina: { active: false, id: 5 },
+        claritos: { active: false, id: 6 },
+        decoloracion: { active: false, id: 7 },
+        brushing: { active: false, id: 8 },
       };
       getElementById(state.agendas, action.value).servicios.forEach((s) => {
         switch (s) {
           case 1:
-            baseServicios.corte = true;
+            baseServicios.corte.active = true;
             break;
           case 4:
-            baseServicios.barba = true;
+            baseServicios.barba.active = true;
             break;
           case 5:
-            baseServicios.maquina = true;
+            baseServicios.maquina.active = true;
             break;
           case 6:
-            baseServicios.claritos = true;
+            baseServicios.claritos.active = true;
             break;
           case 7:
-            baseServicios.decoloracion = true;
+            baseServicios.decoloracion.active = true;
             break;
           case 8:
-            baseServicios.brushing = true;
+            baseServicios.brushing.active = true;
             break;
         }
       });
+      mAgenda = calcularPrecio(baseServicios);
+      mPropina =
+        state.propinaAgenda.value.length > 0
+          ? parseInt(state.propinaAgenda.value, 10)
+          : 0;
+      mProducto =
+        state.montoTotalProd.value.length > 0
+          ? parseInt(state.montoTotalProd.value, 10)
+          : 0;
+      total = mProducto + mAgenda + mPropina;
       return {
         ...state,
         comboAgenda: { value: action.value, active: false },
         servicios: { ...baseServicios },
+        montoAgenda: { value: String(mAgenda), isValid: true },
+        montoTotal: {
+          value: String(total),
+          isValid: validarMonto(String(total)),
+        },
       };
     case "CLICK_COMBO_SALIDA":
       return {
@@ -300,11 +314,29 @@ export const cajaReducer = (state, action) => {
         comboSalida: { value: action.value, active: false },
       };
     case "USER_INPUT_MONTO_A":
+      mAgenda = action.value.length > 0 ? parseInt(action.value, 10) : 0;
+      mProducto =
+        state.montoTotalProd.value.length > 0
+          ? parseInt(state.montoTotalProd.value, 10)
+          : 0;
+      mPropina =
+        state.propinaAgenda.value.length > 0
+          ? parseInt(state.propinaAgenda.value, 10)
+          : 0;
+      total = String(mAgenda + mProducto + mPropina);
       return {
         ...state,
+        cantidadMedios: { value: 0 },
+        efectivo: { value: false },
+        debito: { value: false },
+        cuponera: { value: false },
         montoAgenda: {
           value: action.value,
           isValid: state.montoAgenda.isValid,
+        },
+        montoTotal: {
+          value: total,
+          isValid: validarMonto(total),
         },
       };
     case "FOCUS_INPUT_MONTO_A":
@@ -325,11 +357,29 @@ export const cajaReducer = (state, action) => {
         },
       };
     case "USER_INPUT_PROPINA_A":
+      mPropina = action.value.length > 0 ? parseInt(action.value, 10) : 0;
+      mProducto =
+        state.montoTotalProd.value.length > 0
+          ? parseInt(state.montoTotalProd.value, 10)
+          : 0;
+      mAgenda =
+        state.montoAgenda.value.length > 0
+          ? parseInt(state.montoAgenda.value, 10)
+          : 0;
+      total = String(mPropina + mProducto + mAgenda);
       return {
         ...state,
+        cantidadMedios: { value: 0 },
+        efectivo: { value: false },
+        debito: { value: false },
+        cuponera: { value: false },
         propinaAgenda: {
           value: action.value,
           isValid: state.propinaAgenda.isValid,
+        },
+        montoTotal: {
+          value: total,
+          isValid: validarMonto(total),
         },
       };
     case "FOCUS_INPUT_PROPINA_A":
@@ -375,11 +425,29 @@ export const cajaReducer = (state, action) => {
         },
       };
     case "USER_INPUT_MONTO_TOTAL_PRODUCTO":
+      mProducto = action.value.length > 0 ? parseInt(action.value, 10) : 0;
+      mPropina =
+        state.propinaAgenda.value.length > 0
+          ? parseInt(state.propinaAgenda.value, 10)
+          : 0;
+      mAgenda =
+        state.montoAgenda.value.length > 0
+          ? parseInt(state.montoAgenda.value, 10)
+          : 0;
+      total = String(mProducto + mPropina + mAgenda);
       return {
         ...state,
+        cantidadMedios: { value: 0 },
+        efectivo: { value: false },
+        debito: { value: false },
+        cuponera: { value: false },
         montoTotalProd: {
           value: action.value,
           isValid: state.montoTotalProd.isValid,
+        },
+        montoTotal: {
+          value: total,
+          isValid: validarMonto(total),
         },
       };
     case "FOCUS_INPUT_MONTO_TOTAL_PRODUCTO":
@@ -420,60 +488,108 @@ export const cajaReducer = (state, action) => {
           ...state,
           productosSAg: [...auxList],
         };
-      } else {
+      } else
         return {
           ...state,
           productosSEl: [...auxList],
         };
-      }
     case "AGREGAR":
+      origen = [...state.productos];
       destino = [...state.productosAgregados];
       state.productosSAg.forEach((p) => {
-        let resultado = miFiltro(destino, p);
-        if (resultado !== null) {
+        resultadoOrigen = miFiltro(origen, p);
+        resultadoDestino = miFiltro(destino, p);
+        cantidad =
+          parseInt(action.value, 10) > resultadoOrigen.stock
+            ? resultadoOrigen.stock
+            : parseInt(action.value, 10);
+
+        if (resultadoDestino !== null) {
           destino = [
-            ...resultado.lista,
-            { ...p, count: resultado.count + parseInt(action.value, 10) },
+            ...resultadoDestino.lista,
+            { ...p, stock: resultadoDestino.stock + cantidad },
           ];
         } else {
-          destino.push({ ...p, count: parseInt(action.value, 10) });
+          destino.push({ ...p, stock: cantidad });
         }
+        resto = resultadoOrigen.stock - cantidad;
+        origen = [...resultadoOrigen.lista, { ...p, stock: resto }];
       });
+      origen.sort(orden);
       destino.sort(orden);
       destino.forEach((p) => {
-        total += p.price * p.count;
+        mProducto += p.price * p.stock;
       });
+      //Calculo de totales
+      mAgenda =
+        state.montoAgenda.value.length > 0
+          ? parseInt(state.montoAgenda.value, 10)
+          : 0;
+      mPropina =
+        state.propinaAgenda.value.length > 0
+          ? parseInt(state.propinaAgenda.value, 10)
+          : 0;
+      total = String(mAgenda + mProducto + mPropina);
       return {
         ...state,
+        cantidadMedios: { value: 0 },
+        efectivo: { value: false },
+        debito: { value: false },
+        cuponera: { value: false },
         productosAgregados: [...destino],
         montoProductos: { value: "", isValid: null },
         productosSAg: [],
-        montoTotalProd: { value: String(total), isValid: true },
+        montoTotalProd: { value: String(mProducto), isValid: true },
+        montoTotal: { value: total, isValid: validarMonto(total) },
+        productos: [...origen],
       };
     case "QUITAR":
       destino = [...state.productosAgregados];
+      origen = [...state.productos];
       state.productosSEl.forEach((p) => {
-        let resultado = miFiltro(destino, p);
-        const amount = parseInt(action.value, 10);
-        if (resultado.count > amount) {
+        resultadoOrigen = miFiltro(origen, p);
+        resultadoDestino = miFiltro(destino, p);
+        cantidad =
+          parseInt(action.value, 10) > resultadoDestino.stock
+            ? resultadoDestino.stock
+            : parseInt(action.value, 10);
+        if (resultadoDestino.stock > cantidad) {
           destino = [
-            ...resultado.lista,
-            { ...p, count: resultado.count - amount },
+            ...resultadoDestino.lista,
+            { ...p, stock: resultadoDestino.stock - cantidad },
           ];
         } else {
-          destino = [...resultado.lista];
+          destino = [...resultadoDestino.lista];
         }
+        resto = resultadoOrigen.stock + cantidad;
+        origen = [...resultadoOrigen.lista, { ...p, stock: resto }];
       });
+      origen.sort(orden);
       destino.sort(orden);
       destino.forEach((p) => {
-        total += p.price * p.count;
+        mProducto += p.price * p.stock;
       });
+      mAgenda =
+        state.montoAgenda.value.length > 0
+          ? parseInt(state.montoAgenda.value, 10)
+          : 0;
+      mPropina =
+        state.propinaAgenda.value.length > 0
+          ? parseInt(state.propinaAgenda.value, 10)
+          : 0;
+      total = String(mAgenda + mProducto + mPropina);
       return {
         ...state,
+        productos: [...origen],
+        cantidadMedios: { value: 0 },
+        efectivo: { value: false },
+        debito: { value: false },
+        cuponera: { value: false },
         productosAgregados: [...destino],
         montoProductos: { value: "", isValid: null },
         productosSEl: [],
-        montoTotalProd: { value: total, isValid: true },
+        montoTotalProd: { value: mProducto, isValid: true },
+        montoTotal: { value: total, isValid: validarMonto(total) },
       };
     case "CLICK_EFECTIVO":
     case "CLICK_DEBITO":
@@ -531,13 +647,21 @@ export const cajaReducer = (state, action) => {
       }
       return { ...myState };
     case "USER_INPUT_EFECTIVO":
-      return {
-        ...state,
-        montoEfectivo: {
-          value: action.value,
-          isValid: state.montoEfectivo.isValid,
-        },
-      };
+      mEfectivo = action.value === "" ? 0 : action.value;
+      if (state.cantidadMedios.value === 2) {
+        mDebito = "";
+        mCuponera = "";
+        if (state.debito.value) {
+          mDebito = String(
+            parseInt(state.montoTotal.value, 10) - parseInt(mEfectivo, 10)
+          );
+        } else {
+          mCuponera = String(
+            parseInt(state.montoTotal.value, 10) - parseInt(mEfectivo, 10)
+          );
+        }
+      }
+      break;
     case "FOCUS_INPUT_EFECTIVO":
       return {
         ...state,
@@ -556,13 +680,21 @@ export const cajaReducer = (state, action) => {
         },
       };
     case "USER_INPUT_DEBITO":
-      return {
-        ...state,
-        montoDebito: {
-          value: action.value,
-          isValid: state.montoDebito.isValid,
-        },
-      };
+      mDebito = action.value === "" ? 0 : action.value;
+      if (state.cantidadMedios.value === 2) {
+        mEfectivo = "";
+        mCuponera = "";
+        if (state.efectivo.value) {
+          mEfectivo = String(
+            parseInt(state.montoTotal.value, 10) - parseInt(mDebito, 10)
+          );
+        } else {
+          mCuponera = String(
+            parseInt(state.montoTotal.value, 10) - parseInt(mDebito, 10)
+          );
+        }
+      }
+      break;
     case "FOCUS_INPUT_DEBITO":
       return {
         ...state,
@@ -581,13 +713,21 @@ export const cajaReducer = (state, action) => {
         },
       };
     case "USER_INPUT_CUPONERA":
-      return {
-        ...state,
-        montoCuponera: {
-          value: action.value,
-          isValid: state.montoCuponera.isValid,
-        },
-      };
+      mCuponera = action.value === "" ? 0 : action.value;
+      if (state.cantidadMedios.value === 2) {
+        mEfectivo = "";
+        mDebito = "";
+        if (state.efectivo.value) {
+          mEfectivo = String(
+            parseInt(state.montoTotal.value, 10) - parseInt(mCuponera, 10)
+          );
+        } else {
+          mDebito = String(
+            parseInt(state.montoTotal.value, 10) - parseInt(mCuponera, 10)
+          );
+        }
+      }
+      break;
     case "FOCUS_INPUT_CUPONERA":
       return {
         ...state,
@@ -608,6 +748,10 @@ export const cajaReducer = (state, action) => {
     case "USER_INPUT_TOTAL":
       return {
         ...state,
+        cantidadMedios: { value: 0 },
+        efectivo: { value: false },
+        debito: { value: false },
+        cuponera: { value: false },
         montoTotal: {
           value: action.value,
           isValid: state.montoTotal.isValid,
@@ -735,5 +879,123 @@ export const cajaReducer = (state, action) => {
           isValid: valido,
         },
       };
+    case "CLICK_CORTE":
+      myState = {
+        ...state,
+        servicios: {
+          ...state.servicios,
+          corte: {
+            active: !state.servicios.corte.active,
+            id: state.servicios.corte.id,
+          },
+        },
+      };
+      break;
+    case "CLICK_BARBA":
+      myState = {
+        ...state,
+        servicios: {
+          ...state.servicios,
+          barba: {
+            active: !state.servicios.barba.active,
+            id: state.servicios.barba.id,
+          },
+        },
+      };
+      break;
+    case "CLICK_MAQUINA":
+      myState = {
+        ...state,
+        servicios: {
+          ...state.servicios,
+          maquina: {
+            active: !state.servicios.maquina.active,
+            id: state.servicios.maquina.id,
+          },
+        },
+      };
+      break;
+    case "CLICK_BRUSHING":
+      myState = {
+        ...state,
+        servicios: {
+          ...state.servicios,
+          brushing: {
+            active: !state.servicios.brushing.active,
+            id: state.servicios.brushing.id,
+          },
+        },
+      };
+      break;
+    case "CLICK_DECOLORACION":
+      myState = {
+        ...state,
+        servicios: {
+          ...state.servicios,
+          decoloracion: {
+            active: !state.servicios.decoloracion.active,
+            id: state.servicios.decoloracion.id,
+          },
+        },
+      };
+      break;
+    case "CLICK_CLARITOS":
+      myState = {
+        ...state,
+        servicios: {
+          ...state.servicios,
+          claritos: {
+            active: !state.servicios.claritos.active,
+            id: state.servicios.claritos.id,
+          },
+        },
+      };
+      break;
+  }
+  if (myState !== null) {
+    mAgenda = calcularPrecio(myState.servicios);
+    mProducto =
+      state.montoTotalProd.value.length > 0
+        ? parseInt(state.montoTotalProd.value, 10)
+        : 0;
+    mPropina =
+      state.propinaAgenda.value.length > 0
+        ? parseInt(state.propinaAgenda.value, 10)
+        : 0;
+    total = String(mProducto + mAgenda + mPropina);
+    myState = {
+      ...myState,
+      cantidadMedios: { value: 0 },
+      efectivo: { value: false },
+      debito: { value: false },
+      cuponera: { value: false },
+      montoAgenda: { value: mAgenda, isValid: true },
+      montoTotal: {
+        value: total,
+        isValid: validarMonto(total),
+      },
+    };
+    return { ...myState };
+  }
+  if (myStateMedios !== null) {
+    mEfectivo = mEfectivo !== null ? mEfectivo : state.montoEfectivo.value;
+    mDebito = mDebito !== null ? mDebito : state.montoDebito.value;
+    mCuponera = mCuponera !== null ? mCuponera : state.montoCuponera.value;
+    myStateMedios = {
+      ...state,
+      montoEfectivo: {
+        value: mEfectivo,
+        isValid: validarMonto(mEfectivo),
+      },
+      montoDebito: {
+        value: mDebito,
+        isValid: validarMonto(mDebito),
+      },
+      montoCuponera: {
+        value: mCuponera,
+        isValid: validarMonto(mCuponera),
+      },
+    };
+    return { ...myStateMedios };
   }
 };

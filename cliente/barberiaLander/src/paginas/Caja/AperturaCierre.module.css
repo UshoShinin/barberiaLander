@@ -132,6 +132,11 @@
   align-items: center;
   justify-content: center;
   width: 100%;
+  position: relative;
+}
+.productosActions > button{
+  position: relative;
+  z-index: 100;
 }
 .servicios{
   display: grid;
@@ -196,4 +201,8 @@
 }
 .salidaDinero > div+div{
   margin-top: 16px;
+}
+
+.invalid{
+  color:var(--clr-neon-red);
 }

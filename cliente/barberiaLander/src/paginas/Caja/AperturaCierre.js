@@ -1,9 +1,11 @@
 import React, { useEffect, useReducer, useRef } from "react";
+import Button from "../../components/UI/Button/Button";
 import SimpleButton from "../../components/UI/SimpleButton/SimpleButton";
 import Switch from "../../components/UI/Switch/Switch";
 import Input from "../../components/UI/Input/Input";
 import ComboBox from "../../components/ComboBox/ComboBox";
 import Border from "../../components/UI/Border/Border";
+import classesBorder from "../../components/UI/Border/Border.module.css";
 import Card from "../../components/UI/Card/Card";
 import Note from "../../components/UI/Note/Note";
 import TextArea from "../../components/UI/TextArea/TextArea";
@@ -13,6 +15,7 @@ import Checkbox from "../../components/UI/Checkbox/Checkbox";
 import ListadoProductos from "./ListadoProductos/ListadoProductos";
 import { initialState, cajaReducer } from "./ReducerCaja";
 import useHttp from "../../hooks/useHttp";
+import inputs from "./AuxiliaresCaja/inputs";
 
 const AperturaCierre = () => {
   const [cajaState, dispatchCaja] = useReducer(cajaReducer, initialState);
@@ -27,257 +30,7 @@ const AperturaCierre = () => {
   const montoTotal = useRef();
   const montoSalida = useRef();
 
-  const INPUTS = [
-    {
-      id: 1,
-      type: "number",
-      value: cajaState.montoInicial.value,
-      placeholder: "0",
-      disabled: !cajaState.cajaAbierta,
-      onChange: (event) => {
-        dispatchCaja({
-          type: "USER_INPUT_MONTO_I",
-          value: event.target.value,
-        });
-      },
-      onBlur: () => {
-        dispatchCaja({ type: "BLUR_INPUT_MONTO_I" });
-      },
-      onFocus: () => {
-        dispatchCaja({ type: "FOCUS_INPUT_MONTO_I" });
-      },
-    },
-    {
-      id: 2,
-      type: "number",
-      value: cajaState.montoAgenda.value,
-      placeholder: "0",
-      disabled: !cajaState.cajaAbierta,
-      onChange: (event) => {
-        dispatchCaja({
-          type: "USER_INPUT_MONTO_A",
-          value: event.target.value,
-        });
-      },
-      onBlur: () => {
-        dispatchCaja({ type: "BLUR_INPUT_MONTO_A" });
-      },
-      onFocus: () => {
-        dispatchCaja({ type: "FOCUS_INPUT_MONTO_A" });
-      },
-    },
-    {
-      id: 3,
-      type: "number",
-      value: cajaState.propinaAgenda.value,
-      placeholder: "0",
-      disabled: !cajaState.cajaAbierta,
-      onChange: (event) => {
-        dispatchCaja({
-          type: "USER_INPUT_PROPINA_A",
-          value: event.target.value,
-        });
-      },
-      onBlur: () => {
-        dispatchCaja({ type: "BLUR_INPUT_PROPINA_A" });
-      },
-      onFocus: () => {
-        dispatchCaja({ type: "FOCUS_INPUT_PROPINA_A" });
-      },
-    },
-    {
-      id: 4,
-      type: "number",
-      value: cajaState.montoProductos.value,
-      placeholder: "1",
-      disabled: !cajaState.cajaAbierta,
-      onChange: (event) => {
-        dispatchCaja({
-          type: "USER_INPUT_MONTO_PRODUCTO",
-          value: event.target.value,
-        });
-      },
-      onBlur: () => {
-        dispatchCaja({ type: "BLUR_INPUT_MONTO_PRODUCTO" });
-      },
-      onFocus: () => {
-        dispatchCaja({ type: "FOCUS_INPUT_MONTO_PRODUCTO" });
-      },
-    },
-    {
-      id: 5,
-      type: "number",
-      value: cajaState.montoTotalProd.value,
-      placeholder: "0",
-      disabled: !cajaState.cajaAbierta,
-      onChange: (event) => {
-        dispatchCaja({
-          type: "USER_INPUT_MONTO_TOTAL_PRODUCTO",
-          value: event.target.value,
-        });
-      },
-      onBlur: () => {
-        dispatchCaja({ type: "BLUR_INPUT_MONTO_TOTAL_PRODUCTO" });
-      },
-      onFocus: () => {
-        dispatchCaja({
-          type: "FOCUS_INPUT_MONTO_TOTAL_PRODUCTO",
-        });
-      },
-    },
-    {
-      id: 6,
-      type: "number",
-      value: cajaState.montoEfectivo.value,
-      placeholder: "0",
-      disabled: !cajaState.cajaAbierta||!cajaState.efectivo.value,
-      onChange: (event) => {
-        dispatchCaja({
-          type: "USER_INPUT_EFECTIVO",
-          value: event.target.value,
-        });
-      },
-      onBlur: () => {
-        dispatchCaja({ type: "BLUR_INPUT_EFECTIVO" });
-      },
-      onFocus: () => {
-        dispatchCaja({ type: "FOCUS_INPUT_EFECTIVO" });
-      },
-    },
-    {
-      id: 7,
-      type: "number",
-      value: cajaState.montoDebito.value,
-      placeholder: "0",
-      disabled: !cajaState.cajaAbierta||!cajaState.debito.value,
-      onChange: (event) => {
-        dispatchCaja({
-          type: "USER_INPUT_DEBITO",
-          value: event.target.value,
-        });
-      },
-      onBlur: () => {
-        dispatchCaja({ type: "BLUR_INPUT_DEBITO" });
-      },
-      onFocus: () => {
-        dispatchCaja({ type: "FOCUS_INPUT_DEBITO" });
-      },
-    },
-    {
-      id: 8,
-      type: "number",
-      value: cajaState.montoCuponera.value,
-      placeholder: "0",
-      disabled: !cajaState.cajaAbierta||!cajaState.cuponera.value,
-      onChange: (event) => {
-        dispatchCaja({
-          type: "USER_INPUT_CUPONERA",
-          value: event.target.value,
-        });
-      },
-      onBlur: () => {
-        dispatchCaja({ type: "BLUR_INPUT_CUPONERA" });
-      },
-      onFocus: () => {
-        dispatchCaja({ type: "FOCUS_INPUT_CUPONERA" });
-      },
-    },
-    {
-      id: 9,
-      type: "number",
-      value: cajaState.montoTotal.value,
-      placeholder: "0",
-      disabled: !cajaState.cajaAbierta,
-      onChange: (event) => {
-        dispatchCaja({
-          type: "USER_INPUT_TOTAL",
-          value: event.target.value,
-        });
-      },
-      onBlur: () => {
-        dispatchCaja({ type: "BLUR_INPUT_TOTAL" });
-      },
-      onFocus: () => {
-        dispatchCaja({ type: "FOCUS_INPUT_TOTAL" });
-      },
-    },
-    {
-      id: 10,
-      type: "number",
-      value: cajaState.montoSalida.value,
-      placeholder: "0",
-      disabled: !cajaState.cajaAbierta,
-      onChange: (event) => {
-        dispatchCaja({
-          type: "USER_INPUT_MONTO_S",
-          value: event.target.value,
-        });
-      },
-      onBlur: () => {
-        dispatchCaja({ type: "BLUR_INPUT_MONTO_S" });
-      },
-      onFocus: () => {
-        dispatchCaja({ type: "FOCUS_INPUT_MONTO_S" });
-      },
-    },
-    {
-      id: 11,
-      rows: 4,
-      value: cajaState.descripcionSalida.value,
-      placeholder: "Escribe la razón de esta salida de dinero",
-      disabled: !cajaState.cajaAbierta,
-      onChange: (event) => {
-        dispatchCaja({
-          type: "USER_DESCRIPCION_SALIDA",
-          value: event.target.value,
-        });
-      },
-      onBlur: () => {
-        dispatchCaja({ type: "BLUR_DESCRIPCION_SALIDA" });
-      },
-      onFocus: () => {
-        dispatchCaja({ type: "FOCUS_DESCRIPCION_SALIDA" });
-      },
-    },
-    {
-      id: 12,
-      type: "number",
-      value: cajaState.codCuponera.value,
-      placeholder: "Codigo cuponera",
-      disabled: !cajaState.cajaAbierta,
-      onChange: (event) => {
-        dispatchCaja({
-          type: "USER_COD_CUPONERA",
-          value: event.target.value,
-        });
-      },
-      onBlur: () => {
-        dispatchCaja({ type: "BLUR_COD_CUPONERA" });
-      },
-      onFocus: () => {
-        dispatchCaja({ type: "FOCUS_COD_CUPONERA" });
-      },
-    },
-    {
-      id: 13,
-      type: "number",
-      value: cajaState.ticketDebito.value,
-      placeholder: "Ticket débito",
-      disabled: !cajaState.cajaAbierta,
-      onChange: (event) => {
-        dispatchCaja({
-          type: "USER_TICK_DEBITO",
-          value: event.target.value,
-        });
-      },
-      onBlur: () => {
-        dispatchCaja({ type: "BLUR_TICK_DEBITO" });
-      },
-      onFocus: () => {
-        dispatchCaja({ type: "FOCUS_TICK_DEBITO" });
-      },
-    },
-  ];
+  const INPUTS = inputs(cajaState, dispatchCaja);
 
   const salidaSubmitHandler = (e) => {
     e.preventDefault();
@@ -290,6 +43,31 @@ const AperturaCierre = () => {
   };
   const obtenerAgendas = (mensaje) => {
     dispatchCaja({ type: "CARGA_DE_DATOS", payload: mensaje.mensaje });
+  };
+
+  const submitHandler = (e) => {
+    e.preventDefault();
+    if (cajaState.comboAgenda.value === null) {
+      const agenda = document.getElementById("Agenda");
+      agenda.className = `${agenda.className} ${classesBorder.invalid}`;
+    } else if (!cajaState.montoAgenda.isValid&&cajaState.montoAgenda.isValid!==null) montoAgendaRef.current.focus();
+    else if (!cajaState.propinaAgenda.isValid&&cajaState.propinaAgenda.isValid!==null) propinaAgendaRef.current.focus();
+    else if (!cajaState.montoProductos.isValid&&cajaState.montoProductos.isValid!==null)
+      montoProductoRef.current.focus();
+    else if (!cajaState.montoTotalProd.isValid&&cajaState.montoTotalProd.isValid!==null)
+      montoTotalProdRef.current.focus();
+    else if (cajaState.cantidadMedios.value === 0) {
+      const efectivo = document.getElementById("Efectivo");
+      efectivo.className = `${efectivo.className} ${classes.invalid}`;
+
+      const debito = document.getElementById("Debito");
+      debito.className = `${debito.className} ${classes.invalid}`;
+
+      const cuponera = document.getElementById("Cuponera");
+      cuponera.className = `${cuponera.className} ${classes.invalid}`;
+    } else if (!cajaState.montoTotal.isValid) montoTotal.current.focus();
+
+    console.log("me tocaron");
   };
 
   const {
@@ -305,7 +83,6 @@ const AperturaCierre = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
   };
-  console.log(cajaState);
   return (
     <>
       <Modal
@@ -346,22 +123,7 @@ const AperturaCierre = () => {
         </form>
       </Modal>
       <div className={classes.container}>
-        {/*<Note show={cajaState.jornal.show}>{cajaState.jornal.value}</Note>
-        <div className={`${classes.cajaContainer} ${classes.actions}`}>
-          <SimpleButton
-            action={() => {
-              dispatchCaja({ type: "SHOW_JORNAL", value: "Soy el jornal papu" });
-              setTimeout(() => {
-                dispatchCaja({ type: "HIDE_JORNAL" });
-              }, 3000);
-            }}
-          >
-            Calcular Jornal
-          </SimpleButton>
-          <SimpleButton>Calcular Comisiones</SimpleButton>
-          <SimpleButton>Calcular Propinas</SimpleButton>
-        </div> */}
-        <div className={classes.caja}>
+        <form className={classes.caja} onSubmit={submitHandler}>
           <Border
             disabled={!cajaState.cajaAbierta}
             className={`${classes.cajaContainer} ${classes.abrirCerrar}`}
@@ -411,6 +173,7 @@ const AperturaCierre = () => {
             <Border
               disabled={!cajaState.cajaAbierta}
               className={classes.cajaContainer}
+              id="Agenda"
             >
               <div className={classes.agenda}>
                 <div className={classes.dobleFild}>
@@ -427,6 +190,9 @@ const AperturaCierre = () => {
                     <Switch
                       active={cajaState.sinAgendar.value}
                       onCheck={() => {
+                        const agenda = document.getElementById("Agenda");
+                        if (agenda.classList[2] !== undefined)
+                          agenda.classList.remove(agenda.classList[2]);
                         dispatchCaja({ type: "CLICK_S_A" });
                       }}
                       disabled={!cajaState.cajaAbierta}
@@ -468,14 +234,18 @@ const AperturaCierre = () => {
                   <ComboBox
                     disabled={!cajaState.cajaAbierta}
                     opciones={
-                      cajaState.sinAgendar.value ? cajaState.Empleados:
-                      cajaState.soloHoy.value
+                      cajaState.sinAgendar.value
+                        ? cajaState.Empleados
+                        : cajaState.soloHoy.value
                         ? cajaState.agendasHoy
                         : cajaState.agendas
                     }
                     current={cajaState.comboAgenda.value}
                     active={cajaState.comboAgenda.active}
                     onClick={() => {
+                      const agenda = document.getElementById("Agenda");
+                      if (agenda.classList[2] !== undefined)
+                        agenda.classList.remove(agenda.classList[2]);
                       dispatchCaja({ type: "CLICK_COMBO_AGENDA" });
                     }}
                     onChange={(id) => {
@@ -492,46 +262,88 @@ const AperturaCierre = () => {
                 </h1>
                 <div className={classes.servicios}>
                   <div>
-                    <h2 onClick={()=>{dispatchCaja({type:'CLICK_CORTE'})}}
-                      className={`${!cajaState.cajaAbierta?classes.textDisabled:
-                        cajaState.servicios.corte ? classes.active : ""
+                    <h2
+                      onClick={() => {
+                        dispatchCaja({ type: "CLICK_CORTE" });
+                      }}
+                      className={`${
+                        !cajaState.cajaAbierta
+                          ? classes.textDisabled
+                          : cajaState.servicios.corte.active
+                          ? classes.active
+                          : ""
                       }`}
                     >
                       Corte
                     </h2>
-                    <h2 onClick={()=>{dispatchCaja({type:'CLICK_BARBA'})}}
-                      className={`${!cajaState.cajaAbierta?classes.textDisabled:
-                        cajaState.servicios.barba ? classes.active : ""
+                    <h2
+                      onClick={() => {
+                        dispatchCaja({ type: "CLICK_BARBA" });
+                      }}
+                      className={`${
+                        !cajaState.cajaAbierta
+                          ? classes.textDisabled
+                          : cajaState.servicios.barba.active
+                          ? classes.active
+                          : ""
                       }`}
                     >
                       Barba
                     </h2>
-                    <h2 onClick={()=>{dispatchCaja({type:'CLICK_MAQUINA'})}}
-                      className={`${!cajaState.cajaAbierta?classes.textDisabled:
-                        cajaState.servicios.maquina ? classes.active : ""
+                    <h2
+                      onClick={() => {
+                        dispatchCaja({ type: "CLICK_MAQUINA" });
+                      }}
+                      className={`${
+                        !cajaState.cajaAbierta
+                          ? classes.textDisabled
+                          : cajaState.servicios.maquina.active
+                          ? classes.active
+                          : ""
                       }`}
                     >
                       Maquina
                     </h2>
                   </div>
                   <div>
-                    <h2 onClick={()=>{dispatchCaja({type:'CLICK_BRUSHING'})}}
-                      className={`${!cajaState.cajaAbierta?classes.textDisabled:
-                        cajaState.servicios.brushing ? classes.active : ""
+                    <h2
+                      onClick={() => {
+                        dispatchCaja({ type: "CLICK_BRUSHING" });
+                      }}
+                      className={`${
+                        !cajaState.cajaAbierta
+                          ? classes.textDisabled
+                          : cajaState.servicios.brushing.active
+                          ? classes.active
+                          : ""
                       }`}
                     >
                       Brushing
                     </h2>
-                    <h2 onClick={()=>{dispatchCaja({type:'CLICK_DECOLORACION'})}}
-                      className={`${!cajaState.cajaAbierta?classes.textDisabled:
-                        cajaState.servicios.decoloracion ? classes.active : ""
+                    <h2
+                      onClick={() => {
+                        dispatchCaja({ type: "CLICK_DECOLORACION" });
+                      }}
+                      className={`${
+                        !cajaState.cajaAbierta
+                          ? classes.textDisabled
+                          : cajaState.servicios.decoloracion.active
+                          ? classes.active
+                          : ""
                       }`}
                     >
                       Decoloración
                     </h2>
-                    <h2 onClick={()=>{dispatchCaja({type:'CLICK_CLARITOS'})}}
-                      className={`${!cajaState.cajaAbierta?classes.textDisabled:
-                        cajaState.servicios.claritos ? classes.active : ""
+                    <h2
+                      onClick={() => {
+                        dispatchCaja({ type: "CLICK_CLARITOS" });
+                      }}
+                      className={`${
+                        !cajaState.cajaAbierta
+                          ? classes.textDisabled
+                          : cajaState.servicios.claritos.active
+                          ? classes.active
+                          : ""
                       }`}
                     >
                       Claritos
@@ -689,6 +501,7 @@ const AperturaCierre = () => {
               <div>
                 <div>
                   <label
+                    id="Efectivo"
                     className={`${
                       cajaState.cajaAbierta
                         ? classes.text
@@ -711,6 +524,7 @@ const AperturaCierre = () => {
                     id={11}
                     checked={cajaState.efectivo.value}
                     onChange={() => {
+                      resetChecks()
                       dispatchCaja({ type: "CLICK_EFECTIVO" });
                     }}
                   />
@@ -719,6 +533,7 @@ const AperturaCierre = () => {
               <div>
                 <div>
                   <label
+                    id="Debito"
                     className={`${
                       cajaState.cajaAbierta
                         ? classes.text
@@ -742,6 +557,7 @@ const AperturaCierre = () => {
                     id={12}
                     checked={cajaState.debito.value}
                     onChange={() => {
+                      resetChecks()
                       dispatchCaja({ type: "CLICK_DEBITO" });
                     }}
                   />
@@ -760,6 +576,7 @@ const AperturaCierre = () => {
               <div>
                 <div>
                   <label
+                    id="Cuponera"
                     className={`${
                       cajaState.cajaAbierta
                         ? classes.text
@@ -782,6 +599,7 @@ const AperturaCierre = () => {
                     id={13}
                     checked={cajaState.cuponera.value}
                     onChange={() => {
+                      resetChecks()
                       dispatchCaja({ type: "CLICK_CUPONERA" });
                     }}
                   />
@@ -811,12 +629,27 @@ const AperturaCierre = () => {
                   input={INPUTS[8]}
                 />
               </div>
+              <SimpleButton disabled={!cajaState.cajaAbierta} type="submit">
+                Cobrar
+              </SimpleButton>
             </div>
           </div>
-        </div>
+        </form>
       </div>
     </>
   );
+};
+
+const resetChecks = () => {
+  const efectivo = document.getElementById("Efectivo");
+  if (efectivo.classList[1] !== undefined)
+    efectivo.classList.remove(efectivo.classList[1]);
+  const debito = document.getElementById("Debito");
+  if (debito.classList[1] !== undefined)
+    debito.classList.remove(debito.classList[1]);
+  const cuponera = document.getElementById("Cuponera");
+  if (cuponera.classList[1] !== undefined)
+    cuponera.classList.remove(cuponera.classList[1]);
 };
 
 export default AperturaCierre;

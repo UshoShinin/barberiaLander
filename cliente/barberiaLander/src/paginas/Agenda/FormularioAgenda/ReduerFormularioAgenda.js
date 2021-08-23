@@ -1,4 +1,4 @@
-import { getElementById } from "../../../components/Calendario/FuncionesAuxiliares";
+import { getElementById } from "../../../FuncionesAuxiliares/FuncionesAuxiliares";
 
 const noManeja = [
   { id: 6, idEmpleados: [{ id: "50098037" }, { id: "48279578" }] },
@@ -94,7 +94,7 @@ export const inputReducer = (state, action) => {
           value: action.value,
           dia: action.dia,
         },
-        Employee:{value:state.Employee.value,active:false}
+        Employee: { value: state.Employee.value, active: false },
       };
     case "HORARIOS_CLICK":
       return {
@@ -116,66 +116,80 @@ export const inputReducer = (state, action) => {
     case "CHANGE_EMPLOYEE":
       return {
         ...state,
-        Employee: { value: action.value,active:false },
+        Employee: { value: action.value, active: false },
         Calendario: { value: null },
         ComboBox: { value: null, active: false },
       };
     case "CLICK_EMPLOYEE":
       return {
         ...state,
-        Employee: { value:state.Employee.value,active:!state.Employee.active},
+        Employee: {
+          value: state.Employee.value,
+          active: !state.Employee.active,
+        },
       };
     case "CHANGE_TIME":
       return { ...state, Time: { value: action.time } };
     case "CORTE":
       myState = {
         ...state,
-        corte: { active: !state.corte.active, id: state.corte.id },
+        servicios: {
+          ...state.servicios,
+          corte: { active: !state.servicios.corte.active, id: state.servicios.corte.id },
+        },
       };
       break;
     case "MAQUINA":
       myState = {
         ...state,
-        maquina: { active: !state.maquina.active, id: state.maquina.id },
+        servicios: {
+          ...state.servicios,
+          maquina: { active: !state.servicios.maquina.active, id: state.servicios.maquina.id },
+        },
       };
       break;
     case "BARBA":
       myState = {
         ...state,
-        barba: { active: !state.barba.active, id: state.barba.id },
+        servicios: {
+          ...state.servicios,
+          barba: { active: !state.servicios.barba.active, id: state.servicios.barba.id },
+        },
       };
       break;
     case "BRUSHING":
       myState = {
         ...state,
-        brushing: { active: !state.brushing.active, id: state.brushing.id },
+        servicios: {
+          ...state.servicios,
+          brushing: { active: !state.servicios.brushing.active, id: state.servicios.brushing.id },
+        },
       };
       break;
     case "DECOLORACION":
       myState = {
         ...state,
-        decoloracion: {
-          active: !state.decoloracion.active,
-          id: state.decoloracion.id,
+        servicios: {
+          ...state.servicios,
+          decoloracion: {
+            active: !state.servicios.decoloracion.active,
+            id: state.servicios.decoloracion.id,
+          },
         },
       };
       break;
     case "CLARITOS":
       myState = {
         ...state,
-        claritos: { active: !state.claritos.active, id: state.claritos.id },
+        servicios: {
+          ...state.servicios,
+          claritos: { active: !state.servicios.claritos.active, id: state.servicios.claritos.id },
+        },
       };
       break;
   }
   if (myState !== null) {
-    const servicios = Object.values({
-      corte: myState.corte,
-      maquina: myState.maquina,
-      barba: myState.barba,
-      brushing: myState.brushing,
-      decoloracion: myState.decoloracion,
-      claritos: myState.claritos,
-    });
+    const servicios = Object.values(myState.servicios);
     let horariosAuxiliares = [...myState.Horarios];
     servicios.forEach((s) => {
       if (s.active) {
@@ -198,7 +212,7 @@ export const inputReducer = (state, action) => {
         title: " ",
       },
       HorariosFiltrados: [...horariosAuxiliares],
-      Employee: { value: horariosAuxiliares[0].id ,active:false},
+      Employee: { value: horariosAuxiliares[0].id, active: false },
     };
   }
   return myState;

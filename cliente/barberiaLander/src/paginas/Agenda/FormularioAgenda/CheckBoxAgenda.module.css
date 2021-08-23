@@ -3,7 +3,7 @@
   margin-bottom: 0em;
 }
 
-.label>label {
+.label > label {
   color: var(--clr-neon-white);
   font-size: 1.45em;
 }
@@ -19,9 +19,9 @@
 }
 .opciones {
   display: grid;
-  grid-template-columns: repeat(4,1fr);
-  grid-column-gap:10px;
-  grid-row-gap:12px
+  grid-template-columns: repeat(4, 1fr);
+  grid-column-gap: 10px;
+  grid-row-gap: 12px;
 }
 .label {
   align-items: center;
@@ -39,3 +39,12 @@
     width: 20%;
   }
 } */
+
+.information {
+  display: grid;
+  grid-template-columns: 50% 50%;
+}
+
+.information > p {
+  text-align: center;
+}

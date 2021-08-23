@@ -124,7 +124,7 @@ const eliminarHorario = async (idHorario) => {
     const deleteHorario = await pool
       .request()
       .input("idHorario", sql.Int, idHorario)
-      .query("delete from Agenda where IdHorario = @idHorario");
+      .query("delete from Horario where IdHorario = @idHorario");
     //Separo la cantidad de filas afectadas
     const filasAfectadas = deleteHorario.rowsAffected;
     //Devuelvo la cantidad de filas afectadas

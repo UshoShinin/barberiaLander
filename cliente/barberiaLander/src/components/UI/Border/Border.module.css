@@ -21,4 +21,15 @@
     ;
 }
 
+.invalid,
+.invalid:hover {
+  border: 2px var(--clr-neon-white) solid;
+  box-shadow: 
+    0 0 0.4em 0 var(--clr-neon-red),
+    inset 0 0 0.4em 0 var(--clr-neon-red),
+    0 0 0.7em 0 var(--clr-neon-red),
+    inset 0 0 0.7em 0 var(--clr-neon-red)
+    ;
+    transition: color 180ms linear, border 200ms linear, box-shadow 220ms linear;
+}
 

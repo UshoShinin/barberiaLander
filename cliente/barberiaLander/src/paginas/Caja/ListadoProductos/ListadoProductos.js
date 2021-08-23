@@ -1,10 +1,13 @@
 import classes from "./ListadoProductos.module.css";
-import { getElementById } from "../../../components/Calendario/FuncionesAuxiliares";
+import { getElementById } from "../../../FuncionesAuxiliares/FuncionesAuxiliares";
 const ListadoProductos = (props) => {
+  
   let lista = [...props.seleccionados];
   const content = props.productos.map((p) => {
+    
+    const disabled = props.disabled||p.stock<1;
     let pertenece = false;
-    if (!props.disabled) {
+    if (!disabled) {
       if (getElementById(lista, p.id) !== null) {
         pertenece = true;
         lista.shift();
@@ -13,9 +16,9 @@ const ListadoProductos = (props) => {
     return (
       <li
         key={p.id}
-        className={`${pertenece ? classes.active : ""}`}
+        className={`${disabled?classes.liDisabled:pertenece ? classes.active : ''}`}
         onClick={
-          !props.disabled
+          !disabled
             ? () => {
                 props.onClick(p);
               }
@@ -23,7 +26,7 @@ const ListadoProductos = (props) => {
         }
       >
         {p.nombre}{" "}
-        {`${p.count !== undefined && p.count > 1 ? "X" + p.count : ""}`}
+        {`${p.stock !== undefined && p.stock > 1 ? " X " + p.stock : ""}`}
       </li>
     );
   });

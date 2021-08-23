@@ -17,13 +17,15 @@ const CrearAgenda = (props) => {
     Referencia: { value: "" },
     Calendario: { value: null, dia: null },
     ComboBox: { value: null, active: false, title: "" },
-    Employee: { value: null,active:false },
-    corte: { active: false, id: 1 },
-    barba: { active: false, id: 4 },
-    maquina: { active: false, id: 5 },
-    claritos: { active: false, id: 6 },
-    decoloracion: { active: false, id: 7 },
-    brushing: { active: false, id: 8 },
+    Employee: { value: null, active: false },
+    servicios: {
+      corte: { active: false, id: 1 },
+      barba: { active: false, id: 4 },
+      maquina: { active: false, id: 5 },
+      claritos: { active: false, id: 6 },
+      decoloracion: { active: false, id: 7 },
+      brushing: { active: false, id: 8 }
+    },
   });
   const {
     isLoadingModificar,
@@ -73,12 +75,14 @@ const CrearAgenda = (props) => {
   return (
     <div className="nuevaAgenda">
       <NormalCard>
-        {initialState.Horarios===null&&<LoaddingSpinner/>}
-        {initialState.Horarios!==null&&<FormularioAgenda
-          onSaveDatosAgenda={guardarDatosAgendaHandler}
-          agenda={null}
-          initialState={initialState}
-        />}
+        {initialState.Horarios === null && <LoaddingSpinner />}
+        {initialState.Horarios !== null && (
+          <FormularioAgenda
+            onSaveDatosAgenda={guardarDatosAgendaHandler}
+            agenda={null}
+            initialState={initialState}
+          />
+        )}
       </NormalCard>
     </div>
   );

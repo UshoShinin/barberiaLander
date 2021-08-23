@@ -2,7 +2,7 @@ import classes from "./Fotos.module.css";
 import ComboBox from "./../../components/ComboBox/ComboBox";
 import { useReducer } from "react"; 
 import { CSSTransition } from "react-transition-group";
-import { getElementById } from "./FuncionesAuxiliares";
+import { getElementById } from "../../FuncionesAuxiliares/FuncionesAuxiliares";
 const Fotos = (props) => {
   const initialState = {
     Actual: { value: props.fotos[0].foto, mostrar: true },

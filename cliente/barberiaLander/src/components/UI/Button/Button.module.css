@@ -1,3 +1,17 @@
+.disabled {
+  cursor: default !important;
+  color: var(--clr-inActive);
+  border: var(--clr-inActive) 0.125em solid;
+}
+
+.button{
+  color: var(--clr-neon-blue);
+  border: var(--clr-neon-blue) 0.125em solid;  
+  text-shadow: 0 0 0.18em hsl(240 100% 78%/0.3), 0 0 0.45em var(--clr-neon-blue);
+  box-shadow: inset 0 0 0.8em 0 var(--clr-neon-blue),
+                0 0 0.8em 0 var(--clr-neon-blue);
+}
+.disabled,
 .button {
   font-size: 1rem;
   font-family: 'Staatliches';
@@ -5,14 +19,9 @@
   display: inline-block;
   cursor: pointer;
   text-decoration: none;
-  color: var(--clr-neon-blue);
-  border: var(--clr-neon-blue) 0.125em solid;
   border-radius: 0.25em;
   padding: 0.25em 1em;
   background-color: transparent;
-  text-shadow: 0 0 0.18em hsl(240 100% 78%/0.3), 0 0 0.45em var(--clr-neon-blue);
-  box-shadow: inset 0 0 0.8em 0 var(--clr-neon-blue),
-                0 0 0.8em 0 var(--clr-neon-blue);
   position: relative;
   margin-bottom: 1.4em;
   transition: background-color 100ms linear, color 100ms linear,
@@ -34,7 +43,8 @@
   transition: opacity 110ms linear;
 }
 
-.button::after {
+.button::after,
+.disabled::after {
   content: "";
   position: absolute;
   inset:0;

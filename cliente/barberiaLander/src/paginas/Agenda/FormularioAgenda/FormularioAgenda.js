@@ -8,8 +8,8 @@ import Calendario from "../../../components/Calendario/Calendario";
 
 import CheckBoxAgenda from "./CheckBoxAgenda";
 import { DaysGenerator } from "../../../components/Calendario/Dias/GeneradorDias";
+import { getElementById } from "../../../FuncionesAuxiliares/FuncionesAuxiliares";
 import {
-  getElementById,
   transformStringNumber,
   horarioEnMinutos,
   minutosAHorarios,
@@ -93,12 +93,13 @@ const FormularioAgenda = (props) => {
   const submitHandler = (event) => {
     event.preventDefault();
     let services = [];
-    Object.values(inputState).forEach((serv) => {
+    console.log(inputState);
+    /* Object.values(inputState).forEach((serv) => {
       if (serv.active) {
         services.push(serv.id);
       }
-    });
-    if (services.length === 0) {
+    }); */
+    /* if (services.length === 0) {
       const combo = document.getElementById("timeLeft");
       combo.className = `${combo.className} ${classes.invalidCombo}`;
       combo.focus();
@@ -164,8 +165,8 @@ const FormularioAgenda = (props) => {
           },
         };
       }
-      props.onSaveDatosAgenda(datosAgenda);
-    }
+      props.onSaveDatosAgenda(datosAgenda); 
+    }*/
   };
 
   let diasMostrar;
@@ -183,7 +184,7 @@ const FormularioAgenda = (props) => {
   ) {
     tiempoNecesario = calcularTiempo(
       inputState.Employee.value,
-      inputState,
+      inputState.servicios,
       inputState.HorariosFiltrados
     );
     diasMostrar = DaysGenerator(
@@ -332,10 +333,10 @@ const FormularioAgenda = (props) => {
         <div className={classes.nuevaAgenda}>
           <div className={classes.Inputs}>
             <CheckBoxAgenda
-              state={inputState}
+              servicios={inputState.servicios}
               time={calcularTiempo(
                 inputState.Employee.value,
-                inputState,
+                inputState.servicios,
                 inputState.HorariosFiltrados
               )}
               myAction={(action) => {
@@ -400,27 +401,25 @@ const FormularioAgenda = (props) => {
 export default FormularioAgenda;
 
 //Esto hay que borrarlo cuando tengamos en el backend esta info
-const calcularTiempo = (id, serv, horariosState) => {
-  console.log(id, serv, horariosState); 
+const calcularTiempo = (id, servicios, horariosState) => {
+  const duracionEmpleado = getElementById(horariosState,id).duracion.map((dura)=>{return{id:dura.idServicio,duracion:dura.duracion}});
+  const servicesList = Object.values(servicios);  
+  console.log(servicesList);
   let total = 0;
-
-  if (horariosState !== null) {
-    if (id === horariosState[0].id) {
-      if (serv.corte.active) total += 30;
-      if (serv.maquina.active) total += 20;
-      if (serv.barba.active) total += 15;
-      if (serv.brushing.active) total += 30;
-      if (serv.decoloracion.active) total += 15;
-      if (serv.claritos.active) total += 15;
-    } else {
-      if (serv.corte.active) total += 60;
-      if (serv.maquina.active) total += 40;
-      if (serv.barba.active) total += 30;
-      if (serv.brushing.active) total += 60;
-      if (serv.decoloracion.active) total += 30;
-      if (serv.claritos.active) total += 30;
+  let ignorar;
+  servicesList.forEach((ser)=>{
+    if(ser.active&&ser.id!==ignorar){
+      if(ser.id===1&&servicesList[1].active){
+        ignorar=servicesList[1].id;
+        total+=getElementById(duracionEmpleado,2).duracion;
+      }else if(ser.id===4&&servicesList[2].active){
+        ignorar=servicesList[2].id;
+        total+=(getElementById(duracionEmpleado,3).duracion);
+      }else{
+        total+=getElementById(duracionEmpleado,ser.id).duracion;
+      }
     }
-  }
-
-  return total;
+  });
+  return total*15;
 };
+

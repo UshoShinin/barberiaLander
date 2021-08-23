@@ -22,21 +22,34 @@
 
 .productos > li {
   color: var(--clr-neon-white);
+  cursor: pointer;
 }
 
-.disabled > li {
-  color: var(--clr-inActive);
+.disabled > li,
+.liDisabled {
+  color: var(--clr-inActive) !important;
+  cursor: default !important;
+}
+.liDisabled:hover{
+  background-color: transparent!important;
+  color: var(--clr-inActive)!important;
 }
 .productos > li,
-.disabled > li {
+.disabled > li,
+.liDisabled {
   font-size: 1.2em;
   padding: 0.2em 0;
-  background-color: var(--clr-background);
+  background-color: transparent;
   transition: all 200ms linear;
+}
+
+.productos > li:hover{
+  background-color: var(--clr-neon-placeholder);
+  color:var(--clr-background);
 }
 
 .active,
 .active:hover {
   background-color: var(--clr-neon-white) !important;
-  color: var(--clr-background) !important;
+  color:var(--clr-background) !important;
 }
