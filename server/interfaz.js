@@ -731,7 +731,7 @@ const getListadoAgendasAceptadas = async () => {
     const agendas = await pool
       .request()
       .query(
-        "select A.IdAgenda as id, A.NombreCliente as title, H.Fecha as fecha, H.Cedula as empleado from Agenda A, Horario H where A.Aceptada = 1 and H.IdHorario = A.IdHorario"
+        "select A.IdAgenda as id, A.NombreCliente as title, H.Fecha as fecha, H.Cedula as empleado, A.IdHorario as idHorario from Agenda A, Horario H where A.Aceptada = 1 and H.IdHorario = A.IdHorario"
       );
     //Separo los datos de la consulta
     const listadoAgendas = agendas.recordset;
