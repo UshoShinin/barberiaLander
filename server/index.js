@@ -111,6 +111,17 @@ app.post("/entradaCaja", (req, res) => {
   });
 });
 
+app.post("/registroCliente", (req, res) => {
+  const ret = interfaz.registrarCliente(req.body);
+  ret.then((resultado) => {
+    res.json({
+      mensaje: resultado,
+    });
+  });
+});
+
+
+
 //No escribir nada por debajo de esto
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);

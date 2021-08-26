@@ -1065,6 +1065,32 @@ const eliminarServicioAgendaPorIdAgenda = async (idAgenda) => {
   }
 };
 
+//Metodo para crear un usuario nuevo
+const registrarCliente = async (nuevoCliente) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el insert en la tabla cliente
+    const insertCliente = await pool
+      .request()
+      .input("ciUsuario", sql.Int, nuevoCliente.ciUsuario)
+      .input("nombre", sql.Int, nuevoCliente.nombre)
+      .input("apellido", sql.Int, nuevoCliente.apellido)
+      .input("telefono", sql.Int, nuevoCliente.telefono)
+      .input("contra", sql.Int, nuevoCliente.contra)
+      .query(
+        "insert into Cliente (Cedula, Nombre, Contra, Tel) values (@ciUsuario, @nombre, @apellido, @contra, @telefono)"
+      );
+    if (insertCliente.rowsAffected === 1) {
+      return { seInserto: true, error: "" };
+    } else {
+      return { seInserto: false, error: "Algo paso que no pudimos" };
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 //Creo un objeto que voy a exportar para usarlo desde el index.js
 //Adentro voy a tener todos los metodos de llamar a la base
 const interfaz = {
@@ -1078,6 +1104,7 @@ const interfaz = {
   datosFormularioCaja,
   modificarAgenda,
   cancelarAgenda,
+  registrarCliente,
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar
