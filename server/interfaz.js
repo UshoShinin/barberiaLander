@@ -1068,6 +1068,24 @@ const eliminarServicioAgendaPorIdAgenda = async (idAgenda) => {
 //Metodo para crear un usuario nuevo
 const registrarCliente = async (nuevoCliente) => {
   try {
+    //Llamo al metodo que verifica de si el cliente existe o no
+    const resultado = existeCliente(nuevoCliente.ciUsuario)
+      .then((existe) => {
+        if (existe) {
+          return "El cliente ya existe";
+        } else {
+          return insertarCliente(nuevoCliente);
+        }
+      })
+      .then((resultadoFinal) => resultadoFinal);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo auxiliar para insertar un cliente en la tabla cliente
+const insertarCliente = async (nuevoCliente) => {
+  try {
     //Creo la conexion
     let pool = await sql.connect(conexion);
     //Junto el nombre y el apellido
@@ -1082,11 +1100,29 @@ const registrarCliente = async (nuevoCliente) => {
       .query(
         "insert into Cliente (Cedula, Nombre, Contra, Tel) values (@ciUsuario, @nombre, @contra, @telefono)"
       );
-    if (insertCliente.rowsAffected === 1) {
+    if (insertCliente.rowsAffected[0] === 1) {
       return { seInserto: true, error: "" };
     } else {
       return { seInserto: false, error: "Algo paso que no pudimos" };
     }
+  } catch (error) {
+    console.log(error);
+  }
+};
+//Metodo auxiliar para verificar de si existe un cliente o no
+const existeCliente = async (ciCliente) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Busco si existe el cliente
+    const cliente = await pool
+      .request()
+      .input("ciUsuario", sql.VarChar, ciCliente)
+      .query("select Cedula from Cliente where Cedula = @ciUsuario");
+    if (cliente.recordset[0].Cedula === ciCliente) {
+      return true;
+    }
+    return false;
   } catch (error) {
     console.log(error);
   }
@@ -1108,9 +1144,12 @@ const getEmpleadoParaLogin = async (empleado) => {
     //Hago el insert en la tabla cliente
     const empleado = await pool
       .request()
-      .input("ciUsuario", sql.Int, nuevoCliente.ciUsuario)
-      .input("contra", sql.Int, nuevoCliente.contra)
-      .query("select E.Cedula, E.Nombre, ");
+      .input("ciUsuario", sql.VarChar, nuevoCliente.ciUsuario)
+      .input("contra", sql.VarChar, nuevoCliente.contra)
+      .query(
+        "select E.Cedula as ciUsuario, E.Nombre as nombre, R.Nombre as rol from Empleado E, Rol R, Empleado_Rol RE where RE.IdRol = R.IdRol and E.Cedula = RE.Cedula and E.Cedula = @ciUsuario and E.Contra = @contra"
+      );
+    return empleado.recordset;
   } catch (error) {
     console.log(error);
   }
