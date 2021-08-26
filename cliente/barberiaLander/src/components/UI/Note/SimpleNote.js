@@ -2,7 +2,6 @@ import CSSTransition from "react-transition-group/CSSTransition";
 import SimpleButton from "../SimpleButton/SimpleButton";
 import classes from "./SimpleNote.module.css";
 const SimpleNote = (props) => {
-    console.log(props.show);
   return (
     <CSSTransition
       mountOnEnter
@@ -17,8 +16,11 @@ const SimpleNote = (props) => {
       }}
     >
       <div className={classes.Note}>
-          <SimpleButton color='red'>X</SimpleButton>
-        <p>{props.children}</p>
+        <h3>{props.children}</h3>
+        <div>
+            <div><SimpleButton action={props.aceptar}>Si</SimpleButton></div>
+            <div><SimpleButton action={props.rechazar} color="red">No</SimpleButton></div>          
+        </div>
       </div>
     </CSSTransition>
   );

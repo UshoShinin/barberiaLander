@@ -17,6 +17,7 @@ import { resetAgendaProductos } from "./AuxiliaresCaja/reseteos";
 import { initialState, cajaReducer } from "./ReducerCaja";
 import useHttp from "../../hooks/useHttp";
 import inputs from "./AuxiliaresCaja/inputs";
+import { getElementById } from "../../FuncionesAuxiliares/FuncionesAuxiliares";
 
 const AperturaCierre = () => {
   const [cajaState, dispatchCaja] = useReducer(cajaReducer, initialState);
@@ -35,12 +36,19 @@ const AperturaCierre = () => {
 
   const salidaSubmitHandler = (e) => {
     e.preventDefault();
-    const data = {
-      monto: cajaState.montoSalida.value,
-      descripcion: cajaState.descripcionSalida.value,
-      empleados: cajaState.comboSalida,
-    };
-    console.log(data);
+    if (!cajaState.montoSalida.isValid) {
+      montoSalida.current.focus();
+    } else if (cajaState.comboSalida.value === null) {
+      const comboSalida = document.getElementById('comboSalida');
+      comboSalida.className=`${comboSalida.className} ${classes.invalid}`;
+    } else {
+      const data = {
+        monto: cajaState.montoSalida.value,
+        descripcion: cajaState.descripcionSalida.value,
+        empleado: cajaState.comboSalida.value,
+      };
+      console.log(data);
+    }
   };
   const obtenerAgendas = (mensaje) => {
     dispatchCaja({ type: "CARGA_DE_DATOS", payload: mensaje.mensaje });
@@ -56,7 +64,7 @@ const AperturaCierre = () => {
   };
   const submitHandler = (e) => {
     e.preventDefault();
-    /* let agenda;
+    let agenda;
     let productos;
     if (cajaState.comboAgenda.value === null) {
       agenda = document.getElementById("Agenda");
@@ -102,17 +110,8 @@ const AperturaCierre = () => {
       cuponera.className = `${cuponera.className} ${classes.invalid}`;
     } else if (!cajaState.montoTotal.isValid) montoTotal.current.focus();
     else {
-      cobrarCaja(
-        {
-          url: "/entradaCaja",
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: cajaState,
-        },
-        getRespuesta
-        );
-      } */
       dispatchCaja({ type: "SHOW_JORNAL" });
+    }
   };
 
   const {
@@ -125,9 +124,6 @@ const AperturaCierre = () => {
     fetchAgendas({ url: "/datosFormularioCaja" }, obtenerAgendas);
   }, []);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-  };
   return (
     <>
       <Modal
@@ -146,12 +142,15 @@ const AperturaCierre = () => {
               input={INPUTS[9]}
             />
           </div>
+          <label id="comboSalida" className={classes.text}>Empleado</label>
           <div style={{ height: "40px" }}>
             <ComboBox
               opciones={cajaState.Empleados}
               current={cajaState.comboSalida.value}
               active={cajaState.comboSalida.active}
               onClick={() => {
+                const comboSalida = document.getElementById('comboSalida');
+                if(comboSalida.classList[1]!==undefined) comboSalida.classList.remove(comboSalida.classList[1]);
                 dispatchCaja({ type: "CLICK_COMBO_SALIDA" });
               }}
               onChange={(id) => {
@@ -168,15 +167,58 @@ const AperturaCierre = () => {
         </form>
       </Modal>
       <div className={classes.container}>
-        <SimpleNote show={cajaState.jornal.show} close={()=>{dispatchCaja({type:'HIDE_JORNAL'})}}>¿Está seguro?</SimpleNote>
+        <SimpleNote
+          show={cajaState.jornal.show}
+          aceptar={() => {
+            dispatchCaja({ type: "HIDE_JORNAL" });
+            console.log("Aceptar");
+            const montoE = cajaState.montoEfectivo.value.length>0?cajaState.montoEfectivo.value:0;
+            const montoD = cajaState.montoDebito.value.length>0?cajaState.montoDebito.value:0;
+            const montoC = cajaState.montoCuponera.value.length>0?cajaState.montoCuponera.value:0;
+            const productosVendidos = cajaState.productosAgregados.map((p)=>{
+              return {idProducto:p.id,cantidad:p.stock};
+            })
+            const servicios = Object.values(cajaState.servicios).filter((s)=>s.active);
+            console.log(cajaState.sinAgendar.value);
+            const agenda = getElementById(cajaState.agendas,cajaState.comboAgenda.value);
+            console.log(agenda);
+            const datosEnviar={
+              idCaja:cajaState.idCaja,
+              fecha:cajaState.fecha,
+              ciEmpleado:cajaState.sinAgendar.value?cajaState.comboAgenda.value:agenda.empleado,
+              montoTotal:cajaState.montoTotal.value,
+              montoEfectivo:montoE,
+              montoDebito:montoD,
+              montoCuponera:montoC,
+              productosVendidos,
+              servicios
+            }
+            console.log(datosEnviar);
+            /* cobrarCaja(
+              {
+                url: "/entradaCaja",
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: cajaState,
+              },
+              getRespuesta
+            ); */
+          }}
+          rechazar={() => {
+            dispatchCaja({ type: "HIDE_JORNAL" });
+            console.log("Rechazar");
+          }}
+        >
+          ¿Está seguro?
+        </SimpleNote>
         <form className={classes.caja} onSubmit={submitHandler}>
           <Border
-            disabled={!cajaState.cajaAbierta}
+            /* disabled={cajaState.cajaAbierta} */
             className={`${classes.cajaContainer} ${classes.abrirCerrar}`}
           >
             <label
               className={`${
-                cajaState.cajaAbierta ? classes.text : classes.textDisabled
+                !cajaState.cajaAbierta ? classes.text : classes.textDisabled
               }`}
             >
               Monto Inicial

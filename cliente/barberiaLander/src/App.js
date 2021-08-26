@@ -15,6 +15,7 @@ import MovimientoCaja from "./paginas/Caja/MovimientoCaja";
 import CrearAgenda from "./paginas/Agenda/CrearAgenda";
 import PreAgendas from "./paginas/Agenda/PreAgendas/PreAgendas";
 import VisualAgendas from "./paginas/Agenda/VisualAgendas/VisualAgendas";
+import Registro from "./paginas/Registro/Registro";
 import NoEncontrado from "./paginas/NoEncontrado";
 import Navbar from "./components/Navbar";
 import React from "react";
@@ -24,6 +25,7 @@ import {
   Redirect,
   Switch,
 } from "react-router-dom";
+import { register } from "react-scroll/modules/mixins/scroller";
 const App = () => {
   //DEJO ACA LO QUE IRIAMOS A USAR PARA CUANDO CONTROLEMOS A DONDE TIENE QUE IR EL USUARIO
   //ESTO POR AHORA QUEDA NADA MAS, CUANDO ACOMODEMOS LAS COSAS PARA QUE QUEDEN PROLIJAS HAY QUE PONER EL IMPORT DONDE TIENE QUE IR
@@ -66,6 +68,9 @@ const App = () => {
             </Route>
             <Route path="/agenda/preagendas" exact>
               <PreAgendas />
+            </Route>
+            <Route path="/registro" exact>
+              <Registro/>
             </Route>
             <Route path="/cuponeras" exact>
               <Cuponeras />

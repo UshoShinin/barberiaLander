@@ -106,7 +106,9 @@ app.post("/entradaCaja", (req, res) => {
   //     mensaje: resultado,
   //   });
   // });
-  return req.body;
+  res.json({
+    mensaje: req.body,
+  });
 });
 
 //No escribir nada por debajo de esto

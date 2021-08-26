@@ -6,12 +6,13 @@ import { formatDate } from "../../FuncionesAuxiliares/FuncionesAuxiliares";
 import { resetAgendaProductos } from "./AuxiliaresCaja/reseteos";
 const today = new Date();
 export const initialState = {
-  idCaja: new Date(),
+  idCaja: 1,
+  fecha:new Date(),
   cajaAbierta: false,
   desc: "AbrirCaja",
   montoInicial: { value: "", isValid: null },
-  jornal: { value: "", show: false },
   comboAgenda: { value: null, active: false },
+  jornal: { value: "", show: false },
   sinAgendar: { value: false },
   soloHoy: { value: false },
   montoAgenda: { value: "", isValid: null },
@@ -199,13 +200,23 @@ export const cajaReducer = (state, action) => {
         listaBase = [...state.agendas];
         posicion = null;
       }
-      console.log(posicion);
+      total = parseInt(state.montoTotalProd.value, 10);
+      if(total===0){
+        total='';
+        validoTotal=null;
+      }else{
+        total=String(total);
+        validoTotal=validarMonto(total);
+      }
       return {
         ...state,
         sinAgendar: { value: nuevoEstado },
         soloHoy: { value: false },
         comboAgenda: { value: posicion, active: false },
         propinaAgenda: { value: "", isValid: null },
+        servicios:{...initialState.servicios},
+        montoAgenda:{value:'',isValid:null},
+
       };
     case "CLICK_S_H":
       nuevoEstado = !state.soloHoy.value;
@@ -258,6 +269,7 @@ export const cajaReducer = (state, action) => {
         },
       };
     case "CHANGE_COMBO_AGENDA":
+      mAgenda=0;
       let baseServicios = {
         corte: { active: false, id: 1 },
         barba: { active: false, id: 4 },
@@ -266,46 +278,62 @@ export const cajaReducer = (state, action) => {
         decoloracion: { active: false, id: 7 },
         brushing: { active: false, id: 8 },
       };
-      getElementById(state.agendas, action.value).servicios.forEach((s) => {
-        switch (s) {
-          case 1:
-            baseServicios.corte.active = true;
-            break;
-          case 4:
-            baseServicios.barba.active = true;
-            break;
-          case 5:
-            baseServicios.maquina.active = true;
-            break;
-          case 6:
-            baseServicios.claritos.active = true;
-            break;
-          case 7:
-            baseServicios.decoloracion.active = true;
-            break;
-          case 8:
-            baseServicios.brushing.active = true;
-            break;
-        }
-      });
-      mAgenda = calcularPrecio(baseServicios);
+      if(!state.sinAgendar.value){
+        getElementById(state.agendas, action.value).servicios.forEach((s) => {
+          switch (s) {
+            case 1:
+              baseServicios.corte.active = true;
+              break;
+            case 4:
+              baseServicios.barba.active = true;
+              break;
+            case 5:
+              baseServicios.maquina.active = true;
+              break;
+            case 6:
+              baseServicios.claritos.active = true;
+              break;
+            case 7:
+              baseServicios.decoloracion.active = true;
+              break;
+            case 8:
+              baseServicios.brushing.active = true;
+              break;
+          }
+        });
+        mAgenda = calcularPrecio(baseServicios);
+      }
       mPropina =
-        state.propinaAgenda.value.length > 0
-          ? parseInt(state.propinaAgenda.value, 10)
-          : 0;
+      state.propinaAgenda.value.length > 0
+      ? parseInt(state.propinaAgenda.value, 10)
+      : 0;
       mProducto =
-        state.montoTotalProd.value.length > 0
-          ? parseInt(state.montoTotalProd.value, 10)
-          : 0;
+      state.montoTotalProd.value.length > 0
+      ? parseInt(state.montoTotalProd.value, 10)
+      : 0;
       total = mProducto + mAgenda + mPropina;
+      if(total===0){
+        total='';
+        validoTotal = null;
+      }else{
+        total = String(total);
+        validoTotal = validarMonto(total);
+      }
+      if(mAgenda===0){
+        mAgenda='';
+        valido = null;
+      }else{
+        mAgenda = String(mAgenda);
+        valido = validarMonto(mAgenda);
+      }
       return {
         ...state,
         comboAgenda: { value: action.value, active: false },
         servicios: { ...baseServicios },
-        montoAgenda: { value: String(mAgenda), isValid: true },
+        montoAgenda: { value: mAgenda, isValid: valido },
         montoTotal: {
-          value: String(total),
-          isValid: validarMonto(String(total)),
+          value: total,
+          isValid: validoTotal,
         },
       };
     case "CLICK_COMBO_SALIDA":

@@ -5,7 +5,7 @@ const inputs = (cajaState,dispatchCaja) => {
       type: "number",
       value: cajaState.montoInicial.value,
       placeholder: "0",
-      disabled: !cajaState.cajaAbierta,
+      disabled: cajaState.cajaAbierta,
       onChange: (event) => {
         dispatchCaja({
           type: "USER_INPUT_MONTO_I",

@@ -44,10 +44,15 @@
       transform: translateX(100%);
     }
   }
-  
-  .Note>button{
-      position: absolute;
-      right: 10px;
-      top:10px;
-      border-radius:50% ;
-  }
+
+.Note>h3{
+    margin-bottom: 4px;
+}
+.Note>div{
+    display: grid;
+    width: 100%;
+    grid-template-columns: 50% 50%;
+}
+.Note >div >div{
+    text-align: center;
+}

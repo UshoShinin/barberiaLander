@@ -48,6 +48,23 @@
   box-sizing: border-box;
 }
 
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  background-color: var( --clr-background);
+  border: var(--clr-inActive) 0.125em solid;
+  border-radius: 0.25em;
+  -webkit-text-fill-color: var(--clr-inActive);
+  -webkit-box-shadow: var( --clr-background);
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 .fill-window {
   height: 100%;
   position: absolute;
