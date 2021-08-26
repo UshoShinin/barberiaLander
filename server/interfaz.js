@@ -1078,6 +1078,7 @@ const registrarCliente = async (nuevoCliente) => {
         }
       })
       .then((resultadoFinal) => resultadoFinal);
+      return resultado;
   } catch (error) {
     console.log(error);
   }
