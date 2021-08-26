@@ -1070,22 +1070,47 @@ const registrarCliente = async (nuevoCliente) => {
   try {
     //Creo la conexion
     let pool = await sql.connect(conexion);
+    //Junto el nombre y el apellido
+    let nombreApellido = nuevoCliente.nombre + " " + nuevoCliente.apellido;
     //Hago el insert en la tabla cliente
     const insertCliente = await pool
       .request()
-      .input("ciUsuario", sql.Int, nuevoCliente.ciUsuario)
-      .input("nombre", sql.Int, nuevoCliente.nombre)
-      .input("apellido", sql.Int, nuevoCliente.apellido)
-      .input("telefono", sql.Int, nuevoCliente.telefono)
-      .input("contra", sql.Int, nuevoCliente.contra)
+      .input("ciUsuario", sql.VarChar, nuevoCliente.ciUsuario)
+      .input("nombre", sql.VarChar, nombreApellido)
+      .input("telefono", sql.VarChar, nuevoCliente.telefono)
+      .input("contra", sql.VarChar, nuevoCliente.contra)
       .query(
-        "insert into Cliente (Cedula, Nombre, Contra, Tel) values (@ciUsuario, @nombre, @apellido, @contra, @telefono)"
+        "insert into Cliente (Cedula, Nombre, Contra, Tel) values (@ciUsuario, @nombre, @contra, @telefono)"
       );
     if (insertCliente.rowsAffected === 1) {
       return { seInserto: true, error: "" };
     } else {
       return { seInserto: false, error: "Algo paso que no pudimos" };
     }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo para el login
+const login = async (usuario) => {
+  try {
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo auxiliar para ir a buscar un empleado por su cedula y contra
+const getEmpleadoParaLogin = async (empleado) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el insert en la tabla cliente
+    const empleado = await pool
+      .request()
+      .input("ciUsuario", sql.Int, nuevoCliente.ciUsuario)
+      .input("contra", sql.Int, nuevoCliente.contra)
+      .query("select E.Cedula, E.Nombre, ");
   } catch (error) {
     console.log(error);
   }
