@@ -7,6 +7,7 @@ import Marco from "../../components/UI/Marco/Marco";
 import Border from "../../components/UI/Border/Border";
 import NormalCard from "../../components/UI/Card/NormalCard";
 import Button from "../../components/UI/Button/Button";
+import useHttp from "../../hooks/useHttp";
 const Registro = (props) => {
   const refCi = useRef();
   const refNom = useRef();
@@ -17,7 +18,15 @@ const Registro = (props) => {
   const [registroState, dispatchRegistro] = useReducer(reducer, initialState);
   const INPUTS = inputs(registroState, dispatchRegistro);
 
-  
+  const {
+    isLoadingRegistro,
+    errorRegistro,
+    sendRequest: registrarse,
+  } = useHttp();
+
+  const getRespuesta = (res)=>{
+    console.log(res);
+  }
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -26,13 +35,27 @@ const Registro = (props) => {
     else if (!registroState.apellido.isValid) refApe.current.focus();
     else if (!registroState.telefono.isValid) refTel.current.focus();
     else if (!registroState.contra.isValid) refCon.current.focus();
-    else if (!registroState.contraR.isValid) refConR.current.focus()
-    else{
-      console.log('Registrado maquinola');
-    };
+    else if (!registroState.contraR.isValid) refConR.current.focus();
+    else {
+      const data = {
+        ciUsuario: registroState.ciUsuario.value,
+        nombre: registroState.nombre.value,
+        apellido: registroState.apellido.value,
+        telefono: registroState.telefono.value,
+        contra: registroState.contra.value
+      };
+      console.log("Registrado maquinola");
+      registrarse(
+        {
+          url: "/registroCliente",
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: data,
+        },
+        getRespuesta
+      );
+    }
   };
-
-  console.log(registroState);
   return (
     <Marco className={classes.alinear}>
       <form onSubmit={submitHandler}>
@@ -77,7 +100,9 @@ const Registro = (props) => {
                 input={INPUTS[5]}
               />
             </div>
-            {registroState.problema!==-1&&<p>{registroState.problemas[registroState.problema].pro}</p>}
+            {registroState.problema !== -1 && (
+              <p>{registroState.problemas[registroState.problema].pro}</p>
+            )}
             <Button type="submit">Registrarse</Button>
           </Border>
         </NormalCard>

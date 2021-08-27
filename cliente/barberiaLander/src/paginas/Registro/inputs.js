@@ -74,7 +74,7 @@ const inputs = (registerState,dispatchCaja) => {
       },
       {
         id: 5,
-        type: "text",
+        type: "password",
         value: registerState.contra.value,
         placeholder: "Contraseña",
         onChange: (event) => {
@@ -92,7 +92,7 @@ const inputs = (registerState,dispatchCaja) => {
       },
       {
         id: 6,
-        type: "text",
+        type: "password",
         value: registerState.contraR.value,
         placeholder: "Repetir",
         onChange: (event) => {

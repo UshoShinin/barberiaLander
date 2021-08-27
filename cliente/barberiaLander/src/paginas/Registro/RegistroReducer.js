@@ -73,7 +73,6 @@ const validarContraseña = (con) => {
 };
 
 export const reducer = (state, action) => {
-  let largo;
   let valido = false;
   let validoAux = false;
   let problemasAux;
@@ -269,7 +268,7 @@ export const reducer = (state, action) => {
         },
       };
     case "BLUR_CONT2":
-      valido = state.contraR.value === state.contra.value && state.contra.isValid;
+      valido = state.contraR.value === state.contra.value;
       problemasAux=state.problemas.filter((p)=>p.id!==6);
       if(!valido)problemasAux=[...problemasAux,{id:6,pro:'La contraseña y la repetición de contraseña deben coincidir'}]; 
       else problemasAux=[...problemasAux,{id:6,pro:''}];

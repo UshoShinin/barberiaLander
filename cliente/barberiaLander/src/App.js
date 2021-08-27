@@ -16,6 +16,7 @@ import CrearAgenda from "./paginas/Agenda/CrearAgenda";
 import PreAgendas from "./paginas/Agenda/PreAgendas/PreAgendas";
 import VisualAgendas from "./paginas/Agenda/VisualAgendas/VisualAgendas";
 import Registro from "./paginas/Registro/Registro";
+import Login from "./paginas/Login/Login";
 import NoEncontrado from "./paginas/NoEncontrado";
 import Navbar from "./components/Navbar";
 import React from "react";
@@ -71,6 +72,9 @@ const App = () => {
             </Route>
             <Route path="/registro" exact>
               <Registro/>
+            </Route>
+            <Route path="/login" exact>
+              <Login/>
             </Route>
             <Route path="/cuponeras" exact>
               <Cuponeras />

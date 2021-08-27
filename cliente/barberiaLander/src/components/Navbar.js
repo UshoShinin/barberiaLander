@@ -20,6 +20,7 @@ const Navbar = () => {
       <li><NavLink exact activeClassName="active"  to="/cuponeras" className="nav-item nav-link">Cuponeras</NavLink></li>
       <li><NavLink exact activeClassName="active"  to="/agenda/crearagenda" className="nav-item nav-link">Crear Agenda</NavLink></li>
       <li><NavLink exact activeClassName="active"  to="/registro" className="nav-item nav-link">Registro</NavLink>   </li>         
+      <li><NavLink exact activeClassName="active"  to="/login" className="nav-item nav-link">Login</NavLink>   </li>         
       {/* <li><NavLink exact activeClassName="active"  to="/caja/movimientocaja" className="nav-item nav-link">Movimiento de Caja</NavLink>    </li>  */}       
       <li><NavLink exact activeClassName="active"  to="/agenda/visualagendas" className="nav-item nav-link">Visualizar Agendas</NavLink>   </li>         
       <li><NavLink exact activeClassName="active"  to="/administracion" className="nav-item nav-link">Administracion</NavLink>           </li> 
