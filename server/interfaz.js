@@ -1142,7 +1142,7 @@ const login = async (usuario) => {
       })
       .then((cliente) => {
         if (cliente.rowsAffected[0] === 1) {
-          return {...cliente.recordset, rol:"Cliente"};
+          return {...cliente.recordset[0], rol:"Cliente"};
         } else {
           return { login: false, error: "Credenciales incorrectas" };
         }
