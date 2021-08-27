@@ -1142,7 +1142,7 @@ const login = async (usuario) => {
       })
       .then((cliente) => {
         if (cliente.rowsAffected[0] === 1) {
-          return cliente.recordset;
+          return {...cliente.recordset, rol:"Cliente"};
         } else {
           return { login: false, error: "Credenciales incorrectas" };
         }
@@ -1183,7 +1183,7 @@ const getClienteParaLogin = async (datosCliente) => {
       .input("ciUsuario", sql.VarChar, datosCliente.ciUsuario)
       .input("contra", sql.VarChar, datosCliente.contra)
       .query(
-        "select C.Cedula as ciUsuario, C.Nombre as nombre from Cliente C where C.Cedula = @ciUsuario and C.Contra = @contra"
+        "select C.Cedula as ciUsuario, C.Nombre as nombre, C.Tel as telefono from Cliente C where C.Cedula = @ciUsuario and C.Contra = @contra"
       );
     return cliente;
   } catch (error) {
