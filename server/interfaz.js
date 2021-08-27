@@ -1072,13 +1072,13 @@ const registrarCliente = async (nuevoCliente) => {
     const resultado = existeCliente(nuevoCliente.ciUsuario)
       .then((existe) => {
         if (existe) {
-          return "El cliente ya existe";
+          return { seInserto: false, error: "El cliente ya existe" };
         } else {
           return insertarCliente(nuevoCliente);
         }
       })
       .then((resultadoFinal) => resultadoFinal);
-      return resultado;
+    return resultado;
   } catch (error) {
     console.log(error);
   }
@@ -1132,25 +1132,60 @@ const existeCliente = async (ciCliente) => {
 //Metodo para el login
 const login = async (usuario) => {
   try {
+    const resultado = getEmpleadoParaLogin(usuario)
+      .then((resultado) => {
+        if (resultado.rowsAffected[0] === 1) {
+          return resultado.recordset;
+        } else {
+          return getClienteParaLogin(usuario);
+        }
+      })
+      .then((cliente) => {
+        if (cliente.rowsAffected[0] === 1) {
+          return cliente.recordset;
+        } else {
+          return { login: false, error: "Credenciales incorrectas" };
+        }
+      });
+    return resultado;
   } catch (error) {
     console.log(error);
   }
 };
 
 //Metodo auxiliar para ir a buscar un empleado por su cedula y contra
-const getEmpleadoParaLogin = async (empleado) => {
+const getEmpleadoParaLogin = async (datosEmpleado) => {
   try {
     //Creo la conexion
     let pool = await sql.connect(conexion);
-    //Hago el insert en la tabla cliente
+    //Hago el select de la tabla empleado
     const empleado = await pool
       .request()
-      .input("ciUsuario", sql.VarChar, nuevoCliente.ciUsuario)
-      .input("contra", sql.VarChar, nuevoCliente.contra)
+      .input("ciUsuario", sql.VarChar, datosEmpleado.ciUsuario)
+      .input("contra", sql.VarChar, datosEmpleado.contra)
       .query(
         "select E.Cedula as ciUsuario, E.Nombre as nombre, R.Nombre as rol from Empleado E, Rol R, Empleado_Rol RE where RE.IdRol = R.IdRol and E.Cedula = RE.Cedula and E.Cedula = @ciUsuario and E.Contra = @contra"
       );
-    return empleado.recordset;
+    return empleado;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo auxiliar para ir a buscar un cliente por su cedula y contra
+const getClienteParaLogin = async (datosCliente) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el select de la tabla cliente
+    const cliente = await pool
+      .request()
+      .input("ciUsuario", sql.VarChar, datosCliente.ciUsuario)
+      .input("contra", sql.VarChar, datosCliente.contra)
+      .query(
+        "select C.Cedula as ciUsuario, C.Nombre as nombre from Cliente C where C.Cedula = @ciUsuario and C.Contra = @contra"
+      );
+    return cliente;
   } catch (error) {
     console.log(error);
   }
@@ -1170,6 +1205,7 @@ const interfaz = {
   modificarAgenda,
   cancelarAgenda,
   registrarCliente,
+  login,
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar

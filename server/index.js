@@ -120,7 +120,14 @@ app.post("/registroCliente", (req, res) => {
   });
 });
 
-
+app.use("/login", (req, res) => {
+  let ret = interfaz.login(req.body);
+  ret.then((resultado) => {
+    res.json({
+      mensaje: resultado,
+    });
+  });
+});
 
 //No escribir nada por debajo de esto
 app.listen(PORT, () => {
