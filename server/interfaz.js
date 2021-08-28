@@ -227,7 +227,7 @@ const getEmpleadosFormulario = async () => {
     //Consigo los datos de los empleados
     const empleados = await pool
       .request()
-      .query("select Cedula, Nombre, Img from Empleado");
+      .query("select Cedula, Nombre, Img, HorarioEntrada, HorarioSalida from Empleado");
     //Creo el array de retorno
     let arrayRetorno = [];
     //Recorro el listado de empleados para armar el objeto como necesito
@@ -705,6 +705,7 @@ const crearSolicitudAgenda = async (agenda) => {
       });
     })
     .then((resAgenda) => {
+      //ACA TENGO QUE HACER EL INSERT EN LA TABLA AGENDA CLIENTE, PERO ANTES TENGO QUE VERIFICAR DE SI TIENE O NO UN CLIENTE REGISTRADO
       //El resultado de la promesa de insertarAgenda es un objeto con idHorario y idAgenda
       return insertarServicioAgenda({
         idAgenda: resAgenda.idAgenda,
@@ -1149,12 +1150,12 @@ const login = async (usuario) => {
         if (cliente.rowsAffected[0] === 1) {
           return {...cliente.recordset[0], rol:"Cliente"};
         } else {
-          return { login: false, error: "Credenciales incorrectas" };
+          return {codigo: 400, error: "Credenciales incorrectas"}
         }
       });
     return resultado;
   } catch (error) {
-    console.log(error);
+    console.log(error)
   }
 };
 
