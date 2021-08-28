@@ -4,12 +4,21 @@ import LoaddingSpinner from "../../../../components/LoaddingSpinner/LoaddingSpin
 import classes from "./Visualizador.module.css";
 import useHttp from "../../../../hooks/useHttp";
 import SimpleButton from "../../../../components/UI/SimpleButton/SimpleButton";
-import Border from '../../../../components/UI/Border/Border';
+import Border from "../../../../components/UI/Border/Border";
 import { Redirect, Route } from "react-router-dom";
 const Visualizador = React.memo((props) => {
   const { isLoading, error, sendRequest: getAgenda } = useHttp();
-  const [agenda, setAgenda] = useState({ IdAgenda: -1 });
-
+  const [agenda, setAgenda] = useState({
+    IdAgenda: -1,
+    servicios: {
+      corte: false,
+      barba: false,
+      maquina: false,
+      claritos: false,
+      decoloracion: false,
+      brushing: false,
+    },
+  });
 
   const obtenerAgenda = (respuesta) => {
     let servicios = {
@@ -46,7 +55,7 @@ const Visualizador = React.memo((props) => {
     const agendaObtenida = {
       ...respuesta.mensaje,
       fecha: respuesta.mensaje.fecha.slice(0, 10),
-      ...servicios,
+      servicios: { ...servicios },
     };
     setAgenda(agendaObtenida);
   };
@@ -56,13 +65,11 @@ const Visualizador = React.memo((props) => {
       getAgenda({ url: "/agendaPorId?idAgenda=" + props.id }, obtenerAgenda);
     }
   }, [props.id]);
-  const sendAgendas = () =>{
+  const sendAgendas = () => {
     props.mostrarAgenda(agenda);
-  }
+  };
   return (
     <>
-      {/* {isLoading && <LoaddingSpinner />}
-      {!isLoading && ( */}
       <Border className={classes.container}>
         <div>
           <div>
@@ -73,18 +80,30 @@ const Visualizador = React.memo((props) => {
             >
               Servicios
             </h1>
-            <h2 className={`${agenda.corte ? classes.active : ""}`}>Corte</h2>
-            <h2 className={`${agenda.barba ? classes.active : ""}`}>Barba</h2>
-            <h2 className={`${agenda.maquina ? classes.active : ""}`}>
+            <h2 className={`${agenda.servicios.corte ? classes.active : ""}`}>
+              Corte
+            </h2>
+            <h2 className={`${agenda.servicios.barba ? classes.active : ""}`}>
+              Barba
+            </h2>
+            <h2 className={`${agenda.servicios.maquina ? classes.active : ""}`}>
               Maquina
             </h2>
-            <h2 className={`${agenda.brushing ? classes.active : ""}`}>
+            <h2
+              className={`${agenda.servicios.brushing ? classes.active : ""}`}
+            >
               Brushing
             </h2>
-            <h2 className={`${agenda.decoloracion ? classes.active : ""}`}>
+            <h2
+              className={`${
+                agenda.servicios.decoloracion ? classes.active : ""
+              }`}
+            >
               Decoloración
             </h2>
-            <h2 className={`${agenda.claritos ? classes.active : ""}`}>
+            <h2
+              className={`${agenda.servicios.claritos ? classes.active : ""}`}
+            >
               Claritos
             </h2>
           </div>
@@ -212,7 +231,9 @@ const Visualizador = React.memo((props) => {
             />
           </div>
         </div>
-        <SimpleButton active={false} action={sendAgendas}>Comenzar a modificar</SimpleButton>
+        <SimpleButton active={false} action={sendAgendas}>
+          Comenzar a modificar
+        </SimpleButton>
       </Border>
     </>
   );

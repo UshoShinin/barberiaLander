@@ -1,4 +1,4 @@
-import { useRef, useReducer } from "react";
+import { useRef, useReducer, useContext } from "react";
 import classes from "./Login.module.css";
 import Input from "../../components/UI/Input/Input";
 import Marco from "../../components/UI/Marco/Marco";
@@ -8,17 +8,25 @@ import NormalCard from "../../components/UI/Card/NormalCard";
 import { initialState, reducer } from "./LoginReducer";
 import inputs from "./inputs";
 import useHttp from "../../hooks/useHttp";
+import AuthContext from "../../store/AuthContext";
+import { useHistory } from "react-router-dom";
 const Login = (props) => {
+  const history = useHistory();
+
   const refCi = useRef();
   const refCon = useRef();
   const [loginState, dispatchLogin] = useReducer(reducer, initialState);
   const INPUTS = inputs(loginState, dispatchLogin);
 
-  const { isLoadingLogin, errorLogin, sendRequest: login } = useHttp();
+  const authCtx = useContext(AuthContext);
 
-    const getRespuesta = (res) =>{
-        console.log(res);
+  const { isLoadingLogin, errorLogin, sendRequest: login } = useHttp();
+  const getRespuesta = (res) => {
+    if (res.mensaje.login === undefined) {
+      authCtx.login(res.mensaje);
+      history.replace('/');
     }
+  };
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -26,13 +34,13 @@ const Login = (props) => {
     else if (!loginState.contra.isValid) refCon.current.focus();
     else {
       const data = {
-        ciUsuario: loginState.ciUsuario.value,
+        ciUsuario: parseInt(loginState.ciUsuario.value, 10),
         contra: loginState.contra.value,
       };
       login(
         {
           url: "/login",
-          method: "GET",
+          method: "POST",
           headers: { "Content-Type": "application/json" },
           body: data,
         },
@@ -63,6 +71,7 @@ const Login = (props) => {
             {loginState.problema !== -1 && (
               <p>{loginState.problemas[loginState.problema].pro}</p>
             )}
+            {/* {errorLogin !== null && <p>{errorLogin}</p>} */}
             <Button type="submit">Iniciar Sesión</Button>
           </Border>
         </NormalCard>

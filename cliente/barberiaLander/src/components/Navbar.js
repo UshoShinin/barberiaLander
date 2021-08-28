@@ -2,9 +2,15 @@
 import React , {useEffect} from 'react'
 import './Navbar.css';
 import { Link, NavLink } from 'react-router-dom';
-import $ from 'jquery';
+import { useContext } from 'react';
+import AuthContext from '../store/AuthContext';
 
 const Navbar = () => {
+
+  const authCtx = useContext(AuthContext);
+
+  const isLoggedIn = authCtx.isLoggedIn
+  console.log(authCtx);
 
   return (
     <nav className="navbar-ul">
@@ -20,7 +26,7 @@ const Navbar = () => {
       <li><NavLink exact activeClassName="active"  to="/cuponeras" className="nav-item nav-link">Cuponeras</NavLink></li>
       <li><NavLink exact activeClassName="active"  to="/agenda/crearagenda" className="nav-item nav-link">Crear Agenda</NavLink></li>
       <li><NavLink exact activeClassName="active"  to="/registro" className="nav-item nav-link">Registro</NavLink>   </li>         
-      <li><NavLink exact activeClassName="active"  to="/login" className="nav-item nav-link">Login</NavLink>   </li>         
+      {!isLoggedIn&&<li><NavLink exact activeClassName="active"  to="/login" className="nav-item nav-link">Login</NavLink>   </li>}         
       {/* <li><NavLink exact activeClassName="active"  to="/caja/movimientocaja" className="nav-item nav-link">Movimiento de Caja</NavLink>    </li>  */}       
       <li><NavLink exact activeClassName="active"  to="/agenda/visualagendas" className="nav-item nav-link">Visualizar Agendas</NavLink>   </li>         
       <li><NavLink exact activeClassName="active"  to="/administracion" className="nav-item nav-link">Administracion</NavLink>           </li> 

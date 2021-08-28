@@ -50,7 +50,6 @@ const Dias = (props) => {
     if(dia.disponibilidad.valido){
       par= <p onClick={()=>{
         props.obtenerHorarios({value:dia.disponibilidad.horariosDisponibles,dia:{d:dia.num,m:dia.mes}});
-        console.log(dia);
       }} className={`${classes.dia} ${dia.activo?classes.activo:''}`}>{dia.num}</p>;
     }else{
       par= <p className={classes.invalid}>{dia.num}</p>;

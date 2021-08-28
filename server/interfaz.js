@@ -6,10 +6,15 @@ const sql = require("mssql");
 //Aceptar una agenda
 const aceptarAgenda = async (id, horario) => {
   try {
+    /* console.log(horario); */
     //Verifico que el horario siga estando disponible
-    const horarioDisponible = verificarHorario(horario).then(
+    const horarioDisponible = verificarHorario({
+      ciEmpleado: horario.ciEmpleado,
+      i: horario.horario.i,
+      f: horario.horario.f,
+      fecha: horario.fecha,
+    }).then(
       async (disponible) => {
-        console.log(disponible);
         if (!disponible) {
           return "El horario ya esta ocupado";
         } else {

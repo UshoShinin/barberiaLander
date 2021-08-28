@@ -1,3 +1,5 @@
+import { getElementById } from "../../FuncionesAuxiliares/FuncionesAuxiliares";
+
 /* Extrae todas las fotos id y nombres de una lista de empleados */
 export const extraerFotos = (empleados) => {
   let resultado = [];
@@ -12,6 +14,7 @@ export const extraerFotos = (empleados) => {
 };
 /* Espera un día, un mes y una lista de fechas, en caso que no le llegen fechas no hace nada */
 export const obtenerHorariosDeDia = (dia, myMonth, fechas) => {
+  /* console.log(dia, myMonth, fechas); */
   if (fechas) {
     /* Recorre las fechas y cuando encuentra la que tiene el día y mes mandados devuelve los horarios */
     for (let i = 0; i < fechas.length; i++) {
@@ -19,6 +22,13 @@ export const obtenerHorariosDeDia = (dia, myMonth, fechas) => {
         return fechas[i].horarios;
       }
     }
+  }
+  return null;
+};
+
+export const getIdByTitle = (list, title) => {
+  for (let i = 0; i < list.length; i++) {
+    if (list[i].title === title) return list[i].id;
   }
   return null;
 };
@@ -38,10 +48,11 @@ export const horariosDisponibilidad = (
     return { valido: false, horariosDisponibles: [] };
   if (horarios === null) return { valido: true, horariosDisponibles: [] };
   else {
-    if (horariosAgendarDisponibles(horarios, servicios).length > 0) {
+    const resultado = horariosAgendarDisponibles(horarios, servicios);
+    if (resultado.length > 0) {
       return {
         valido: true,
-        horariosDisponibles: horariosAgendarDisponibles(horarios, servicios),
+        horariosDisponibles: resultado,
       };
     }
   }
@@ -58,7 +69,9 @@ export const transformStringNumber = (horario) => {
 };
 
 export const transformNumberString = (hor) => {
-  return `${hor.h>9?hor.h:'0'+hor.h}:${hor.m>9?hor.m:'0'+hor.m}`;
+  return `${hor.h > 9 ? hor.h : "0" + hor.h}:${
+    hor.m > 9 ? hor.m : "0" + hor.m
+  }`;
 };
 
 export const horarioEnMinutos = (hora) => {
@@ -94,7 +107,7 @@ export const horariosAgendarDisponibles = (horarios, timeNeed) => {
           ),
         ];
       }
-      
+
       horarioBase = horarios[i].f;
     }
   }
@@ -126,10 +139,44 @@ export const cargarHorarios = (inicio, fin) => {
   }
   return lista;
 };
+export const cargarHorariosEnMinutos = (inicio, fin) => {
+  let lista = [];
+  let id = 1;
+  while (inicio <= fin) {
+    lista.push({id:id,title:transformNumberString(minutosAHorarios(inicio))});
+    inicio += 15;
+    id++;
+  }
+
+  return lista;
+};
 
 /* Te da el día con su propiedad mostrar del array que gestiona la iluminación de los días */
-export const getDayOfDate = (dia,mes,dates) => {
-  for(let i = 0; i<dates.length;i++){
-    if(dates[i].dia === dia && dates[i].mes === mes) return dates[i];
+export const getDayOfDate = (dia, mes, dates) => {
+  for (let i = 0; i < dates.length; i++) {
+    if (dates[i].dia === dia && dates[i].mes === mes) return dates[i];
   }
-}
+};
+
+export const calcularTiempo = (empleado, servicios) => {
+  const duracionEmpleado = empleado.duracion.map((dura) => {
+    return { id: dura.idServicio, duracion: dura.duracion };
+  });
+  const servicesList = Object.values(servicios);
+  let total = 0;
+  let ignorar;
+  servicesList.forEach((ser) => {
+    if (ser.active && ser.id !== ignorar) {
+      if (ser.id === 1 && servicesList[1].active) {
+        ignorar = servicesList[1].id;
+        total += getElementById(duracionEmpleado, 2).duracion;
+      } else if (ser.id === 4 && servicesList[2].active) {
+        ignorar = servicesList[2].id;
+        total += getElementById(duracionEmpleado, 3).duracion;
+      } else {
+        total += getElementById(duracionEmpleado, ser.id).duracion;
+      }
+    }
+  });
+  return total * 15;
+};

@@ -1,60 +1,36 @@
 import classes from "./FormularioAgenda.module.css";
-import React, { useRef, useReducer } from "react";
+import React, { useRef, useReducer,useContext } from "react";
 import Button from "../../../components/UI/Button/Button";
 import Input from "../../../components/UI/Input/Input";
 import InputFile from "../../../components/UI/InputFile/InputFile";
 import TextArea from "../../../components/UI/TextArea/TextArea";
 import Calendario from "../../../components/Calendario/Calendario";
+import { calcularTiempo } from "../../../components/Calendario/FuncionesAuxiliares";
 
 import CheckBoxAgenda from "./CheckBoxAgenda";
 import { DaysGenerator } from "../../../components/Calendario/Dias/GeneradorDias";
 import { getElementById } from "../../../FuncionesAuxiliares/FuncionesAuxiliares";
-import {
-  transformStringNumber,
-  horarioEnMinutos,
-  minutosAHorarios,
-  transformNumberString,
-  horariosAgendarDisponibles,
-} from "../../../components/Calendario/FuncionesAuxiliares";
 
 import { inputReducer } from "./ReduerFormularioAgenda";
 import ComboBox from "../../../components/ComboBox/ComboBox";
 
+import {
+  transformNumberString,
+  minutosAHorarios,
+  transformStringNumber,
+  horarioEnMinutos,
+} from "../../../components/Calendario/FuncionesAuxiliares";
+import AuthContext from "../../../store/AuthContext";
 const FormularioAgenda = (props) => {
-  /* console.log(props.agenda); */
-  console.log(props.initialState)
-  /* let initialState;
-  if (props.agenda !== null) {
-    const misHorarios = horariosAgendarDisponibles
-    initialState = {
-      Nombre: { value: props.agenda.nombreCliente, isValid: true },
-      Horarios: null,
-      HorariosFiltrados: null,
-      Telefono: { value: props.agenda.tel, isValid: true },
-      Descripcion: {
-        value: props.agenda.descripcion,
-        isValid: props.agenda.descripcion.length !== 0 ? true : null,
-      },
-      Referencia: { value: props.agenda.img },
-      Calendario: { value: null, dia: props.agenda.fecha },
-      ComboBox: { value: null, active: false },
-      Employee: { value: props.agenda.ciPeluquero },
-      corte: { active: props.agenda.corte, id: 1 },
-      barba: { active: props.agenda.barba, id: 4 },
-      maquina: { active: props.agenda.maquina, id: 5 },
-      claritos: { active: props.agenda.claritos, id: 6 },
-      decoloracion: { active: props.agenda.decoloracion, id: 7 },
-      brushing: { active: props.agenda.brushing, id: 8 },
-    };
-    console.log(initialState.Employee.value);
-  } else {
-    initialState = initialBaseState;
-  } */
-
-  const [inputState, dispatchInput] = useReducer(inputReducer, props.initialState);
+  const [inputState, dispatchInput] = useReducer(
+    inputReducer,
+    props.initialState
+  );
   const nombreRef = useRef();
   const telefonoRef = useRef();
   const descripcionRef = useRef();
+
+  const authCtx = useContext(AuthContext);
 
   const calendarioHandler = (horarios) => {
     let misHorarios = [];
@@ -89,17 +65,18 @@ const FormularioAgenda = (props) => {
       dia: horarios.dia,
     });
   };
+  console.log(inputState);
   /* Aqui se procesa y se manda la info en caso de esta correcta */
   const submitHandler = (event) => {
     event.preventDefault();
     let services = [];
     console.log(inputState);
-    /* Object.values(inputState).forEach((serv) => {
+    Object.values(inputState.servicios).forEach((serv) => {
       if (serv.active) {
         services.push(serv.id);
       }
-    }); */
-    /* if (services.length === 0) {
+    });
+    if (services.length === 0) {
       const combo = document.getElementById("timeLeft");
       combo.className = `${combo.className} ${classes.invalidCombo}`;
       combo.focus();
@@ -128,10 +105,12 @@ const FormularioAgenda = (props) => {
         )
       );
       let datosAgenda;
-      if (props.agenda === null) {
+
+      if (props.agenda === null||props.agenda === undefined) {
+        const ci =authCtx.user.ciUsuario;
         //Crear
         datosAgenda = {
-          ciCliente:-1,
+          ciCliente: ci===undefined?'-1':ci,
           nombreCliente: inputState.Nombre.value,
           telefono: inputState.Telefono.value,
           descripcion: inputState.Descripcion.value,
@@ -165,8 +144,8 @@ const FormularioAgenda = (props) => {
           },
         };
       }
-      props.onSaveDatosAgenda(datosAgenda); 
-    }*/
+      props.onSaveDatosAgenda(datosAgenda);
+    }
   };
 
   let diasMostrar;
@@ -183,9 +162,8 @@ const FormularioAgenda = (props) => {
     inputState.Employee.value !== null
   ) {
     tiempoNecesario = calcularTiempo(
-      inputState.Employee.value,
-      inputState.servicios,
-      inputState.HorariosFiltrados
+      getElementById(inputState.HorariosFiltrados, inputState.Employee.value),
+      inputState.servicios
     );
     diasMostrar = DaysGenerator(
       date.getDate(),
@@ -335,9 +313,11 @@ const FormularioAgenda = (props) => {
             <CheckBoxAgenda
               servicios={inputState.servicios}
               time={calcularTiempo(
-                inputState.Employee.value,
-                inputState.servicios,
-                inputState.HorariosFiltrados
+                getElementById(
+                  inputState.HorariosFiltrados,
+                  inputState.Employee.value
+                ),
+                inputState.servicios
               )}
               myAction={(action) => {
                 const element = document.getElementById("timeLeft");
@@ -399,27 +379,3 @@ const FormularioAgenda = (props) => {
   );
 };
 export default FormularioAgenda;
-
-//Esto hay que borrarlo cuando tengamos en el backend esta info
-const calcularTiempo = (id, servicios, horariosState) => {
-  const duracionEmpleado = getElementById(horariosState,id).duracion.map((dura)=>{return{id:dura.idServicio,duracion:dura.duracion}});
-  const servicesList = Object.values(servicios);  
-  console.log(servicesList);
-  let total = 0;
-  let ignorar;
-  servicesList.forEach((ser)=>{
-    if(ser.active&&ser.id!==ignorar){
-      if(ser.id===1&&servicesList[1].active){
-        ignorar=servicesList[1].id;
-        total+=getElementById(duracionEmpleado,2).duracion;
-      }else if(ser.id===4&&servicesList[2].active){
-        ignorar=servicesList[2].id;
-        total+=(getElementById(duracionEmpleado,3).duracion);
-      }else{
-        total+=getElementById(duracionEmpleado,ser.id).duracion;
-      }
-    }
-  });
-  return total*15;
-};
-

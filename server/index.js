@@ -120,7 +120,7 @@ app.post("/registroCliente", (req, res) => {
   });
 });
 
-app.use("/login", (req, res) => {
+app.post("/login", (req, res) => {
   let ret = interfaz.login(req.body);
   ret.then((resultado) => {
     res.json({

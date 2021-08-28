@@ -8,9 +8,9 @@ import { useEffect, useReducer, useState } from "react";
 import LoaddingSpinner from "../../../components/LoaddingSpinner/LoaddingSpinner";
 import Switch from "../../../components/UI/Switch/Switch";
 import Visualizador from "./Visualizador/Visualizador";
-import FormularioAgenda from "../FormularioAgenda/FormularioAgenda";
 import {obtenerHorariosDeDia} from "../../../components/Calendario/FuncionesAuxiliares";
 import { getElementById } from "../../../FuncionesAuxiliares/FuncionesAuxiliares";
+import CrearAgenda from "../CrearAgenda";
 /* const DUMMY_AGENDAS = [
   {
     idAgenda: 1,
@@ -172,7 +172,7 @@ const PreAgendas = () => {
       {" "}
       {agendaAModificar !== null && (
         <NormalCard>
-          <FormularioAgenda agenda={agendaAModificar} horario={horarioAgenda} />
+          <CrearAgenda agenda={agendaAModificar} horario={horarioAgenda} />
         </NormalCard>
       )}
       {agendaAModificar === null && (

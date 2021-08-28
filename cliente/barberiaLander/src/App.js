@@ -65,7 +65,7 @@ const App = () => {
               <Slider />
             </Route>
             <Route path="/agenda/crearagenda" exact>
-              <CrearAgenda />
+              <CrearAgenda agenda={null}/>
             </Route>
             <Route path="/agenda/preagendas" exact>
               <PreAgendas />

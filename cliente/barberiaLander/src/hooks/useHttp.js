@@ -16,6 +16,7 @@ const useHttp = () => {
         throw new Error("Request failed!");
       }
       const data = await response.json();
+      /* if(data.mensaje.error!==undefined)setError(data.mensaje.error); */
       applyData(data);
     } catch (err) {
       setError(err.message || "Something went wrong! :c");
