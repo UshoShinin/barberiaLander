@@ -151,18 +151,16 @@ const getDatosListadoAgendas = async () => {
   let consultaAgendas = await pool
     .request()
     .query(
-      "select A.IdAgenda, H.Cedula, H.HoraInicio, H.HoraFin from Agenda A, Horario H where A.IdHorario = H.IdHorario order by H.Cedula, H.HoraInicio"
+      "select A.IdAgenda, H.Cedula, H.HoraInicio, H.HoraFin from Agenda A, Horario H where A.IdHorario = H.IdHorario and A.Aceptada = 1 order by H.Cedula, H.HoraInicio"
     );
   //Dejo armado un array con los datos de las agendas
   let agendas = consultaAgendas.recordset;
   //Dejo armado un array con los empleados
   let nombreEmpleados = consultaNombreEmpleados.recordset;
-
   //Armo el objeto que voy a devolver
   let ret = {
     agendas: [],
   };
-
   //Recorro los empleados para armar los objetos que necesito pushear al array que devuelvo
   for (let i = 0; i < nombreEmpleados.length; i++) {
     //Armo el objeto con los datos del empleado
