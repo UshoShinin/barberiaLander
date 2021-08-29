@@ -1,6 +1,9 @@
 .container {
   width: 60%;
   margin: 0 auto;
+  color: var(--clr-neon-placeholder);
+  display: flex;
+
 }
 .empleados {
   display: flex;
@@ -9,7 +12,7 @@
 .marcas {
   width: 10%;
   height: 100%;
-  padding-top: 35px;
+  padding-top: 83px;
   color: var(--clr-neon-placeholder); 
 }
 .marcas > p + p {
@@ -39,6 +42,7 @@
   border: 2px var(--clr-dark-blue) solid;
   border-radius: 10px;
   padding: 5px;
+  height: 1680px;
 }
 
 .navigation > div > p {
@@ -69,7 +73,7 @@
 
 @media (max-width: 580px) {
   .container {
-    width: 95%;
+    width: 80%;
     margin: 0 auto;
   }
   .empleados {
@@ -77,7 +81,7 @@
   }
   .marcas {
     width: 15%;
-    padding-top: 20px;
+    padding-top: 83px;
   }
   .toTheTop {
     font-size: 1.6rem;

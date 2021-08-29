@@ -22,6 +22,7 @@ import {
 } from "../../../components/Calendario/FuncionesAuxiliares";
 import AuthContext from "../../../store/AuthContext";
 const FormularioAgenda = (props) => {
+  console.log(props.agenda);
   const [inputState, dispatchInput] = useReducer(
     inputReducer,
     props.initialState
@@ -107,10 +108,10 @@ const FormularioAgenda = (props) => {
       let datosAgenda;
 
       if (props.agenda === null||props.agenda === undefined) {
-        const ci =authCtx.user.ciUsuario;
+        const user =authCtx.user;
         //Crear
         datosAgenda = {
-          ciCliente: ci===undefined?'-1':ci,
+          ciCliente: user===null?'-1':user.ci,
           nombreCliente: inputState.Nombre.value,
           telefono: inputState.Telefono.value,
           descripcion: inputState.Descripcion.value,

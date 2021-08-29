@@ -11,10 +11,26 @@ import {
   faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
 import { animateScroll as scroll } from "react-scroll";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import LoaddingSpinner from "../../../components/LoaddingSpinner/LoaddingSpinner";
+import useHttp from "../../../hooks/useHttp";
+import CrearAgenda from "../CrearAgenda";
 
 const VisualAgendas = () => {
   const [inicio, setInicio] = useState(0);
+  const [agendas, setAgendas] = useState(null);
+  const [agenda, setAgenda] = useState(null);
+  const {
+    isLoadingAgendas,
+    errorAgendas,
+    sendRequest: fetchAgendas,
+  } = useHttp();
+
+  const {
+    isLoadingModificar,
+    errorModificar,
+    sendRequest: getAgenda,
+  } = useHttp();
 
   const moveFHandler = () => {
     setInicio((prev) => {
@@ -27,109 +43,138 @@ const VisualAgendas = () => {
     });
   };
 
-  const DUMMY_AGENDAS = [
-    {
-      nombreEmpleado: "Paco",
-      agendas: [
-        { idAgenda: 1, i: "8:00", f: "10:00" },
-        { idAgenda: 2, i: "11:00", f: "14:00" },
-        { idAgenda: 3, i: "14:00", f: "15:00" },
-        { idAgenda: 4, i: "15:30", f: "16:00" },
-        { idAgenda: 5, i: "17:00", f: "19:00" },
-        { idAgenda: 6, i: "20:00", f: "22:00" },
-      ],
-    },
-    {
-      nombreEmpleado: "Manolo",
-      agendas: [
-        { idAgenda: 7, i: "9:00", f: "10:00" },
-        { idAgenda: 8, i: "11:00", f: "12:00" },
-        { idAgenda: 8, i: "13:00", f: "13:15" },
-        { idAgenda: 9, i: "19:00", f: "22:00" },
-      ],
-    },
-    {
-      nombreEmpleado: "ANTONIO",
-      agendas: [
-        { idAgenda: 10, i: "15:00", f: "17:00" },
-        { idAgenda: 11, i: "19:00", f: "20:00" },
-        { idAgenda: 12, i: "20:00", f: "22:00" },
-      ],
-    },
-    {
-      nombreEmpleado: "Manueh",
-      agendas: [
-        { idAgenda: 13, i: "12:00", f: "14:00" },
-        { idAgenda: 14, i: "15:00", f: "17:00" },
-        { idAgenda: 15, i: "18:00", f: "20:00" },
-      ],
-    },
-    {
-      nombreEmpleado: "Carlos",
-      agendas: [
-        { idAgenda: 16, i: "11:00", f: "12:00" },
-        { idAgenda: 17, i: "19:00", f: "19:30" },
-        { idAgenda: 18, i: "20:15", f: "20:45" },
-      ],
-    },
-  ];
+  const obtenerAgenda = (res) => {
+    /* console.log(res.mensaje); */
+    let misServicios = {
+      barba: false,
+      brushing: false,
+      corte: false,
+      claritos: false,
+      decoloracion: false,
+      maquina: false,
+    };
+    res.mensaje.servicios.forEach((s) => {
+      switch (s) {
+        case 1:
+          misServicios.corte = true;
+        case 4:
+          misServicios.barba = true;
+        case 5:
+          misServicios.maquina = true;
+        case 6:
+          misServicios.claritos = true;
+        case 7:
+          misServicios.decoloracion = true;
+        case 8:
+          misServicios.brushing = true;
+      }
+    
+    });
+    setAgenda({...res.mensaje,servicios:{...misServicios}});
+  };
+
+  const obtenerAgendas = (res) => {
+    setAgendas(res.mensaje.agendas);
+  };
+
+  useEffect(() => {
+    fetchAgendas({ url: "/listadoAgendas" }, obtenerAgendas);
+  }, []);
+
   let Mostrar = [];
-  const final =
-    DUMMY_AGENDAS.length > (inicio + 1) * 4
-      ? (inicio + 1) * 4
-      : DUMMY_AGENDAS.length;
-  for (let i = inicio * 4; i < final; i++) {
-    Mostrar.push(DUMMY_AGENDAS[i]);
-  }
+  let tope = null;
   let empleados;
   let colorFilaI = 1;
   let i = 0;
-  let ocupar = 100 / Mostrar.length;
-  empleados = generarCupos(Mostrar, colorFilaI).map((divA) => {
-    i++;
-    return (
-      <div key={i} className = {classes.bordeIntento}style={{ width: `${ocupar}%` }}>
-        {divA}
-      </div>
-    );
-  });
-  const tope = (DUMMY_AGENDAS.length + 4 - (DUMMY_AGENDAS.length % 4)) / 4;
-  return (
-    <div className={classes.myContainer}>
-      <div className={classes.navigation}>
-        <div>
-          <div className={classes.arrow}>
-            {inicio > 0 && (
-              <FontAwesomeIcon icon={faChevronLeft} onClick={moveBHandler} />
-            )}
-          </div>
-          <p>
-            {inicio + 1} de {tope}
-          </p>
-          <div className={classes.arrow}>
-            {inicio < tope - 1 && (
-              <FontAwesomeIcon icon={faChevronRight} onClick={moveFHandler} />
-            )}
-          </div>
+  let ocupar;
+  let cantidadMostrar;
+  const tamaño = document.getElementById("root").clientWidth;
+  if (tamaño < 581) {
+    cantidadMostrar = 1;
+  } else if (tamaño < 801) {
+    cantidadMostrar = 2;
+  } else {
+    cantidadMostrar = 4;
+  }
+  if (agendas !== null) {
+    const final =
+      agendas.length > (inicio + 1) * cantidadMostrar
+        ? (inicio + 1) * cantidadMostrar
+        : agendas.length;
+    for (let i = inicio * cantidadMostrar; i < final; i++) {
+      Mostrar.push(agendas[i]);
+    }
+    ocupar = 100 / Mostrar.length;
+    console.log(Mostrar);
+    empleados = generarCupos(Mostrar, colorFilaI, (id) => {
+      getAgenda({ url: "/agendaPorId?idAgenda=" + id }, obtenerAgenda);
+    }).map((divA) => {
+      i++;
+      return (
+        <div
+          key={i}
+          className={classes.bordeIntento}
+          style={{ width: `${ocupar}%` }}
+        >
+          {divA}
         </div>
-      </div>
-      {generarNavegacion(8, 22)}
-      <div
-        className={classes.container}
-        style={{ color: "white", display: "flex" }}
-      >
-        <div className={classes.marcas}>{generarHoras(8, 22)}</div>
-        <div className={classes.empleados}>{empleados}</div>
-      </div>
-      <button
-        className={classes.toTheTop}
-        onClick={() => {
-          scroll.scrollToTop();
-        }}
-      >
-        <FontAwesomeIcon icon={faChevronUp} />
-      </button>
-    </div>
+      );
+    });
+    const mod = agendas.length % cantidadMostrar;
+    tope =
+      (agendas.length - mod + (mod > 0 ? cantidadMostrar : 0)) /
+      cantidadMostrar;
+  }
+
+  return (
+    <>
+      {agenda !== null && <CrearAgenda agenda={agenda} />}
+      {agenda === null && (
+        <>
+          {agendas === null && <LoaddingSpinner />}
+          {agendas !== null && (
+            <div className={classes.myContainer}>
+              <div className={classes.navigation}>
+                <div>
+                  <div className={classes.arrow}>
+                    {inicio > 0 && (
+                      <FontAwesomeIcon
+                        icon={faChevronLeft}
+                        onClick={moveBHandler}
+                      />
+                    )}
+                  </div>
+                  <p>
+                    {inicio + 1} de {tope}
+                  </p>
+                  <div className={classes.arrow}>
+                    {inicio < tope - 1 && (
+                      <FontAwesomeIcon
+                        icon={faChevronRight}
+                        onClick={moveFHandler}
+                      />
+                    )}
+                  </div>
+                </div>
+              </div>
+              {generarNavegacion(8, 22)}
+              <div className={classes.container}>
+                <div className={classes.marcas}>{generarHoras(8, 22)}</div>
+                <div className={classes.empleados}>{empleados}</div>
+              </div>
+              <button
+                className={classes.toTheTop}
+                onClick={() => {
+                  scroll.scrollToTop();
+                }}
+              >
+                <FontAwesomeIcon icon={faChevronUp} />
+              </button>
+            </div>
+          )}
+        </>
+      )}
+    </>
   );
 };
 export default VisualAgendas;

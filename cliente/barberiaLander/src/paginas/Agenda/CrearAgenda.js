@@ -63,6 +63,7 @@ const CrearAgenda = (props) => {
   /* Carga inicial de datos */
   const obtenerHorarios = (horarios) => {
     const agenda = props.agenda;
+    console.log(agenda);
     let nombre;
     let telefono;
     let servicios = { ...initialState.servicios };
@@ -136,7 +137,6 @@ const CrearAgenda = (props) => {
   useEffect(() => {
     fetchHorarios({ url: "/datosFormularioAgenda" }, obtenerHorarios);
   }, []);
-  console.log(stateAgenda);
   return (
     <div className="nuevaAgenda">
       <NormalCard>

@@ -11,77 +11,10 @@ import Visualizador from "./Visualizador/Visualizador";
 import {obtenerHorariosDeDia} from "../../../components/Calendario/FuncionesAuxiliares";
 import { getElementById } from "../../../FuncionesAuxiliares/FuncionesAuxiliares";
 import CrearAgenda from "../CrearAgenda";
-/* const DUMMY_AGENDAS = [
-  {
-    idAgenda: 1,
-    fecha: "28-07-2021",
-    nombreCliente: "Migel", //nombreCliente
-    horaInicio: "08:00",
-    horaFin: "10:30",
-    descripcion: "",
-  },
-  {
-    idAgenda: 2,
-    fecha: "29-07-2021",
-    nombreCliente: "Mangel",
-    horaInicio: "09:00",
-    horaFin: "10:30",
-    descripcion: "Un corte super cool",
-  },
-  {
-    idAgenda: 3,
-    fecha: "29-07-2021",
-    nombreCliente: "Carlos",
-    horaInicio: "11:00",
-    horaFin: "11:30",
-    descripcion: "Quiero que me hagan el pelo de Goku :D",
-  },
-  {
-    idAgenda: 4,
-    fecha: "30-07-2021",
-    nombreCliente: "Pablito",
-    horaInicio: "20:00",
-    horaFin: "21:30",
-    descripcion: "No se :c",
-  },
-  {
-    idAgenda: 5,
-    fecha: "28-07-2021",
-    nombreCliente: "Migel", //nombreCliente
-    horaInicio: "08:00",
-    horaFin: "10:30",
-    descripcion: "",
-  },
-  {
-    idAgenda: 6,
-    fecha: "29-07-2021",
-    nombreCliente: "Mangel",
-    horaInicio: "09:00",
-    horaFin: "10:30",
-    descripcion: "Un corte super cool",
-  },
-  {
-    idAgenda: 7,
-    fecha: "29-07-2021",
-    nombreCliente: "Carlos",
-    horaInicio: "11:00",
-    horaFin: "11:30",
-    descripcion: "Quiero que me hagan el pelo de Goku :D",
-  },
-  {
-    idAgenda: 8,
-    fecha: "30-07-2021",
-    nombreCliente: "Pablito",
-    horaInicio: "20:00",
-    horaFin: "21:30",
-    descripcion: "No se :c",
-  },
-]; */
 
 const initialState = { aceptar: false, rechazar: false };
 
 const reducerChecks = (state, action) => {
-  console.log(action.type)
   switch (action.type) {
     case "ACEPTAR":
       return {aceptar:!state.aceptar,rechazar:false}
@@ -137,6 +70,7 @@ const PreAgendas = () => {
   };
 
   const showAgenda = (agendita) => {
+    //Creo que todo lo de los horarios no es necesario y se puede eliminar
     setAgendaAModificar({...agendita,fecha:{d:parseInt(agendita.fecha.slice(8,10),10),m:parseInt(agendita.fecha.slice(5,7),10)}})
     fetchHorarios({ url: "/datosFormularioAgenda"},obtenerHorarios);
   };

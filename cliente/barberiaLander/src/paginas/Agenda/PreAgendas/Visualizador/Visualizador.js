@@ -66,6 +66,8 @@ const Visualizador = React.memo((props) => {
     }
   }, [props.id]);
   const sendAgendas = () => {
+    console.log("Visualizador");
+    console.log(agenda);
     props.mostrarAgenda(agenda);
   };
   return (
