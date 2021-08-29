@@ -336,7 +336,7 @@ const agregarHorariosEmpleado = async (listadoEmpleados) => {
     //Consigo los datos de los horarios
     const horarios = await pool
       .request()
-      .query("select * from Horario order by Cedula, HoraInicio");
+      .query("select H.IdHorario, H.Cedula, H.HoraInicio, H.HoraFin, H.Fecha from Horario H, Agenda A where H.IdHorario = A.IdHorario and A.Aceptada = 1 order by Cedula, HoraInicio");
     //Recorro todos los empleados para ir agregando uno por uno sus horarios
     for (let k = 0; k < listadoEmpleados.length; k++) {
       //Recorro las fechas del empleado en el cual estoy parado
