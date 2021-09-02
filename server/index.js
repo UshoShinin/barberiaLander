@@ -99,10 +99,16 @@ app.delete("/eliminarAgenda", (req, res) => {
   });
 });
 
-
 app.post("/entradaCaja", (req, res) => {
   console.log(req.body);
-  const ret = interfaz.nuevaEntradaDinero(req.body.idCaja, req.body.montoTotal, req.body.pago, req.body.ciEmpleado, req.body.productosVendidos, req.body.servicios);
+  const ret = interfaz.nuevaEntradaDinero(
+    req.body.idCaja,
+    req.body.montoTotal,
+    req.body.pago,
+    req.body.ciEmpleado,
+    req.body.productosVendidos,
+    req.body.servicios
+  );
   ret.then((resultado) => {
     res.json({
       mensaje: resultado,
@@ -121,6 +127,15 @@ app.post("/registroCliente", (req, res) => {
 
 app.post("/login", (req, res) => {
   let ret = interfaz.login(req.body);
+  ret.then((resultado) => {
+    res.json({
+      mensaje: resultado,
+    });
+  });
+});
+
+app.post("/abrirCaja", (req, res) => {
+  let ret = interfaz.abrirCaja(req.body);
   ret.then((resultado) => {
     res.json({
       mensaje: resultado,

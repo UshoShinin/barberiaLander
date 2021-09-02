@@ -911,6 +911,31 @@ const agregarServiciosParaCaja = async (listado) => {
   return retorno;
 };
 
+//Metodo auxiliar para agregar si la caja esta abierta o no
+const agregarIdCaja = async (listado) => {
+  const fecha = new Date(Date.now());
+  let dia = fecha.getDate();
+  let mes = fecha.getMonth() + 1;
+  let anio = fecha.getFullYear();
+  let parametroFecha = anio + "-" + mes + "-" + dia;
+  let retorno = getCaja(parametroFecha).then((caja) => {
+    if (caja.rowsAffected[0] < 1) {
+      //Armo el array entero con todo
+      return {
+        ...listado,
+        idCaja: -1,
+      };
+    } else {
+      //Armo el array entero con todo
+      return {
+        ...listado,
+        idCaja: caja.recordset[0].idCaja,
+      };
+    }
+  });
+  return retorno;
+};
+
 //Metodo para devolver todos los datos del formulario de caja
 const datosFormularioCaja = async () => {
   try {
@@ -925,7 +950,10 @@ const datosFormularioCaja = async () => {
         return agregarServiciosParaCaja(listadoCompletoSinServicios);
       })
       .then((listadoCompleto) => {
-        return listadoCompleto;
+        return agregarIdCaja(listadoCompleto);
+      })
+      .then((listadoCompletoConCaja) => {
+        return listadoCompletoConCaja;
       });
     return resultado;
   } catch (error) {
@@ -1239,12 +1267,13 @@ const abrirCaja = async (montoInicial, cedula) => {
     //Agarro el id de la caja que acabo de insertar
     const idCaja = insertCaja.recordset[0].IdCaja;
     //Despues de insertar tengo que hacer una entrada de caja a la caja actual con el monto inicial
-    // const insertMontoInicial = nuevaEntradaDinero(
-    //   idCaja,
-    //   montoInicial,
-    //   medioPago,
-    //   cedula
-    // );
+    const insertMontoInicial = nuevaEntradaDinero(
+      idCaja,
+      montoInicial,
+      medioPago,
+      cedula
+    ).then((resultado) => resultado);
+    return { idCaja: idCaja, mensaje: insertMontoInicial };
   } catch (error) {
     console.log(error);
   }
@@ -1260,11 +1289,18 @@ el objeto pago es del estilo. Llega en 0 si no se uso nada
   Cuponera:montoC,
 }
 */
-const nuevaEntradaDinero = async (idCaja, monto, pago, cedula, listadoProductos, listadoServicios) => {
+const nuevaEntradaDinero = async (
+  idCaja,
+  monto,
+  pago,
+  cedula,
+  listadoProductos,
+  listadoServicios
+) => {
   try {
     //Hago primero el insert en la tabla entrada
-    const insertoEntradaDinero = insertarEntradaDinero(monto, cedula).then(
-      (idEntrada) => {
+    const insertoEntradaDinero = insertarEntradaDinero(monto, cedula)
+      .then((idEntrada) => {
         //Armo un listado para guardar todas las promesas que haya hecho
         const listadoPromesas = [];
         //Ahora tengo que ver en que otras tablas deberia insertar
@@ -1307,7 +1343,7 @@ const nuevaEntradaDinero = async (idCaja, monto, pago, cedula, listadoProductos,
         //Ahora verifico si se hizo algun servicio
         if (listadoServicios !== null) {
           const agregoServicios = insertarEntradaServicio(
-            identrada,
+            idEntrada,
             listadoServicios
           );
           listadoPromesas.push(agregoServicios);
@@ -1320,8 +1356,10 @@ const nuevaEntradaDinero = async (idCaja, monto, pago, cedula, listadoProductos,
           //Aca tengo que verificar que me devolvieron las promesas para tener una idea
           console.log(respuestas);
         });
-      }
-    );
+      })
+      .then((resultado) => {
+        return "Por lo menos llegamos hasta aca creo";
+      });
   } catch (error) {
     console.log(error);
   }
@@ -1408,7 +1446,10 @@ const insertarEntradaProducto = async (idEntrada, listadoProductos, monto) => {
     tabla.create = false;
     //Segun lo leido tengo que insertar a la variable 'tabla' las columnas que va a tener
     tabla.columns.add("IdEntrada", sql.Int, { nullable: false, primary: true });
-    tabla.columns.add("IdProducto", sql.Int, { nullable: true, primary: true });
+    tabla.columns.add("IdProducto", sql.Int, {
+      nullable: false,
+      primary: true,
+    });
     tabla.columns.add("Cantidad", sql.Int, { nullable: false });
     //Por cada producto que me llegue agrego una fila (row)
     listadoProductos.forEach((producto) => {
@@ -1442,10 +1483,13 @@ const insertarEntradaServicio = async (idEntrada, listadoServicios) => {
     tabla.create = false;
     //Segun lo leido tengo que insertar a la variable 'tabla' las columnas que va a tener
     tabla.columns.add("IdEntrada", sql.Int, { nullable: false, primary: true });
-    tabla.columns.add("IdServicio", sql.Int, { nullable: true, primary: true });
+    tabla.columns.add("IdServicio", sql.Int, {
+      nullable: false,
+      primary: true,
+    });
     //Por cada idServicio que me llegue agrego una fila (row)
     listadoServicios.forEach((idServicio) => {
-      tabla.rows.add(idEntrada, idServicio);
+      tabla.rows.add(idEntrada, idServicio.id);
     });
     //Creo el request que voy a hacer
     const request = pool.request();
