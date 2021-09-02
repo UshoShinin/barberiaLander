@@ -135,7 +135,7 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/abrirCaja", (req, res) => {
-  let ret = interfaz.abrirCaja(req.body);
+  let ret = interfaz.abrirCaja(req.body.montoInicial, req.body.cedula);
   ret.then((resultado) => {
     res.json({
       mensaje: resultado,
