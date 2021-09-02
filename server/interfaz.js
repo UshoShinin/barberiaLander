@@ -13,41 +13,38 @@ const aceptarAgenda = async (id, horario) => {
       i: horario.horario.i,
       f: horario.horario.f,
       fecha: horario.fecha,
-    }).then(
-      async (disponible) => {
-        if (!disponible) {
-          return "El horario ya esta ocupado";
+    }).then(async (disponible) => {
+      if (!disponible) {
+        return "El horario ya esta ocupado";
+      } else {
+        //Creo la conexion
+        let pool = await sql.connect(conexion);
+        //Hago la query para conseguir la agenda
+        let queryAgenda = "Select Aceptada from Agenda where IdAgenda = " + id;
+        //Voy a buscar si esta aceptada la agenda
+        let agenda = await pool.request().query(queryAgenda);
+        //Si la agenda esta aceptada devuelvo eso
+        if (agenda.recordset[0].Aceptada) {
+          let ret = {
+            codigo: 400,
+            mensaje: "La agenda ya fue aceptada previamente",
+          };
+          return ret;
         } else {
-          //Creo la conexion
-          let pool = await sql.connect(conexion);
-          //Hago la query para conseguir la agenda
-          let queryAgenda =
-            "Select Aceptada from Agenda where IdAgenda = " + id;
-          //Voy a buscar si esta aceptada la agenda
-          let agenda = await pool.request().query(queryAgenda);
-          //Si la agenda esta aceptada devuelvo eso
-          if (agenda.recordset[0].Aceptada) {
-            let ret = {
-              codigo: 400,
-              mensaje: "La agenda ya fue aceptada previamente",
-            };
-            return ret;
-          } else {
-            //Hago la query del update
-            let queryUpdate =
-              "update Agenda set Aceptada = 1 where IdAgenda = " + id;
-            //Hago update de la agenda
-            let empleados = await pool.request().query(queryUpdate);
-            //Si salio todo bien y no fue al catch se confirma de que fue aceptada
-            let ret = {
-              codigo: 200,
-              mensaje: "La agenda fue aceptada",
-            };
-            return ret;
-          }
+          //Hago la query del update
+          let queryUpdate =
+            "update Agenda set Aceptada = 1 where IdAgenda = " + id;
+          //Hago update de la agenda
+          let empleados = await pool.request().query(queryUpdate);
+          //Si salio todo bien y no fue al catch se confirma de que fue aceptada
+          let ret = {
+            codigo: 200,
+            mensaje: "La agenda fue aceptada",
+          };
+          return ret;
         }
       }
-    );
+    });
     return horarioDisponible;
   } catch (error) {
     //Mensaje de error en caso de que haya pasado algo
@@ -225,7 +222,9 @@ const getEmpleadosFormulario = async () => {
     //Consigo los datos de los empleados
     const empleados = await pool
       .request()
-      .query("select Cedula, Nombre, Img, HorarioEntrada, HorarioSalida from Empleado");
+      .query(
+        "select Cedula, Nombre, Img, HorarioEntrada, HorarioSalida from Empleado"
+      );
     //Creo el array de retorno
     let arrayRetorno = [];
     //Recorro el listado de empleados para armar el objeto como necesito
@@ -334,7 +333,9 @@ const agregarHorariosEmpleado = async (listadoEmpleados) => {
     //Consigo los datos de los horarios
     const horarios = await pool
       .request()
-      .query("select H.IdHorario, H.Cedula, H.HoraInicio, H.HoraFin, H.Fecha from Horario H, Agenda A where H.IdHorario = A.IdHorario and A.Aceptada = 1 order by Cedula, HoraInicio");
+      .query(
+        "select H.IdHorario, H.Cedula, H.HoraInicio, H.HoraFin, H.Fecha from Horario H, Agenda A where H.IdHorario = A.IdHorario and A.Aceptada = 1 order by Cedula, HoraInicio"
+      );
     //Recorro todos los empleados para ir agregando uno por uno sus horarios
     for (let k = 0; k < listadoEmpleados.length; k++) {
       //Recorro las fechas del empleado en el cual estoy parado
@@ -674,6 +675,35 @@ const insertarServicioAgenda = async (servicioAgenda) => {
   const resultado = await request.bulk(tabla);
   //Devuelvo el resultado que es la cantidad de filas afectadas
   return resultado.rowsAffected;
+};
+
+//Metodo auxiliar para agregar una agenda a un cliente
+//Me llega un objeto de este estilo
+/*
+  {
+   cedula: '1234567',
+   idAgenda: 1,
+   idHorario: 1,
+  }
+*/
+const insertarAgendaCliente = async (datosAgendaCliente) => {
+  try {
+    //Variable que tiene la conexion
+    const pool = await sql.connect(conexion);
+    //Armo el insert
+    const insertAgendaCliente = await pool
+      .request()
+      .input("ciCliente", sql.VarChar, datosAgendaCliente.ciCliente)
+      .input("idHorario", sql.Int, datosAgendaCliente.idHorario)
+      .input("idAgenda", sql.Int, datosAgendaCliente.idAgenda)
+      .query(
+        "insert into Agenda_Cliente (IdAgenda, IdHorario, Cedula) values (@idAgenda, @idHorario, @ciCliente)"
+      );
+    const filasAfectadas = insertarAgendaCliente.rowsAffected;
+    return filasAfectadas;
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 //Metodo para agregar la agenda a la base, voy a recibir los datos todos dentro del objeto agenda
@@ -1146,14 +1176,14 @@ const login = async (usuario) => {
       })
       .then((cliente) => {
         if (cliente.rowsAffected[0] === 1) {
-          return {...cliente.recordset[0], rol:"Cliente"};
+          return { ...cliente.recordset[0], rol: "Cliente" };
         } else {
-          return {codigo: 400, error: "Credenciales incorrectas"}
+          return { codigo: 400, error: "Credenciales incorrectas" };
         }
       });
     return resultado;
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 };
 
@@ -1195,6 +1225,256 @@ const getClienteParaLogin = async (datosCliente) => {
   }
 };
 
+//Metodo para abrir una caja
+const abrirCaja = async (montoInicial, cedula) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Abro la caja, es decir que inserto una linea en la tabla caja con la fecha de hoy
+    const insertCaja = await pool
+      .request()
+      .query(
+        "insert into Caja(Fecha, Total) output inserted.IdCaja values (CAST(GETDATE() AS DATE), 0)"
+      );
+    //Agarro el id de la caja que acabo de insertar
+    const idCaja = insertCaja.recordset[0].IdCaja;
+    //Despues de insertar tengo que hacer una entrada de caja a la caja actual con el monto inicial
+    // const insertMontoInicial = nuevaEntradaDinero(
+    //   idCaja,
+    //   montoInicial,
+    //   medioPago,
+    //   cedula
+    // );
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo auxiliar para hacer una entrada de dinero
+const nuevaEntradaDinero = async ( idCaja,  monto,  medioPago,  cedula,  nroTicket,  listadoProductos,  listadoServicios) => {
+  try {
+    //Hago primero el insert en la tabla entrada
+    const insertoEntradaDinero = insertarEntradaDinero(monto, cedula).then(
+      (idEntrada) => {
+        //Armo un listado para guardar todas las promesas que haya hecho
+        const listadoPromesas = [];
+        //Ahora tengo que ver en que otras tablas deberia insertar
+        //Primero verifico cual fue el medio de pago que usaron
+        //En la variable agregoPago guardo la promesa del medio de pago que haya insertado
+        if (medioPago === 1 || medioPago === 3) {
+          const agregoPago = insertarEntradaEfectivo(idEntrada, medioPago);
+          listadoPromesas.push(agregoPago);
+        } else {
+          const agregoPago = insertarEntradaDebito(
+            idEntrada,
+            medioPago,
+            nroTicket
+          );
+          listadoPromesas.push(agregoPago);
+        }
+        //Ahora tengo que verificar si se vendieron productos
+        if (listadoProductos !== undefined) {
+          const agregoProductos = insertarEntradaProducto(
+            idEntrada,
+            listadoProductos
+          );
+          listadoPromesas.push(agregoProductos);
+        }
+        //Ahora verifico si se hizo algun servicio
+        if (listadoServicios !== undefined) {
+          const agregoServicios = insertarEntradaServicio(
+            identrada,
+            listadoServicios
+          );
+          listadoPromesas.push(agregoServicios);
+        }
+        //Agrego la entrada a la caja
+        const agregarEntradaCaja = insertarCajaEntrada(idCaja, idEntrada);
+        listadoPromesas.push(agregarEntradaCaja);
+        //Resuelvo todas las promesas
+        Promise.allSettled(listadoPromesas).then((respuestas) => {
+          //Aca tengo que verificar que me devolvieron las promesas para tener una idea
+          console.log(respuestas);
+        });
+      }
+    );
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo auxiliar para hacer el insert en la tabla EntradaDinero
+const insertarEntradaDinero = async (monto, cedula) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el insert en la tabla EntradaDinero
+    const insertEntradaDinero = await pool
+      .request()
+      .input("monto", sql.VarChar, monto)
+      .input("cedula", sql.VarChar, cedula)
+      .query(
+        "insert into EntradaDinero(Cedula, Monto, Fecha) output inserted.IdEntrada values(@cedula, @monto, CAST(GETDATE() AS DATE))"
+      );
+    return insertEntradaDinero.recordset[0].IdEntrada;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo auxiliar para hacer el insert en la tabla EntradaEfectivo
+//Este metodo se usa para cuando pagan con efectivo o cuponera, el idMedioPago puede ser el de Efectivo o Cuponera
+const insertarEntradaEfectivo = async (idEntrada, idMedioPago) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el insert en la tabla EntradaEfectivo
+    const insertEntradaEfectivo = await pool
+      .request()
+      .input("idEntrada", sql.Int, idEntrada)
+      .input("idMedioPago", sql.Int, idMedioPago)
+      .query(
+        "insert into Entrada_Efectivo(IdEntrada, IdMedioPago) values(@idEntrada, @idMedioPago)"
+      );
+    return {
+      filasAfectadas: insertEntradaEfectivo.rowsAffected,
+      tablaInsertada: "Entrada_Efectivo",
+    };
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo auxiliar para hacer el insert en la tabla EntradaDebito
+const insertarEntradaDebito = async (idEntrada, idMedioPago, ticket) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el insert en la tabla EntradaEfectivo
+    const insertEntradaDebito = await pool
+      .request()
+      .input("idEntrada", sql.Int, idEntrada)
+      .input("idMedioPago", sql.Int, idMedioPago)
+      .input("ticket", sql.Int, ticket)
+      .query(
+        "insert into Entrada_Debito(IdEntrada, IdMedioPago, NroTicket) output inserted.IdEntrada values(@idEntrada, @idMedioPago, @ticket)"
+      );
+    return {
+      filasAfectadas: insertEntradaDebito.rowsAffected,
+      tablaInsertada: "Entrada_Debito",
+    };
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo auxiliar para hacer el insert en la tabla EntradaProducto
+//El listado de productos tiene objetos del estilo {id: , cantidad: }
+const insertarEntradaProducto = async (idEntrada, listadoProductos) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Creo la tabla que voy a insertar
+    const tabla = new sql.Table("PeluqueriaLander.dbo.Entrada_Producto");
+    //Le digo cual es la base de datos que corresponde la tabla
+    tabla.database = "PeluqueriaLander";
+    //Tengo que decir si creo la tabla o no
+    tabla.create = false;
+    //Segun lo leido tengo que insertar a la variable 'tabla' las columnas que va a tener
+    tabla.columns.add("IdEntrada", sql.Int, { nullable: false, primary: true });
+    tabla.columns.add("IdProducto", sql.Int, { nullable: true, primary: true });
+    tabla.columns.add("Cantidad", sql.Int, { nullable: false });
+    //Por cada producto que me llegue agrego una fila (row)
+    listadoProductos.forEach((producto) => {
+      tabla.rows.add(idEntrada, producto.id, producto.cantidad);
+    });
+    //Creo el request que voy a hacer
+    const request = pool.request();
+    //Le digo al request que haga el insert
+    const resultado = await request.bulk(tabla);
+    //Devuelvo el resultado que es la cantidad de filas afectadas
+    return {
+      filasAfectadas: resultado.rowsAffected,
+      tablaInsertada: "Entrada_Producto",
+    };
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo auxiliar para hacer el insert en la tabla EntradaServicio
+//Me llega un listado con los id de los servicios que se hace
+const insertarEntradaServicio = async (idEntrada, listadoServicios) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Creo la tabla que voy a insertar
+    const tabla = new sql.Table("PeluqueriaLander.dbo.Entrada_Servicio");
+    //Le digo cual es la base de datos que corresponde la tabla
+    tabla.database = "PeluqueriaLander";
+    //Tengo que decir si creo la tabla o no
+    tabla.create = false;
+    //Segun lo leido tengo que insertar a la variable 'tabla' las columnas que va a tener
+    tabla.columns.add("IdEntrada", sql.Int, { nullable: false, primary: true });
+    tabla.columns.add("IdServicio", sql.Int, { nullable: true, primary: true });
+    //Por cada idServicio que me llegue agrego una fila (row)
+    listadoServicios.forEach((idServicio) => {
+      tabla.rows.add(idEntrada, idServicio);
+    });
+    //Creo el request que voy a hacer
+    const request = pool.request();
+    //Le digo al request que haga el insert
+    const resultado = await request.bulk(tabla);
+    //Devuelvo el resultado que es la cantidad de filas afectadas
+    return {
+      filasAfectadas: resultado.rowsAffected,
+      tablaInsertada: "Entrada_Servicio",
+    };
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo auxiliar para hacer el insert de la entrada en la caja. Tabla Caja_Entrada
+const insertarCajaEntrada = async (idCaja, idEntrada) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el insert en la tabla EntradaEfectivo
+    const insertCajaEntrada = await pool
+      .request()
+      .input("idEntrada", sql.Int, idEntrada)
+      .input("idCaja", sql.Int, idCaja)
+      .query(
+        "insert into Caja_Entrada(IdCaja, IdEntrada) values(@idCaja, @idEntrada)"
+      );
+    return {
+      filasAfectadas: insertCajaEntrada.rowsAffected,
+      tablaInsertada: "Caja_Entrada",
+    };
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+//Metodo auxiliar para conseguir la caja de un dia dado
+const getCaja = async (fecha) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el select para que me traiga la caja
+    const caja = await pool
+      .request()
+      .input("fecha", sql.Date, fecha)
+      .query(
+        "select IdCaja as idCaja, Fecha as fecha, Total as total from Caja C where C.Fecha = @fecha"
+      );
+    return caja;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 //Creo un objeto que voy a exportar para usarlo desde el index.js
 //Adentro voy a tener todos los metodos de llamar a la base
 const interfaz = {
@@ -1210,6 +1490,7 @@ const interfaz = {
   cancelarAgenda,
   registrarCliente,
   login,
+  abrirCaja
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar
