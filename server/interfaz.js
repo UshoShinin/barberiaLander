@@ -1356,12 +1356,27 @@ const nuevaEntradaDinero = async (
         //Resuelvo todas las promesas
         Promise.allSettled(listadoPromesas).then((respuestas) => {
           //Aca tengo que verificar que me devolvieron las promesas para tener una idea
-          console.log(respuestas);
+          let salioBien = true;
+          //Recirro todas las promesas y veo el estado de ellas
+          respuestas.forEach((promesa) => {
+            if (promesa.status !== "fulfilled") {
+              salioBien = false;
+            }
+          });
+          if (salioBien) {
+            return {
+              codigo: 200,
+              mensaje: "Entrada de dinero insertada correctamente",
+            };
+          } else {
+            return {
+              codigo: 400,
+              mensaje: "Le erramos a algo insertando la entrada",
+            };
+          }
         });
       })
-      .then((resultado) => {
-        return "Por lo menos llegamos hasta aca creo";
-      });
+      .then((resultado) => resultado);
   } catch (error) {
     console.log(error);
   }
@@ -1402,7 +1417,7 @@ const insertarEntradaEfectivo = async (idEntrada, idMedioPago, monto) => {
         "insert into Entrada_Efectivo(IdEntrada, IdMedioPago, Monto) values(@idEntrada, @idMedioPago, @monto)"
       );
     return {
-      filasAfectadas: insertEntradaEfectivo.rowsAffected,
+      filasAfectadas: insertEntradaEfectivo.rowsAffected[0],
       tablaInsertada: "Entrada_Efectivo",
     };
   } catch (error) {
@@ -1426,7 +1441,7 @@ const insertarEntradaDebito = async (idEntrada, idMedioPago, monto, ticket) => {
         "insert into Entrada_Debito(IdEntrada, IdMedioPago, Monto, NroTicket) output inserted.IdEntrada values(@idEntrada, @idMedioPago, @monto, @ticket)"
       );
     return {
-      filasAfectadas: insertEntradaDebito.rowsAffected,
+      filasAfectadas: insertEntradaDebito.rowsAffected[0],
       tablaInsertada: "Entrada_Debito",
     };
   } catch (error) {
@@ -1463,7 +1478,7 @@ const insertarEntradaProducto = async (idEntrada, listadoProductos, monto) => {
     const resultado = await request.bulk(tabla);
     //Devuelvo el resultado que es la cantidad de filas afectadas
     return {
-      filasAfectadas: resultado.rowsAffected,
+      filasAfectadas: resultado.rowsAffected[0],
       tablaInsertada: "Entrada_Producto",
     };
   } catch (error) {
@@ -1499,7 +1514,7 @@ const insertarEntradaServicio = async (idEntrada, listadoServicios) => {
     const resultado = await request.bulk(tabla);
     //Devuelvo el resultado que es la cantidad de filas afectadas
     return {
-      filasAfectadas: resultado.rowsAffected,
+      filasAfectadas: resultado.rowsAffected[0],
       tablaInsertada: "Entrada_Servicio",
     };
   } catch (error) {
@@ -1521,7 +1536,7 @@ const insertarCajaEntrada = async (idCaja, idEntrada) => {
         "insert into Caja_Entrada(IdCaja, IdEntrada) values(@idCaja, @idEntrada)"
       );
     return {
-      filasAfectadas: insertCajaEntrada.rowsAffected,
+      filasAfectadas: insertCajaEntrada.rowsAffected[0],
       tablaInsertada: "Caja_Entrada",
     };
   } catch (error) {
