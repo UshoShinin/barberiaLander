@@ -1251,7 +1251,23 @@ const abrirCaja = async (montoInicial, cedula) => {
 };
 
 //Metodo auxiliar para hacer una entrada de dinero
-const nuevaEntradaDinero = async ( idCaja,  monto,  medioPago,  cedula,  nroTicket,  listadoProductos,  listadoServicios) => {
+/*
+el objeto pago es del estilo. Llega en 0 si no se uso nada
+{
+  numeroTicket: 
+  Efectivo:montoE,
+  Debito:montoD,
+  Cuponera:montoC,
+}
+*/
+const nuevaEntradaDinero = async (
+  idCaja,
+  monto,
+  pago,
+  cedula,
+  listadoProductos,
+  listadoServicios
+) => {
   try {
     //Hago primero el insert en la tabla entrada
     const insertoEntradaDinero = insertarEntradaDinero(monto, cedula).then(
@@ -1261,14 +1277,29 @@ const nuevaEntradaDinero = async ( idCaja,  monto,  medioPago,  cedula,  nroTick
         //Ahora tengo que ver en que otras tablas deberia insertar
         //Primero verifico cual fue el medio de pago que usaron
         //En la variable agregoPago guardo la promesa del medio de pago que haya insertado
-        if (medioPago === 1 || medioPago === 3) {
-          const agregoPago = insertarEntradaEfectivo(idEntrada, medioPago);
+        if (pago.Efectivo > 0) {
+          const agregoPago = insertarEntradaEfectivo(
+            idEntrada,
+            1,
+            pago.Efectivo
+          );
           listadoPromesas.push(agregoPago);
-        } else {
+        }
+        if (pago.Cuponera > 0) {
+          //Llamar al metodo que descuenta el saldo de la cuponera
+          const agregoPago = insertarEntradaEfectivo(
+            idEntrada,
+            3,
+            pago.Cuponera
+          );
+          listadoPromesas.push(agregoPago);
+        }
+        if (pago.Debito > 0) {
           const agregoPago = insertarEntradaDebito(
             idEntrada,
-            medioPago,
-            nroTicket
+            2,
+            pago.Debito,
+            pago.numeroTicket
           );
           listadoPromesas.push(agregoPago);
         }
@@ -1324,7 +1355,7 @@ const insertarEntradaDinero = async (monto, cedula) => {
 
 //Metodo auxiliar para hacer el insert en la tabla EntradaEfectivo
 //Este metodo se usa para cuando pagan con efectivo o cuponera, el idMedioPago puede ser el de Efectivo o Cuponera
-const insertarEntradaEfectivo = async (idEntrada, idMedioPago) => {
+const insertarEntradaEfectivo = async (idEntrada, idMedioPago, monto) => {
   try {
     //Creo la conexion
     let pool = await sql.connect(conexion);
@@ -1333,8 +1364,9 @@ const insertarEntradaEfectivo = async (idEntrada, idMedioPago) => {
       .request()
       .input("idEntrada", sql.Int, idEntrada)
       .input("idMedioPago", sql.Int, idMedioPago)
+      .input("monto", sql.Int, monto)
       .query(
-        "insert into Entrada_Efectivo(IdEntrada, IdMedioPago) values(@idEntrada, @idMedioPago)"
+        "insert into Entrada_Efectivo(IdEntrada, IdMedioPago, Monto) values(@idEntrada, @idMedioPago, @monto)"
       );
     return {
       filasAfectadas: insertEntradaEfectivo.rowsAffected,
@@ -1346,7 +1378,7 @@ const insertarEntradaEfectivo = async (idEntrada, idMedioPago) => {
 };
 
 //Metodo auxiliar para hacer el insert en la tabla EntradaDebito
-const insertarEntradaDebito = async (idEntrada, idMedioPago, ticket) => {
+const insertarEntradaDebito = async (idEntrada, idMedioPago, monto, ticket) => {
   try {
     //Creo la conexion
     let pool = await sql.connect(conexion);
@@ -1355,9 +1387,10 @@ const insertarEntradaDebito = async (idEntrada, idMedioPago, ticket) => {
       .request()
       .input("idEntrada", sql.Int, idEntrada)
       .input("idMedioPago", sql.Int, idMedioPago)
+      .input("monto", sql.Int, monto)
       .input("ticket", sql.Int, ticket)
       .query(
-        "insert into Entrada_Debito(IdEntrada, IdMedioPago, NroTicket) output inserted.IdEntrada values(@idEntrada, @idMedioPago, @ticket)"
+        "insert into Entrada_Debito(IdEntrada, IdMedioPago, Monto, NroTicket) output inserted.IdEntrada values(@idEntrada, @idMedioPago, @monto, @ticket)"
       );
     return {
       filasAfectadas: insertEntradaDebito.rowsAffected,
@@ -1370,7 +1403,7 @@ const insertarEntradaDebito = async (idEntrada, idMedioPago, ticket) => {
 
 //Metodo auxiliar para hacer el insert en la tabla EntradaProducto
 //El listado de productos tiene objetos del estilo {id: , cantidad: }
-const insertarEntradaProducto = async (idEntrada, listadoProductos) => {
+const insertarEntradaProducto = async (idEntrada, listadoProductos, monto) => {
   try {
     //Creo la conexion
     let pool = await sql.connect(conexion);
@@ -1455,7 +1488,7 @@ const insertarCajaEntrada = async (idCaja, idEntrada) => {
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 //Metodo auxiliar para conseguir la caja de un dia dado
 const getCaja = async (fecha) => {
@@ -1490,7 +1523,7 @@ const interfaz = {
   cancelarAgenda,
   registrarCliente,
   login,
-  abrirCaja
+  abrirCaja,
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar
