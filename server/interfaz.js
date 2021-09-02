@@ -1254,7 +1254,7 @@ const getClienteParaLogin = async (datosCliente) => {
 };
 
 //Metodo para abrir una caja
-const abrirCaja = async (montoInicial, cedula) => {
+const abrirCaja = async (entrada) => {
   try {
     //Creo la conexion
     let pool = await sql.connect(conexion);
@@ -1269,9 +1269,11 @@ const abrirCaja = async (montoInicial, cedula) => {
     //Despues de insertar tengo que hacer una entrada de caja a la caja actual con el monto inicial
     const insertMontoInicial = nuevaEntradaDinero(
       idCaja,
-      montoInicial,
-      medioPago,
-      cedula
+      entrada.pago.Efectivo,
+      entrada.pago,
+      entrada.cedula,
+      entrada.productosVendidos,
+      entrada.servicios
     ).then((resultado) => resultado);
     return { idCaja: idCaja, mensaje: insertMontoInicial };
   } catch (error) {
