@@ -1275,7 +1275,7 @@ const abrirCaja = async (entrada) => {
       entrada.productosVendidos,
       entrada.servicios
     ).then((resultado) => resultado);
-    return { idCaja: idCaja, mensaje: insertMontoInicial };
+    return { idCaja: idCaja};
   } catch (error) {
     console.log(error);
   }
