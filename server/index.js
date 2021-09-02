@@ -101,14 +101,11 @@ app.delete("/eliminarAgenda", (req, res) => {
 
 
 app.post("/entradaCaja", (req, res) => {
-  // const ret = interfaz.crearSolicitudAgenda(req.body);
-  // ret.then((resultado) => {
-  //   res.json({
-  //     mensaje: resultado,
-  //   });
-  // });
-  res.json({
-    mensaje: req.body,
+  const ret = interfaz.nuevaEntradaDinero(req.body.idCaja, req.body.montoTotal, req.body.pago, req.body.ciEmpleado, req.body.productosVendidos, req.body.servicios);
+  ret.then((resultado) => {
+    res.json({
+      mensaje: resultado,
+    });
   });
 });
 

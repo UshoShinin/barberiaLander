@@ -1260,14 +1260,7 @@ el objeto pago es del estilo. Llega en 0 si no se uso nada
   Cuponera:montoC,
 }
 */
-const nuevaEntradaDinero = async (
-  idCaja,
-  monto,
-  pago,
-  cedula,
-  listadoProductos,
-  listadoServicios
-) => {
+const nuevaEntradaDinero = async (idCaja, monto, pago, cedula, listadoProductos, listadoServicios) => {
   try {
     //Hago primero el insert en la tabla entrada
     const insertoEntradaDinero = insertarEntradaDinero(monto, cedula).then(
@@ -1304,7 +1297,7 @@ const nuevaEntradaDinero = async (
           listadoPromesas.push(agregoPago);
         }
         //Ahora tengo que verificar si se vendieron productos
-        if (listadoProductos !== undefined) {
+        if (listadoProductos !== null) {
           const agregoProductos = insertarEntradaProducto(
             idEntrada,
             listadoProductos
@@ -1312,7 +1305,7 @@ const nuevaEntradaDinero = async (
           listadoPromesas.push(agregoProductos);
         }
         //Ahora verifico si se hizo algun servicio
-        if (listadoServicios !== undefined) {
+        if (listadoServicios !== null) {
           const agregoServicios = insertarEntradaServicio(
             identrada,
             listadoServicios
