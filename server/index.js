@@ -99,6 +99,7 @@ app.delete("/eliminarAgenda", (req, res) => {
   });
 });
 
+
 app.post("/entradaCaja", (req, res) => {
   // const ret = interfaz.crearSolicitudAgenda(req.body);
   // ret.then((resultado) => {
