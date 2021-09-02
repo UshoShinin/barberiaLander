@@ -6,7 +6,7 @@ import peluqueros from "../../recursos/ImagenesPrueba/peluqueros.jpg";
 import Button from "../../components/UI/Button/Button";
 const Inicio = () => {
   return (
-    <div className="container">
+    <div className={classes.container}>
       <Slider />
       <div className={classes.Contactanos}>
         <figure>
@@ -23,7 +23,7 @@ const Inicio = () => {
           <Button action={()=>{console.log('Te mando a reservar')}}>Reservar</Button>
         </div>
       </div>
-      {/* <Footer/> */}
+      <Footer/>
     </div>
   );
 };

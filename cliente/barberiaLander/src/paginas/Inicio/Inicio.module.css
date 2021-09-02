@@ -1,6 +1,11 @@
+.container{
+    position: relative;
+}
+
 .h1 {
     font-family: 'Aleo', serif;
 }
+
 .Contactanos{
     display:grid;
     grid-template-columns: 48% 48%;

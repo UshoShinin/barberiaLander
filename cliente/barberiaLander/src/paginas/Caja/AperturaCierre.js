@@ -171,7 +171,7 @@ const AperturaCierre = () => {
           show={cajaState.jornal.show}
           aceptar={() => {
             dispatchCaja({ type: "HIDE_JORNAL" });
-            console.log("Aceptar");
+            console.log(cajaState);
             const montoE = cajaState.montoEfectivo.value.length>0?cajaState.montoEfectivo.value:0;
             const montoD = cajaState.montoDebito.value.length>0?cajaState.montoDebito.value:0;
             const montoC = cajaState.montoCuponera.value.length>0?cajaState.montoCuponera.value:0;
@@ -187,9 +187,12 @@ const AperturaCierre = () => {
               fecha:cajaState.fecha,
               ciEmpleado:cajaState.sinAgendar.value?cajaState.comboAgenda.value:agenda.empleado,
               montoTotal:cajaState.montoTotal.value,
-              montoEfectivo:montoE,
-              montoDebito:montoD,
-              montoCuponera:montoC,
+              pago:{
+                numeroTicket:cajaState.ticketDebito.value,
+                Efectivo:montoE,
+                Debito:montoD,
+                Cuponera:montoC,
+              },
               productosVendidos,
               servicios
             }

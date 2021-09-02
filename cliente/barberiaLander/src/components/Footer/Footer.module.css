@@ -1,4 +1,4 @@
-footer {
+.footer {
   background-color: var(--clr-footer);
   width: 100%;
   position: absolute;
@@ -10,23 +10,23 @@ footer {
   flex-direction: column;
 } 
 
-footer section{
+.footer section{
   display:flex;
   flex-direction: column;
   color:var(--clr-neon-white);
 }
-footer section div{
+.footer section div{
   margin-top: 0.3em;
   display: flex;
 }
 .Elemento{
   display: flex;
 }
-footer h1{
+.footer h1{
   font-size: 1.6rem;
   color:var(--clr-neon-white);
 }
-footer p {
+.footer p {
   font-size: 1em;
   letter-spacing:.03em;
   margin-left:0.6em;

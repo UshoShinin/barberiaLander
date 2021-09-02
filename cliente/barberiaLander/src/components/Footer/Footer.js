@@ -12,7 +12,7 @@ import Redes from './RedesSociales/Redes'
 algunos iconos de redes sociales creados con css */
 const Footer = () => {
   return (
-    <footer>
+    <footer className={classes.footer}>
       <h1>Contacto y Horarios</h1>
       <section>
         <div>

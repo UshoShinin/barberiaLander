@@ -54,7 +54,6 @@ const Slider = (props) => {
     }
   };
   const [state, dispatch] = useReducer(reducer, initialState);
-  console.log(state.posiciones);
   return (
     <div className={classes.Slider}>
       <button onClick={state.movimiento===0?() => {dispatch({ type: "LEFT" });}:null}
