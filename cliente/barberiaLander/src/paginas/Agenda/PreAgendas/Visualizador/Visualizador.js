@@ -21,6 +21,7 @@ const Visualizador = React.memo((props) => {
   });
 
   const obtenerAgenda = (respuesta) => {
+    console.log(respuesta)
     let servicios = {
       corte: false,
       barba: false,
@@ -66,8 +67,6 @@ const Visualizador = React.memo((props) => {
     }
   }, [props.id]);
   const sendAgendas = () => {
-    console.log("Visualizador");
-    console.log(agenda);
     props.mostrarAgenda(agenda);
   };
   return (

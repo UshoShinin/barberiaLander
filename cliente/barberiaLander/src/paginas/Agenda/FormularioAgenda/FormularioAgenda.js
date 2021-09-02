@@ -155,7 +155,7 @@ const FormularioAgenda = (props) => {
   const realDate = new Date();
   const date = new Date(
     realDate.getFullYear(),
-    realDate.getMonth() - 1,
+    realDate.getMonth(),
     realDate.getDate()
   );
   if (
@@ -167,7 +167,7 @@ const FormularioAgenda = (props) => {
       inputState.servicios
     );
     diasMostrar = DaysGenerator(
-      date.getDate(),
+      date.getDate()+3,
       date.getMonth() + 1,
       date.getFullYear(),
       getElementById(inputState.HorariosFiltrados, inputState.Employee.value)
@@ -373,7 +373,7 @@ const FormularioAgenda = (props) => {
           )}
         </div>
         <Button type="submit">{`${
-          props.agenda === null ? "Agregar Reserva" : "Modificar Reserva"
+          props.agenda === null ? "Reservar" : "Modificar Reserva"
         }`}</Button>
       </form>
     </>

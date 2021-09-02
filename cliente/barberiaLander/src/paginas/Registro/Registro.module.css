@@ -36,7 +36,7 @@
 }
 .container >div >div{
     display: grid;
-    grid-template-columns: max-content 137px;
+    grid-template-columns: max-content 224px;
     align-items: center;
     grid-column-gap:10px;
     grid-row-gap: 11px;

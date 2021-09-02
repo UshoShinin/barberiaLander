@@ -18,6 +18,7 @@
   .input {
     resize: none;
     font-size: 1rem;
+    font-family: 'Aleo', serif;
     text-align: left;
     background: transparent;
     border: var(--clr-inActive) 0.125em solid;

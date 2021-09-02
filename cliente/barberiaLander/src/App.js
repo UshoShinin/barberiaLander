@@ -2,7 +2,7 @@
 /* import ContextUsuario from "./context/contextUsuario"; */
 import "./App.css";
 //IMPORTS PARA LAS PAGINAS
-import Inicio from "./paginas/Inicio";
+import Inicio from "./paginas/Inicio/Inicio";
 import Administracion from "./paginas/Administracion";
 import Cuponeras from "./paginas/Cuponeras";
 import Productos from "./paginas/Productos";
@@ -18,7 +18,7 @@ import VisualAgendas from "./paginas/Agenda/VisualAgendas/VisualAgendas";
 import Registro from "./paginas/Registro/Registro";
 import Login from "./paginas/Login/Login";
 import NoEncontrado from "./paginas/NoEncontrado";
-import Navbar from "./components/Navbar";
+import NavBar from './paginas/NavBars/NavBar';
 import React from "react";
 import {
   BrowserRouter as Router,
@@ -41,7 +41,7 @@ const App = () => {
       {/*ESTAS SON LAS RUTAS POSIBLES A GRANDES RASGOS*/}
       <Router>
         <main>
-          <Navbar />
+          <NavBar />
           <Switch>
             <Route path="/" exact>
               <Redirect to="/inicio" />

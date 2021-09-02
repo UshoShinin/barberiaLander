@@ -102,6 +102,7 @@ export const inputReducer = (state, action) => {
         ComboBox: {
           value: state.ComboBox.value,
           active: !state.ComboBox.active,
+          title:state.ComboBox.title
         },
       };
     case "HORARIOS_SELECT":

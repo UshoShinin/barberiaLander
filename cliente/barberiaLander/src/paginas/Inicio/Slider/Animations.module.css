@@ -1,0 +1,38 @@
+.rightEnter{
+    transform:translateX(-100%);
+    animation: RightEnter 2000ms forwards;
+}
+@keyframes RightEnter {
+    0%{
+        transform: translateX(0);
+    }
+    100%{
+        transform: translateX(-100%);
+    }
+}
+
+.leftEnterA{
+    transform:translateX(100%);
+    animation: LeftEnterA 2000ms forwards;
+}
+@keyframes LeftEnterA {
+    0%{
+        transform: translateX(0%);
+    }
+    100%{
+        transform: translateX(100%);
+    }
+}
+
+.leftEnterB{
+    transform:translateX(-100%);
+    animation: LeftEnterB 2000ms forwards;
+}
+@keyframes LeftEnterB {
+    0%{
+        transform: translateX(-200%);
+    }
+    100%{
+        transform: translateX(-100%);
+    }
+}

@@ -44,7 +44,7 @@ const VisualAgendas = () => {
   };
 
   const obtenerAgenda = (res) => {
-    /* console.log(res.mensaje); */
+    const agenda = res.mensaje
     let misServicios = {
       barba: false,
       brushing: false,
@@ -53,7 +53,7 @@ const VisualAgendas = () => {
       decoloracion: false,
       maquina: false,
     };
-    res.mensaje.servicios.forEach((s) => {
+    agenda.servicios.forEach((s) => {
       switch (s) {
         case 1:
           misServicios.corte = true;
@@ -70,7 +70,8 @@ const VisualAgendas = () => {
       }
     
     });
-    setAgenda({...res.mensaje,servicios:{...misServicios}});
+    console.log(agenda);
+    setAgenda({...agenda,servicios:{...misServicios},fecha:{d:parseInt(agenda.fecha.slice(8,10),10),m:parseInt(agenda.fecha.slice(5,7),10)}});
   };
 
   const obtenerAgendas = (res) => {

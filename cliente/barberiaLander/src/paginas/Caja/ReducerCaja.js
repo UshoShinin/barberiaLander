@@ -81,6 +81,8 @@ export const initialState = {
   ],
 };
 
+
+
 const orden = (a, b) => {
   if (a.id > b.id) {
     return 1;
@@ -652,6 +654,7 @@ export const cajaReducer = (state, action) => {
           ? parseInt(state.propinaAgenda.value, 10)
           : 0;
       total = String(mAgenda + mProducto + mPropina);
+      mProducto = String(mProducto);
       return {
         ...state,
         productos: [...origen],
@@ -662,7 +665,7 @@ export const cajaReducer = (state, action) => {
         productosAgregados: [...destino],
         montoProductos: { value: "", isValid: null },
         productosSEl: [],
-        montoTotalProd: { value: mProducto, isValid: true },
+        montoTotalProd: { value: mProducto, isValid: validarMonto(mProducto) },
         montoTotal: { value: total, isValid: validarMonto(total) },
       };
     case "CLICK_EFECTIVO":

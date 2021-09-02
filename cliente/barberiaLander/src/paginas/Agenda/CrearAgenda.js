@@ -11,6 +11,7 @@ import {
   getIdByTitle,
   cargarHorariosEnMinutos,
   calcularTiempo,
+  transformNumberString
 } from "../../components/Calendario/FuncionesAuxiliares";
 const getRespuesta = (res) => {
   console.log(res);
@@ -71,6 +72,7 @@ const CrearAgenda = (props) => {
     let descripcion = { value: "", isValid: null };
     let empleados = horarios.mensaje.empleados;
     let comboBox = { value: null, active: false, title: "" };
+    let id=1;
     if (agenda !== null) {
       let empleado = getElementById(
         horarios.mensaje.empleados,
@@ -89,9 +91,9 @@ const CrearAgenda = (props) => {
         brushing: { active: agenda.servicios.brushing, id: 8 },
       };
       horarios = obtenerHorariosDeDia(agenda.fecha.d,agenda.fecha.m,empleado.fechas);
-    
       tiempo = calcularTiempo(empleado, servicios);
-      const resultado = horarios!==null?horariosAgendarDisponibles(horarios, tiempo):cargarHorariosEnMinutos(8*60,22*60);
+      const resultado = horarios!==null?horariosAgendarDisponibles(horarios, tiempo).map((h)=>{id++;return {id:id,title:transformNumberString(h)}}):cargarHorariosEnMinutos(8*60,22*60);
+      console.log(resultado);
       const position = getIdByTitle(resultado,agenda.horario.i);
       Calendario = {
         value: resultado,
