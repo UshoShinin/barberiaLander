@@ -175,13 +175,13 @@ const AperturaCierre = () => {
             const montoE = cajaState.montoEfectivo.value.length>0?cajaState.montoEfectivo.value:0;
             const montoD = cajaState.montoDebito.value.length>0?cajaState.montoDebito.value:0;
             const montoC = cajaState.montoCuponera.value.length>0?cajaState.montoCuponera.value:0;
-            const productosVendidos = cajaState.productosAgregados.map((p)=>{
+            let productosVendidos = cajaState.productosAgregados.map((p)=>{
               return {idProducto:p.id,cantidad:p.stock};
             })
-            const servicios = Object.values(cajaState.servicios).filter((s)=>s.active);
-            console.log(cajaState.sinAgendar.value);
+            let servicios = Object.values(cajaState.servicios).filter((s)=>s.active);
+            servicios=servicios.length>0?servicios:null;
+            productosVendidos=productosVendidos.length>0?productosVendidos:null;
             const agenda = getElementById(cajaState.agendas,cajaState.comboAgenda.value);
-            console.log(agenda);
             const datosEnviar={
               idCaja:cajaState.idCaja,
               fecha:cajaState.fecha,
@@ -189,23 +189,22 @@ const AperturaCierre = () => {
               montoTotal:cajaState.montoTotal.value,
               pago:{
                 numeroTicket:cajaState.ticketDebito.value,
-                Efectivo:montoE,
-                Debito:montoD,
-                Cuponera:montoC,
+                Efectivo:parseInt(montoE,10),
+                Debito:parseInt(montoD,10),
+                Cuponera:parseInt(montoC,10),
               },
               productosVendidos,
               servicios
             }
-            console.log(datosEnviar);
-            /* cobrarCaja(
+            cobrarCaja(
               {
                 url: "/entradaCaja",
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: cajaState,
+                body: datosEnviar,
               },
               getRespuesta
-            ); */
+            );
           }}
           rechazar={() => {
             dispatchCaja({ type: "HIDE_JORNAL" });

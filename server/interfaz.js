@@ -1517,6 +1517,7 @@ const interfaz = {
   registrarCliente,
   login,
   abrirCaja,
+  nuevaEntradaDinero,
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar
