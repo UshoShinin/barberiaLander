@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require("express");
 const router = express.Router();
 const PORT = process.env.PORT || 3001;
@@ -7,6 +8,10 @@ app.use(express.json()); // To parse the incoming requests with JSON payloads
 
 //Importo la interfaz. Esto va a tener los metodos para llamar a la base
 const interfaz = require("./interfaz");
+
+
+// Have Node serve the files for our built React app
+app.use(express.static(path.resolve(__dirname, '../cliente/barberiaLander/build')));
 
 app.use("/datosFormularioAgenda", (req, res) => {
   let ret = interfaz.getDatosFormulario();
@@ -142,6 +147,13 @@ app.post("/abrirCaja", (req, res) => {
     });
   });
 });
+
+
+// All other GET requests not handled before will return our React app
+app.get('*', (req, res) => {
+  res.sendFile(path.resolve(__dirname, '../cliente/barberiaLander/build', 'index.html'));
+});
+
 
 //No escribir nada por debajo de esto
 app.listen(PORT, () => {
