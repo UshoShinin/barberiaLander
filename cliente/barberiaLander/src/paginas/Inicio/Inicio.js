@@ -4,7 +4,10 @@ import Slider from "./Slider/Slider";
 import Footer from "../../components/Footer/Footer";
 import peluqueros from "../../recursos/ImagenesPrueba/peluqueros.jpg";
 import Button from "../../components/UI/Button/Button";
+import { useHistory } from "react-router-dom";
 const Inicio = () => {
+const history = useHistory();
+
   return (
     <div className={classes.container}>
       <Slider />
@@ -20,10 +23,12 @@ const Inicio = () => {
             penatibus et magnis dis parturient montes, nascetur ridiculus mus.
             Donec quam felis.
           </p>
-          <Button action={()=>{console.log('Te mando a reservar')}}>Reservar</Button>
+          <Button action={()=>{history.replace('/agenda/crearagenda');}}>Reservar</Button>
         </div>
       </div>
-      <Footer/>
+      <div className={classes.footerContainer}>
+        <Footer/>
+      </div>
     </div>
   );
 };

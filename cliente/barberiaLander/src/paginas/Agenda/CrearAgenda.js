@@ -16,9 +16,9 @@ import {
 const getRespuesta = (res) => {
   console.log(res);
 };
-const CrearAgenda = (props) => {
+const CrearAgenda = (props) => { 
   const authCtx = useContext(AuthContext);
-  /* console.log(props.agenda); */
+
   let initialState = {
     Nombre: { value: "", isValid: null },
     Horarios: null,
@@ -64,7 +64,6 @@ const CrearAgenda = (props) => {
   /* Carga inicial de datos */
   const obtenerHorarios = (horarios) => {
     const agenda = props.agenda;
-    console.log(agenda);
     let nombre;
     let telefono;
     let servicios = { ...initialState.servicios };
@@ -93,7 +92,6 @@ const CrearAgenda = (props) => {
       horarios = obtenerHorariosDeDia(agenda.fecha.d,agenda.fecha.m,empleado.fechas);
       tiempo = calcularTiempo(empleado, servicios);
       const resultado = horarios!==null?horariosAgendarDisponibles(horarios, tiempo).map((h)=>{id++;return {id:id,title:transformNumberString(h)}}):cargarHorariosEnMinutos(8*60,22*60);
-      console.log(resultado);
       const position = getIdByTitle(resultado,agenda.horario.i);
       Calendario = {
         value: resultado,
@@ -137,7 +135,11 @@ const CrearAgenda = (props) => {
 
   /* Se ejecuta al inicio para que se cargen los datos */
   useEffect(() => {
+    if(props.agenda!==null){
+      console.log('Tengo datos');
+    }else{console.log('No tengo datos');}
     fetchHorarios({ url: "/datosFormularioAgenda" }, obtenerHorarios);
+
   }, []);
   return (
     <div className="nuevaAgenda">

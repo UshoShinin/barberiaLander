@@ -3,7 +3,13 @@ import { NavLink } from "react-router-dom";
 import { useContext, useReducer, useState } from "react";
 import AuthContext from "../../store/AuthContext";
 import Menu from "./Menu/Menu";
+import Logo from '../../recursos/LogoChiquitoB.png';
+
 const NavLinks = (props) => {
+
+  
+      
+
   const initialState = { place: -1, active: -1 };
   const reducer = (state, action) => {
     switch (action.type) {
@@ -36,6 +42,9 @@ const NavLinks = (props) => {
   return (
     <ul className={classes.navbarUl}>
       {/* <li><Link to="/" className="navbar-brand">Lander</Link></li>  */}
+      {/* <li className={classes.Logo}>
+        <img src={Logo}/>
+      </li> */}
       <li>
         <NavLink
           onClick={NavOnClick}

@@ -7,6 +7,7 @@
   }
   .Elemento {
     margin-right: 1em;
+    cursor: pointer;
     border: 0.2em solid var(--clr-inActive);
     border-radius: 30%;
     background-color: var(--clr-facebook);
@@ -21,7 +22,7 @@
   
   .ElementoInsta {
     position:relative;
-   /*  float: right;  */
+    cursor: pointer;
     margin-right: 1em;
     padding:0.2em;
     border-radius: 30%;

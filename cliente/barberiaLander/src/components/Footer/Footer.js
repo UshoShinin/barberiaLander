@@ -19,15 +19,14 @@ const Footer = () => {
           <div className={classes.Elemento}>
             <FontAwesomeIcon icon={faMapMarkedAlt} className={classes.MyIcon} />
             <p>Av. Gral. Rivera 2549</p>
-          </div>
-          <div className={classes.Elemento}>
+      
             <FontAwesomeIcon icon={faEnvelope} className={classes.MyIcon} />
             <p>helanderignacio @gmail.com</p>
-          </div>
-        </div>
-        <div className={classes.Elemento}>
-          <FontAwesomeIcon icon={faClock} className={classes.MyIcon} />
+            <FontAwesomeIcon icon={faClock} className={classes.MyIcon} />
           <p>Lun a Vie 10 a 20hs Sab 10 a 18hs</p>
+          <span></span>
+          <span></span>
+          </div>
         </div>
         <div className={classes.Elemento}>
           <FontAwesomeIcon icon={faPhoneAlt} />

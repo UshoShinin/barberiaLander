@@ -16,6 +16,10 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useReducer } from "react";
 const Slider = (props) => {
+  const autoMove = ()=>{
+    dispatch({type:'RIGHT'});
+  }
+  /* setInterval(autoMove,5000); */
   const imagenes = [pelu,one,two,three,four,five,six,mantel];
   let posiciones = [];
   for(let i = 0;i<imagenes.length;i++){
@@ -69,7 +73,7 @@ const Slider = (props) => {
       <div className={classes.Content}>
         <CSSTransition
           in={state.A.active}
-          timeout={2000}
+          timeout={1400}
           classNames={{
             enter: "",
             enterActive: "",
@@ -84,7 +88,7 @@ const Slider = (props) => {
         </CSSTransition>
         <CSSTransition
           in={state.B.active}
-          timeout={2000}
+          timeout={1400}
           classNames={{
             enter:'',
             enterActive: `${state.movimiento>0?classesAnim.rightEnter:classesAnim.leftEnterB}`,

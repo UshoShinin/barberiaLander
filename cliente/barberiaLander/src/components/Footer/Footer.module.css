@@ -10,17 +10,20 @@
   flex-direction: column;
 } 
 
-.footer section{
+.footer > section{
   display:flex;
   flex-direction: column;
   color:var(--clr-neon-white);
 }
-.footer section div{
+.footer > section > div{
   margin-top: 0.3em;
   display: flex;
 }
 .Elemento{
-  display: flex;
+  display: grid;
+  grid-template-columns: 20px max-content;
+  grid-column-gap: 10px;
+  grid-row-gap:3px;
 }
 .footer h1{
   font-size: 1.6rem;
@@ -29,7 +32,6 @@
 .footer p {
   font-size: 1em;
   letter-spacing:.03em;
-  margin-left:0.6em;
 }
 
 .MyIcon{

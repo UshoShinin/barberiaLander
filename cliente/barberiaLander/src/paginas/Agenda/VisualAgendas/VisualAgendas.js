@@ -70,7 +70,6 @@ const VisualAgendas = () => {
       }
     
     });
-    console.log(agenda);
     setAgenda({...agenda,servicios:{...misServicios},fecha:{d:parseInt(agenda.fecha.slice(8,10),10),m:parseInt(agenda.fecha.slice(5,7),10)}});
   };
 
@@ -106,7 +105,6 @@ const VisualAgendas = () => {
       Mostrar.push(agendas[i]);
     }
     ocupar = 100 / Mostrar.length;
-    console.log(Mostrar);
     empleados = generarCupos(Mostrar, colorFilaI, (id) => {
       getAgenda({ url: "/agendaPorId?idAgenda=" + id }, obtenerAgenda);
     }).map((divA) => {

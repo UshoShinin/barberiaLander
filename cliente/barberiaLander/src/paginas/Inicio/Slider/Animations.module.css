@@ -1,6 +1,6 @@
 .rightEnter{
     transform:translateX(-100%);
-    animation: RightEnter 2000ms forwards;
+    animation: RightEnter 1400ms forwards;
 }
 @keyframes RightEnter {
     0%{
@@ -13,7 +13,7 @@
 
 .leftEnterA{
     transform:translateX(100%);
-    animation: LeftEnterA 2000ms forwards;
+    animation: LeftEnterA 1400ms forwards;
 }
 @keyframes LeftEnterA {
     0%{
@@ -26,7 +26,7 @@
 
 .leftEnterB{
     transform:translateX(-100%);
-    animation: LeftEnterB 2000ms forwards;
+    animation: LeftEnterB 1400ms forwards;
 }
 @keyframes LeftEnterB {
     0%{

@@ -39,8 +39,8 @@ const AperturaCierre = () => {
     if (!cajaState.montoSalida.isValid) {
       montoSalida.current.focus();
     } else if (cajaState.comboSalida.value === null) {
-      const comboSalida = document.getElementById('comboSalida');
-      comboSalida.className=`${comboSalida.className} ${classes.invalid}`;
+      const comboSalida = document.getElementById("comboSalida");
+      comboSalida.className = `${comboSalida.className} ${classes.invalid}`;
     } else {
       const data = {
         monto: cajaState.montoSalida.value,
@@ -58,6 +58,17 @@ const AperturaCierre = () => {
     errorModificar,
     sendRequest: cobrarCaja,
   } = useHttp();
+
+  const {
+    isLoadingAbrirCaja,
+    errorAbrirCaja,
+    sendRequest: abrirCaja,
+  } = useHttp();
+
+  const resultadoCaja = (res) => {
+    console.log(res);
+    dispatchCaja({ type: "ABRIR_CAJA" });
+  };
 
   const getRespuesta = (res) => {
     console.log(res);
@@ -142,15 +153,18 @@ const AperturaCierre = () => {
               input={INPUTS[9]}
             />
           </div>
-          <label id="comboSalida" className={classes.text}>Empleado</label>
+          <label id="comboSalida" className={classes.text}>
+            Empleado
+          </label>
           <div style={{ height: "40px" }}>
             <ComboBox
               opciones={cajaState.Empleados}
               current={cajaState.comboSalida.value}
               active={cajaState.comboSalida.active}
               onClick={() => {
-                const comboSalida = document.getElementById('comboSalida');
-                if(comboSalida.classList[1]!==undefined) comboSalida.classList.remove(comboSalida.classList[1]);
+                const comboSalida = document.getElementById("comboSalida");
+                if (comboSalida.classList[1] !== undefined)
+                  comboSalida.classList.remove(comboSalida.classList[1]);
                 dispatchCaja({ type: "CLICK_COMBO_SALIDA" });
               }}
               onChange={(id) => {
@@ -172,30 +186,47 @@ const AperturaCierre = () => {
           aceptar={() => {
             dispatchCaja({ type: "HIDE_JORNAL" });
             console.log(cajaState);
-            const montoE = cajaState.montoEfectivo.value.length>0?cajaState.montoEfectivo.value:0;
-            const montoD = cajaState.montoDebito.value.length>0?cajaState.montoDebito.value:0;
-            const montoC = cajaState.montoCuponera.value.length>0?cajaState.montoCuponera.value:0;
-            let productosVendidos = cajaState.productosAgregados.map((p)=>{
-              return {idProducto:p.id,cantidad:p.stock};
-            })
-            let servicios = Object.values(cajaState.servicios).filter((s)=>s.active);
-            servicios=servicios.length>0?servicios:null;
-            productosVendidos=productosVendidos.length>0?productosVendidos:null;
-            const agenda = getElementById(cajaState.agendas,cajaState.comboAgenda.value);
-            const datosEnviar={
-              idCaja:cajaState.idCaja,
-              fecha:cajaState.fecha,
-              ciEmpleado:cajaState.sinAgendar.value?cajaState.comboAgenda.value:agenda.empleado,
-              montoTotal:cajaState.montoTotal.value,
-              pago:{
-                numeroTicket:cajaState.ticketDebito.value,
-                Efectivo:parseInt(montoE,10),
-                Debito:parseInt(montoD,10),
-                Cuponera:parseInt(montoC,10),
+            const montoE =
+              cajaState.montoEfectivo.value.length > 0
+                ? cajaState.montoEfectivo.value
+                : 0;
+            const montoD =
+              cajaState.montoDebito.value.length > 0
+                ? cajaState.montoDebito.value
+                : 0;
+            const montoC =
+              cajaState.montoCuponera.value.length > 0
+                ? cajaState.montoCuponera.value
+                : 0;
+            let productosVendidos = cajaState.productosAgregados.map((p) => {
+              return { idProducto: p.id, cantidad: p.stock };
+            });
+            let servicios = Object.values(cajaState.servicios).filter(
+              (s) => s.active
+            );
+            servicios = servicios.length > 0 ? servicios : null;
+            productosVendidos =
+              productosVendidos.length > 0 ? productosVendidos : null;
+            const agenda = getElementById(
+              cajaState.agendas,
+              cajaState.comboAgenda.value
+            );
+            const datosEnviar = {
+              idCaja: cajaState.idCaja,
+              fecha: cajaState.fecha,
+              ciEmpleado: cajaState.sinAgendar.value
+                ? cajaState.comboAgenda.value
+                : agenda.empleado,
+              montoTotal: cajaState.montoTotal.value,
+              pago: {
+                numeroTicket: cajaState.ticketDebito.value,
+                Efectivo: parseInt(montoE, 10),
+                Debito: parseInt(montoD, 10),
+                Cuponera: parseInt(montoC, 10),
               },
               productosVendidos,
-              servicios
-            }
+              servicios,
+            };
             cobrarCaja(
               {
                 url: "/entradaCaja",
@@ -234,7 +265,27 @@ const AperturaCierre = () => {
               disabled={cajaState.cajaAbierta}
               className={classes.Abrir}
               action={() => {
-                dispatchCaja({ type: "ABRIR_CAJA" });
+                const monto = parseInt(cajaState.montoInicial.value, 10)
+                const datosEnviar = {
+                  cedula: "48279578",
+                  pago: {
+                    numeroTicket: cajaState.ticketDebito.value,
+                    Efectivo: monto,
+                    Debito: 0,
+                    Cuponera: 0,
+                  },
+                  productosVendidos:null,
+                  servicios:null,
+                };
+                abrirCaja(
+                  {
+                    url: "/abrirCaja",
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: datosEnviar,
+                  },
+                  resultadoCaja
+                );
               }}
             >
               Abrir Caja

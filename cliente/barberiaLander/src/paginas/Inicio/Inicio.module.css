@@ -1,4 +1,5 @@
-.container{
+.footerContainer{
+    height: 221px;
     position: relative;
 }
 
@@ -58,7 +59,7 @@
     
     .Contactanos{
         display:flex;
-        padding:4%;
+        padding:5% 5% 18% 5% ;
     }
     .Contactanos>figure{
         display: none;

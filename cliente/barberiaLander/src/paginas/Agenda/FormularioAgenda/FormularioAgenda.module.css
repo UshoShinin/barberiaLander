@@ -13,6 +13,10 @@
   grid-row-gap: 10px;
 }
 
+.inputsGrid>div>input{
+  max-width: 100%;
+}
+
 .inputsGrid>.label+div{
   width: 100%;
 }

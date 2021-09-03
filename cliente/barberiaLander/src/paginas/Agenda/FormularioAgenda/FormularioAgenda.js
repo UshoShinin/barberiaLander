@@ -22,7 +22,6 @@ import {
 } from "../../../components/Calendario/FuncionesAuxiliares";
 import AuthContext from "../../../store/AuthContext";
 const FormularioAgenda = (props) => {
-  console.log(props.agenda);
   const [inputState, dispatchInput] = useReducer(
     inputReducer,
     props.initialState
@@ -66,7 +65,6 @@ const FormularioAgenda = (props) => {
       dia: horarios.dia,
     });
   };
-  console.log(inputState);
   /* Aqui se procesa y se manda la info en caso de esta correcta */
   const submitHandler = (event) => {
     event.preventDefault();
@@ -167,7 +165,7 @@ const FormularioAgenda = (props) => {
       inputState.servicios
     );
     diasMostrar = DaysGenerator(
-      date.getDate()+3,
+      date.getDate(),
       date.getMonth() + 1,
       date.getFullYear(),
       getElementById(inputState.HorariosFiltrados, inputState.Employee.value)

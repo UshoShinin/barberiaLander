@@ -33,18 +33,10 @@ const Mes = (props) => {
   const changeTitle = () => {
     switch (move) {
       case 1:
-        /* if (myMonth === 12) {
-          setMyMonth(1);
-        } else { */
           setMyMonth((prev) => prev + 1);
-        /* } */
         break;
       case -1:
-        /* if (myMonth === 1) {
-          setMyMonth(12);
-        } else { */
           setMyMonth((prev) => prev - 1);
-        /* } */
         break;
       default:
         break;
