@@ -31,6 +31,8 @@ const AperturaCierre = () => {
   const montoCuponera = useRef();
   const montoTotal = useRef();
   const montoSalida = useRef();
+  const codCuponera = useRef();
+  const ticket = useRef();
 
   const INPUTS = inputs(cajaState, dispatchCaja);
 
@@ -119,6 +121,10 @@ const AperturaCierre = () => {
 
       const cuponera = document.getElementById("Cuponera");
       cuponera.className = `${cuponera.className} ${classes.invalid}`;
+    } else if(cajaState.debito.value&&!cajaState.ticketDebito.isValid){
+      ticket.current.focus();
+    }else if(cajaState.cuponera.value&&!cajaState.codCuponera.isValid){
+      codCuponera.current.focus();
     } else if (!cajaState.montoTotal.isValid) montoTotal.current.focus();
     else {
       dispatchCaja({ type: "SHOW_JORNAL" });
@@ -738,7 +744,7 @@ const AperturaCierre = () => {
                   <div>
                     <label>Ticket</label>
                     <Input
-                      ref={montoCuponera}
+                      ref={ticket}
                       isValid={cajaState.ticketDebito.isValid}
                       input={INPUTS[12]}
                     />
@@ -780,7 +786,7 @@ const AperturaCierre = () => {
                   <div>
                     <label>Codigo cuponera</label>
                     <Input
-                      ref={montoCuponera}
+                      ref={codCuponera}
                       isValid={cajaState.montoCuponera.isValid}
                       input={INPUTS[11]}
                     />

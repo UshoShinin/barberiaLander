@@ -10,7 +10,7 @@
 .title {
   text-align: center;
   color: var(--clr-neon-white);
-  font-size: 1.2em;
+  font-size: 1.6em;
   font-family: 'Aleo', serif;
   margin:0;
 }
@@ -34,19 +34,19 @@
   justify-content: center;
 }
 .Enero{
-  width:22%;
+  width:24%;
 }
 .Febrero{
-  width: 28.5%;
+  width: 30%;
 }
 .Marzo{
-  width: 23.5%;
+  width: 25.5%;
 }
 .Abril{
-  width: 21%;
+  width: 22%;
 }
 .Mayo{
-  width: 22%;
+  width: 23%;
 }
 .Junio{
   width: 21%;
@@ -55,19 +55,19 @@
   width: 19.5%;
 }
 .Agosto{
-  width: 26%;
+  width: 27%;
 }
 .Septiembre{
-  width: 39%;
+  width: 40%;
 }
 .Octubre{
-  width: 28.5%;
+  width: 30%;
 }
 .Noviembre{
-  width: 38.5%;
+  width: 40%;
 }
 .Diciembre{
-  width: 34.5%;
+  width: 36%;
 }
 
 .titleClose{
@@ -75,7 +75,7 @@
 }
 
 .flecha {
-  font-size: 1em;
+  font-size: 1.3em;
   cursor: pointer;
 }
 
@@ -139,4 +139,49 @@
   }
 }
 
+@media (max-width:1400px) {
+  .title {
+    font-size: 1.2em;
+  }
+  .Enero{
+    width:22%;
+  }
+  .Febrero{
+    width: 28.5%;
+  }
+  .Marzo{
+    width: 23.5%;
+  }
+  .Abril{
+    width: 21%;
+  }
+  .Mayo{
+    width: 22%;
+  }
+  .Junio{
+    width: 21%;
+  }
+  .Julio{
+    width: 19.5%;
+  }
+  .Agosto{
+    width: 26%;
+  }
+  .Septiembre{
+    width: 39%;
+  }
+  .Octubre{
+    width: 28.5%;
+  }
+  .Noviembre{
+    width: 38.5%;
+  }
+  .Diciembre{
+    width: 34.5%;
+  }
+  
+.flecha {
+  font-size: 1em;
+}
+}
 

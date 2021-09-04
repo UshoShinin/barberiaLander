@@ -8,16 +8,16 @@
 .inputsGrid {
   width: 100%;
   display: grid;
-  grid-template-columns: 76px auto;
-  grid-column-gap: 10px;
-  grid-row-gap: 10px;
+  grid-template-columns: max-content auto;
+  grid-column-gap: 14px;
+  grid-row-gap: 14px;
 }
 
-.inputsGrid>div>input{
+.inputsGrid > div > input {
   max-width: 100%;
 }
 
-.inputsGrid>.label+div{
+.inputsGrid > .label + div {
   width: 100%;
 }
 
@@ -26,6 +26,7 @@
   justify-self: end;
   color: var(--clr-neon-white);
   align-items: center;
+  font-size: 1.3em;
 }
 
 .Cal {
@@ -48,6 +49,22 @@
   height: 8.8em;
 }
 
+@media (max-width: 1400px) {
+  .inputsGrid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: max-content auto;
+    grid-column-gap: 10px;
+    grid-row-gap: 10px;
+  }
+  .label {
+    display: flex;
+    justify-self: end;
+    color: var(--clr-neon-white);
+    align-items: center;
+    font-size: 1em;
+  }
+}
 @media (max-width: 980px) {
   .nuevaAgenda {
     display: block;

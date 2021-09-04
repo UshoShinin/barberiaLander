@@ -1,6 +1,6 @@
 .icon {
   color: var(--clr-inActive);
-  font-size: 1.4em;
+  font-size: 2em;
   transition: color 180ms linear;
 }
 .checkbox{
@@ -12,8 +12,8 @@
 .checkbox,.disabled {
   position: relative;
   display: flex;
-  width: 38px;
-  height: 38px;
+  width: 46px;
+  height: 46px;
   background-color: transparent;
   border: var(--clr-inActive) 0.18em solid;
   border-radius: 0.6em;
@@ -70,6 +70,16 @@
 }
 .active .icon {
   color: var(--clr-neon-blue);
+}
+
+@media (max-width:1400px){
+  .icon {
+    font-size: 1.4em;
+  }
+  .checkbox,.disabled {
+    width: 38px;
+    height: 38px;
+  }
 }
 
 

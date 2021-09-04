@@ -1,5 +1,6 @@
 .lis{
     margin:0 auto;
+    font-size: 1.3em;
 }
 
 .dia,.invalid{
@@ -49,3 +50,9 @@
     border-radius: 6px;
      text-shadow: 0 0 0.5em var(--clr-neon-blue);
 }
+
+@media (max-width:1400px) {
+    .lis{
+        font-size: 1em;
+    }
+  }

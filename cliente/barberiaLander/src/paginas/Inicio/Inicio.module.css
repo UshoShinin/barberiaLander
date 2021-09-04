@@ -41,7 +41,8 @@
 }
 
 .Contactanos>div{
-    height: max-content;
+    /* height: max-content; */
+    height: 500px;
     width: 100%;
     color:var(--clr-neon-placeholder);
     /* background-color: var(--clr-navbar); */

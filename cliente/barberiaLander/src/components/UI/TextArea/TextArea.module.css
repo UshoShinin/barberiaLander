@@ -16,8 +16,10 @@
   }
   
   .input {
+    font-size: 1.25em;
+  }
+  .input {
     resize: none;
-    font-size: 1rem;
     font-family: 'Aleo', serif;
     text-align: left;
     background: transparent;
@@ -90,4 +92,9 @@
     color: var(--clr-neon-blue);
   }
   
+  @media (max-width: 1400px) {
+    .input {
+      font-size: 1em;
+    }
+  }
   

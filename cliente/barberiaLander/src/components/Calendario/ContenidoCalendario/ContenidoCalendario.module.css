@@ -2,10 +2,17 @@
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   flex-shrink: 0;
-  width: 18em;
+  width: 22.7em;
   margin-right: 1em;
 }
 .diasCalendario > li > p{
   margin:0px;
   font-family: 'Aleo', serif;
+}
+
+
+@media (max-width:1400px) {
+  .diasCalendario {
+    width: 18em;
+  }
 }

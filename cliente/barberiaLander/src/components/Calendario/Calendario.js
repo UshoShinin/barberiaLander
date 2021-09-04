@@ -1,5 +1,4 @@
 import classes from "./Calendario.module.css";
-import classesDia from "./Dias/Dias.module.css";
 import Mes from "./Mes";
 import Fotos from "./Fotos";
 import React from 'react';
@@ -13,6 +12,7 @@ const Calendario = (props) => {
   const empleadosFotos = extraerFotos(props.empleados); /* De la lista de empleados se extraen solo las fotos para mandar
   solo los nombres ci y fotos */
   // Como no tenemos todo pronto en la base de datos voya tener que armar unos tiempos y servicios y tiempos provicionales
+  const move = document.getElementById("root").clientWidth>1400?26.86:19;
   const obtenerHorarios = (horarios) =>{
     props.getHorarios(horarios);
   }
@@ -49,13 +49,13 @@ const Calendario = (props) => {
         <li className={classes.day}>Jue</li>
         <li className={classes.day}>Vie</li>
         <li className={classes.day}>Sáb</li>
-        <li className={`${classes.day} ${classesDia.invalid}`}>Dom</li>
+        <li className={`${classes.day} ${classes.invalidDay}`}>Dom</li>
       </ol>
       <div
         className={classes.contenidoCalendario}
         style={{
           marginLeft:
-            currentCalendar >= 0 ? `-${currentCalendar * 19}em` : undefined,
+            currentCalendar >= 0 ? `-${currentCalendar * move}em` : undefined,
         }} 
       >
         {content}
