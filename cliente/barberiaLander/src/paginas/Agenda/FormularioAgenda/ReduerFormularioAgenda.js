@@ -137,6 +137,7 @@ export const inputReducer = (state, action) => {
         servicios: {
           ...state.servicios,
           corte: { active: !state.servicios.corte.active, id: state.servicios.corte.id },
+          maquina: { active: false, id: state.servicios.maquina.id },
         },
       };
       break;
@@ -145,6 +146,7 @@ export const inputReducer = (state, action) => {
         ...state,
         servicios: {
           ...state.servicios,
+          corte: { active: false, id: state.servicios.corte.id },
           maquina: { active: !state.servicios.maquina.active, id: state.servicios.maquina.id },
         },
       };

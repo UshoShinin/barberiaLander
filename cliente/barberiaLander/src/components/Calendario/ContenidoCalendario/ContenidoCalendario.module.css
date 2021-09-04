@@ -15,4 +15,7 @@
   .diasCalendario {
     width: 18em;
   }
+  .diasCalendario > li +.diasCalendario > li {
+    margin-top:7px;
+  }
 }
