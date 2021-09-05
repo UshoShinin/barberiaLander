@@ -118,7 +118,7 @@ export const inputReducer = (state, action) => {
       return {
         ...state,
         Employee: { value: action.value, active: false },
-        Calendario: { value: null },
+        Calendario: { value: null, dia: null },
         ComboBox: { value: null, active: false },
       };
     case "CLICK_EMPLOYEE":
