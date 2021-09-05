@@ -106,7 +106,7 @@ const CrearAgenda = (props) => {
       if (authCtx.isLoggedIn && authCtx.user.rol === "Cliente") {
         nombre = { value: authCtx.user.nombre, isValid: true };
         telefono = { value: authCtx.user.telefono, isValid: true };
-        ciCliente = authCtx.user.ciCliente;
+        ciCliente = authCtx.user.ciUsuario;
       }
     }
 

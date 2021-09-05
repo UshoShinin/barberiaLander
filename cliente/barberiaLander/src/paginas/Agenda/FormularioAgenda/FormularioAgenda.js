@@ -26,6 +26,7 @@ const FormularioAgenda = (props) => {
     inputReducer,
     props.initialState
   );
+  console.log(inputState);
   const nombreRef = useRef();
   const telefonoRef = useRef();
   const descripcionRef = useRef();
@@ -69,7 +70,7 @@ const FormularioAgenda = (props) => {
   const submitHandler = (event) => {
     event.preventDefault();
     let services = [];
-    console.log(inputState);
+    
     Object.values(inputState.servicios).forEach((serv) => {
       if (serv.active) {
         services.push(serv.id);

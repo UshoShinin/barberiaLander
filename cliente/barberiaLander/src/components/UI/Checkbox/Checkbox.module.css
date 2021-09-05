@@ -70,7 +70,7 @@
   color: var(--clr-neon-blue);
 }
 
-/* @media (max-width:1400px){
+@media (max-width:1400px){
   .icon {
     font-size: 1.4em;
   }
@@ -79,30 +79,27 @@
     height: 38px;
   }
   .active::before {
-    content: "";
-    opacity: 1;
-    width: 6px;
-    height: 8.5px;
-    left:5px;
-    top:12.3px;
-    transform: rotate(-45deg);
-    background-color: var(--clr-neon-blue);
-    position: absolute;
-    filter:blur(2px)
-  }
-  
-  .active::after {
-    content: "";
-    opacity: 1;
-    width: 6px;
-    height: 22px;
-    right: 10.4px;
-    transform: rotate(45deg);
-    background-color: var(--clr-neon-blue);
-    position: absolute;
-    filter:blur(2px)
-  }
-} */
+  content: "\f00c";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  font-size: 2em;
+  opacity: 0.8;
+  color: var(--clr-neon-blue);
+  position: absolute;
+  filter:blur(4px)
+}
+
+.active::after {
+  content: "\f00c";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  font-size: 2em;
+  opacity: 0.8;
+  color: var(--clr-neon-blue);
+  position: absolute;
+  filter:blur(4px)
+}
+}
 
 
 
