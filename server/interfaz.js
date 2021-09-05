@@ -1194,21 +1194,19 @@ const existeCliente = async (ciCliente) => {
 //Metodo para el login
 const login = async (usuario) => {
   try {
-    const resultado = getEmpleadoParaLogin(usuario)
-      .then((resultado) => {
-        if (resultado.rowsAffected[0] === 1) {
-          return resultado.recordset[0];
-        } else {
-          return getClienteParaLogin(usuario);
-        }
-      })
-      .then((cliente) => {
-        if (cliente.rowsAffected[0] === 1) {
-          return { ...cliente.recordset[0], rol: "Cliente" };
-        } else {
-          return { codigo: 400, error: "Credenciales incorrectas" };
-        }
-      });
+    const resultado = getEmpleadoParaLogin(usuario).then((resultado) => {
+      if (resultado.rowsAffected[0] === 1) {
+        return resultado.recordset[0];
+      } else {
+        return getClienteParaLogin(usuario).then((cliente) => {
+          if (cliente.rowsAffected[0] === 1) {
+            return { ...cliente.recordset[0], rol: "Cliente" };
+          } else {
+            return { codigo: 400, error: "Credenciales incorrectas" };
+          }
+        });
+      }
+    });
     return resultado;
   } catch (error) {
     console.log(error);
@@ -1275,7 +1273,7 @@ const abrirCaja = async (entrada) => {
       entrada.productosVendidos,
       entrada.servicios
     ).then((resultado) => resultado);
-    return { idCaja: idCaja};
+    return { idCaja: idCaja };
   } catch (error) {
     console.log(error);
   }
