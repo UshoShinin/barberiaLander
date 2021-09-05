@@ -1197,7 +1197,7 @@ const login = async (usuario) => {
     const resultado = getEmpleadoParaLogin(usuario)
       .then((resultado) => {
         if (resultado.rowsAffected[0] === 1) {
-          return resultado.recordset;
+          return resultado.recordset[0];
         } else {
           return getClienteParaLogin(usuario);
         }

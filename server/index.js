@@ -13,6 +13,7 @@ const interfaz = require("./interfaz");
 // Have Node serve the files for our built React app
 /* app.use(express.static(path.resolve(__dirname, '../cliente/barberiaLander/build'))); */
 
+
 app.use("/datosFormularioAgenda", (req, res) => {
   let ret = interfaz.getDatosFormulario();
   ret.then((empleados) => {

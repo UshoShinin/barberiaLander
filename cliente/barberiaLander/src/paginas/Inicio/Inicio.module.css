@@ -16,6 +16,7 @@
 
 .Contactanos>figure{
     position: relative;
+    min-height: max-content;
 }
 .Contactanos>figure>img{
     max-width: 100%;
