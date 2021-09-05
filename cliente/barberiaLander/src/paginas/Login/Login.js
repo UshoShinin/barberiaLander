@@ -22,7 +22,8 @@ const Login = (props) => {
 
   const { isLoadingLogin, errorLogin, sendRequest: login } = useHttp();
   const getRespuesta = (res) => {
-    if (res.mensaje.login !== undefined) {
+    console.log(res);
+    if (res.mensaje.ciUsuario !== undefined) {
       authCtx.login(res.mensaje);
       history.replace('/');
     }

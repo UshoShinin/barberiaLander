@@ -25,7 +25,7 @@ const CrearAgenda = (props) => {
     HorariosFiltrados: null,
     Telefono: { value: "", isValid: null },
     Descripcion: { value: "", isValid: null },
-    Referencia: { value: "" },
+    Referencia: { value: null },
     Calendario: { value: null, dia: null },
     ComboBox: { value: null, active: false, title: "" },
     Employee: {

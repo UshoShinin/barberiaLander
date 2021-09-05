@@ -9,6 +9,7 @@ const Fotos = (props) => {
     Siguiente: { value: null, mostrar: false },
     canChange: true,
   };
+  const heightCombo = document.getElementById("root").clientWidth >1400?8:4.8;
   const reducer = (state, action) => {
     switch (action.type) {
       case "CHANGE_I":
@@ -128,7 +129,7 @@ const Fotos = (props) => {
 
         <div style={{ width: "60%", margin: "0 auto" }}>
           <ComboBox
-            height={5.75}
+            height={heightCombo}
             active={props.active}
             onClick={props.onClick}
             current={props.currentEmployee}

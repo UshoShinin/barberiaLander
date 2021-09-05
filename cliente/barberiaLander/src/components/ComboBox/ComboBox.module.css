@@ -1,5 +1,5 @@
 .title{
-  font-size:1em;
+  font-size:1.4em;
   color: var(--clr-inActive);
   transition: color 300ms linear;
   margin:0;
@@ -32,11 +32,11 @@
   display:flex;
   justify-content: space-between;
   align-items: center;
-  padding:0.5em;
+  padding:0.6em;
   position:relative;
   z-index:2;
   background-color: var(--clr-background);
-  margin-bottom: 0.7em;
+  margin-bottom: 1em;
 }
 .select::before{
   content:'';
@@ -88,5 +88,15 @@ width: 1em;
 .ComboBox ::-webkit-scrollbar-thumb {
   background: var(--clr-neon-white);
   border-radius: 10px;
+}
+
+@media (max-width:1400px) {
+  .title{
+    font-size:1em;
+  }
+  .select,.disabled {
+    padding:0.5em;
+    margin-bottom: 0.7em;
+  }
 }
 

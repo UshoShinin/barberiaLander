@@ -251,7 +251,7 @@ const FormularioAgenda = (props) => {
         });
       },
     },
-    {
+    /* {
       id: 4,
       onChange: (event) => {
         dispatchInput({
@@ -259,7 +259,7 @@ const FormularioAgenda = (props) => {
           value: event.target.value,
         });
       },
-    },
+    }, */
   ];
 
   /* Este es el combo que aparece cuando se selecciona un día del calendario */
@@ -358,10 +358,10 @@ const FormularioAgenda = (props) => {
               </div>
               <TextArea ref={descripcionRef} isValid={null} input={INPUTS[2]} />
             </div>
-            <InputFile
+            {/* <InputFile
               input={INPUTS[3]}
               label="Seleccione una foto de referencia"
-            />
+            /> */}
           </div>
           {document.getElementById("root").clientWidth > 979 && (
             <div className={classes.Cal}>
