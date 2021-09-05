@@ -1,52 +1,63 @@
 import classes from "./Fotos.module.css";
 import ComboBox from "./../../components/ComboBox/ComboBox";
-import { useReducer } from "react"; 
+import { useReducer } from "react";
 import { CSSTransition } from "react-transition-group";
 import { getElementById } from "../../FuncionesAuxiliares/FuncionesAuxiliares";
 const Fotos = (props) => {
   const initialState = {
     Actual: { value: props.fotos[0].foto, mostrar: true },
     Siguiente: { value: null, mostrar: false },
+    canChange: true,
   };
   const reducer = (state, action) => {
     switch (action.type) {
       case "CHANGE_I":
         if (state.Actual.value === null) {
           return {
+            canChange: false,
             Actual: { value: action.value, mostrar: false },
             Siguiente: { value: state.Siguiente.value, mostrar: false },
           };
         }
         return {
-          Siguiente: { value: action.value, mostrar: false },
           Actual: { value: state.Actual.value, mostrar: false },
+          Siguiente: { value: action.value, mostrar: false },
         };
+
       case "MOSTRAR_ACTUAL":
         return {
-          Siguiente: { value: null, mostrar: false },
           Actual: { value: state.Actual.value, mostrar: true },
+          Siguiente: { value: null, mostrar: false },
         };
       case "MOSTRAR_SIGUIENTE":
         return {
           Actual: { value: null, mostrar: false },
           Siguiente: { value: state.Siguiente.value, mostrar: true },
         };
+      case "PERMITIR": {
+        console.log("Podes tocar");
+        return { ...state, canChange: true };
+      }
     }
   };
   const [state, dispatch] = useReducer(reducer, initialState);
-  if (
-    (state.Actual.mostrar &&
-      state.Actual.value !==
-        getElementById(props.fotos, props.currentEmployee).foto) ||
-    (state.Siguiente.mostrar &&
-      state.Siguiente.value !==
-        getElementById(props.fotos, props.currentEmployee).foto)
-  ) {
-    dispatch({
-      type: "CHANGE_I",
-      value: getElementById(props.fotos, props.currentEmployee).foto,
-    });
-  }
+  const Actualizar = () => {
+    const imagenActual = getElementById(
+      props.fotos,
+      props.currentEmployee
+    ).foto;
+    if (
+      state.canChange &&
+      ((state.Actual.mostrar && state.Actual.value !== imagenActual) ||
+        (state.Siguiente.mostrar && state.Siguiente.value !== imagenActual))
+    ) {
+      dispatch({
+        type: "CHANGE_I",
+        value: imagenActual,
+      });
+    }
+  };
+  Actualizar();
 
   const imagenes = (
     <>
@@ -57,7 +68,12 @@ const Fotos = (props) => {
         unmountOnExit
         timeout={220}
         onExited={() => {
+          console.log("MOSTRAR_SIGUIENTE");
           dispatch({ type: "MOSTRAR_SIGUIENTE" });
+          setTimeout(() => {
+            dispatch({ type: "PERMITIR" });
+            Actualizar();
+          }, 220);
         }}
         classNames={{
           enter: "",
@@ -75,7 +91,12 @@ const Fotos = (props) => {
         unmountOnExit
         timeout={220}
         onExited={() => {
+          console.log("MOSTRAR_ACTUAL");
           dispatch({ type: "MOSTRAR_ACTUAL" });
+          setTimeout(() => {
+            dispatch({ type: "PERMITIR" });
+            Actualizar();
+          }, 220);
         }}
         classNames={{
           enter: "",
@@ -89,11 +110,13 @@ const Fotos = (props) => {
     </>
   );
   const comboChangeHandler = (id) => {
-    dispatch({
-      type: "CHANGE_I",
-      value: getElementById(props.fotos, id).foto,
-    });
-    props.changeEmployee(id);
+    if (state.canChange) {
+      dispatch({
+        type: "CHANGE_I",
+        value: getElementById(props.fotos, id).foto,
+      });
+      props.changeEmployee(id);
+    }
   };
 
   return (

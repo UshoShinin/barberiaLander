@@ -1,5 +1,5 @@
 .lis{
-    margin:0 auto;
+    margin:7px auto 0 auto;
     font-size: 1.3em;
 }
 
@@ -53,6 +53,7 @@
 
 @media (max-width:1400px) {
     .lis{
+        margin:0 auto;
         font-size: 1em;
     }
   }

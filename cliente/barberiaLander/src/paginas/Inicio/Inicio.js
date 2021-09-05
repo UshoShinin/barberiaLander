@@ -6,8 +6,7 @@ import peluqueros from "../../recursos/ImagenesPrueba/peluqueros.jpg";
 import Button from "../../components/UI/Button/Button";
 import { useHistory } from "react-router-dom";
 const Inicio = () => {
-const history = useHistory();
-
+  const history = useHistory();
   return (
     <div className={classes.container}>
       <Slider />

@@ -10,6 +10,7 @@ const Checkbox = (props) => {
   }else{
     classesCheck = `${classes.disabled}`;
   }
+
   return (
     <div disabled={props.disabled} onClick={!props.disabled?props.onChange:null} className={classesCheck}>
       <FontAwesomeIcon icon={faCheck} className={classes.icon}/>

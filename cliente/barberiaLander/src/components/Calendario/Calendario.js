@@ -12,7 +12,7 @@ const Calendario = (props) => {
   const empleadosFotos = extraerFotos(props.empleados); /* De la lista de empleados se extraen solo las fotos para mandar
   solo los nombres ci y fotos */
   // Como no tenemos todo pronto en la base de datos voya tener que armar unos tiempos y servicios y tiempos provicionales
-  const move = document.getElementById("root").clientWidth>1400?26.86:19;
+  const move = document.getElementById("root").clientWidth>1400?23.66:19;
   const obtenerHorarios = (horarios) =>{
     props.getHorarios(horarios);
   }
