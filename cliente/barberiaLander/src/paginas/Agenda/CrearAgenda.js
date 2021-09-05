@@ -40,6 +40,7 @@ const CrearAgenda = (props) => {
       decoloracion: { active: false, id: 7 },
       brushing: { active: false, id: 8 },
     },
+    ciCliente : '-1',
   };
   const [stateAgenda, setStateAgenda] = useState(initialState);
   const {
@@ -66,6 +67,7 @@ const CrearAgenda = (props) => {
     const agenda = props.agenda;
     let nombre;
     let telefono;
+    let ciCliente;
     let servicios = { ...initialState.servicios };
     let Calendario = { value: null, dia: null };
     let descripcion = { value: "", isValid: null };
@@ -104,6 +106,7 @@ const CrearAgenda = (props) => {
       if (authCtx.isLoggedIn && authCtx.user.rol === "Cliente") {
         nombre = { value: authCtx.user.nombre, isValid: true };
         telefono = { value: authCtx.user.telefono, isValid: true };
+        ciCliente = authCtx.user.ciCliente;
       }
     }
 
@@ -123,7 +126,8 @@ const CrearAgenda = (props) => {
         },
         servicios: { ...servicios },
         Calendario: { ...Calendario },
-        ComboBox:{...comboBox}
+        ComboBox:{...comboBox},
+        ciCliente:ciCliente
       };
     });
   };

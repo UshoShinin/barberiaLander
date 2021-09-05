@@ -88,7 +88,6 @@ const FormularioAgenda = (props) => {
       cal.className = `${cal.className} ${classes.invalidCal}`;
       cal.focus();
     } else {
-      console.log(inputState.Calendario);
       const year =
         inputState.Calendario.dia.m < date.getMonth() + 1
           ? new Date().getFullYear() + 1

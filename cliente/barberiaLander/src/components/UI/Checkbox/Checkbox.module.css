@@ -49,11 +49,10 @@
   font-family: "Font Awesome 5 Free";
   font-weight: 900;
   font-size: 2em;
-  opacity: 0.7;
-  color: var(--clr-neon-red);
+  opacity: 0.8;
+  color: var(--clr-neon-blue);
   position: absolute;
-  top:1px;
-  /* filter:blur(1.5px) */
+  filter:blur(4px)
 }
 
 .active::after {
@@ -61,10 +60,10 @@
   font-family: "Font Awesome 5 Free";
   font-weight: 900;
   font-size: 2em;
-  opacity: 0;
-  color: var(--clr-neon-red);
+  opacity: 0.8;
+  color: var(--clr-neon-blue);
   position: absolute;
-  /* filter:blur(1.5px) */
+  filter:blur(4px)
 }
 
 .active .icon {
