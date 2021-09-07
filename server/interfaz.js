@@ -1363,7 +1363,7 @@ const nuevaEntradaDinero = async (
         const agregarEntradaCaja = insertarCajaEntrada(idCaja, idEntrada);
         listadoPromesas.push(agregarEntradaCaja);
         //Resuelvo todas las promesas
-        Promise.allSettled(listadoPromesas).then((respuestas) => {
+        return Promise.allSettled(listadoPromesas).then((respuestas) => {
           //Aca tengo que verificar que me devolvieron las promesas para tener una idea
           let salioBien = true;
           //Recirro todas las promesas y veo el estado de ellas
@@ -1385,7 +1385,10 @@ const nuevaEntradaDinero = async (
           }
         });
       })
-      .then((resultado) => resultado);
+      .then((resultado) => {
+        console.log(resultado);
+        return resultado;
+      });
     return insertoEntradaDinero;
   } catch (error) {
     console.log(error);
