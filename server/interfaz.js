@@ -1582,10 +1582,10 @@ const crearCuponera = async (cedula, monto) => {
         //Si existe devuelvo mensaje de error
         return { codigo: 400, mensaje: "El cliente ya tiene una cuponera" };
       } else {
-        return insertarCuponera(cedula, monto).then(resultado => {
-          if(resultado.rowsAffected[0] < 1){
+        return insertarCuponera(cedula, monto).then((resultado) => {
+          if (resultado.rowsAffected[0] < 1) {
             return { codigo: 400, mensaje: "Error al crear cuponera" };
-          }else {
+          } else {
             return { codigo: 200, mensaje: "Cuponera creada correctamente" };
           }
         });
@@ -1648,6 +1648,55 @@ const getCuponera = async (cedula) => {
   }
 };
 
+//Metodo para modificar saldo de una cuponera
+const modificarSaldoCuponera = async (cedula, monto) => {
+  try {
+    //Voy a buscar la cuponera
+    const retorno = getCuponera(cedula).then(async (resultado) => {
+      if (resultado.rowsAffected[0] < 1) {
+        return { codigo: 400, mensaje: "El cliente no tiene cuponera" };
+      } else {
+        //Veo cual va a ser el nuevo monto de la cuponera
+        let nuevoSaldo = resultado.recordset[0].monto + monto;
+        //Verifico que el monto no sea menor a 0
+        if (nuevoSaldo < 0) {
+          return {
+            codigo: 400,
+            mensaje: "La cuponera no posee montos suficientes",
+          };
+        } else {
+          //Hago la modificacion del saldo
+          //Creo la conexion
+          let pool = await sql.connect(conexion);
+          //Hago el update
+          const cuponera = await pool
+            .request()
+            .input("nuevoSaldo", sql.Int, nuevoSaldo)
+            .input("cedula", sql.VarChar, cedula)
+            .query(
+              "update Cuponera set Monto = @nuevoSaldo where Cedula = @cedula"
+            );
+          if (cuponera.rowsAffected[0] < 1) {
+            return {
+              codigo: 400,
+              mensaje: "Error al modificar saldo de cuponera",
+            };
+          } else {
+            return { codigo: 400, mensaje: "Saldo modificado correctamente" };
+          }
+        }
+      }
+    });
+    if (retorno < 1) {
+      return { codigo: 400, mensaje: "Error al modificar saldo de cuponera" };
+    } else {
+      return retorno;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 //Creo un objeto que voy a exportar para usarlo desde el index.js
 //Adentro voy a tener todos los metodos de llamar a la base
 const interfaz = {
@@ -1666,6 +1715,7 @@ const interfaz = {
   abrirCaja,
   nuevaEntradaDinero,
   crearCuponera,
+  modificarSaldoCuponera,
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar

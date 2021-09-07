@@ -149,6 +149,15 @@ app.post("/abrirCaja", (req, res) => {
   });
 });
 
+app.post("/modificarSaldoCuponera", (req, res) => {
+  const ret = interfaz.modificarSaldoCuponera(req.body.cedula, req.body.monto);
+  ret.then((resultado) => {
+    res.json({
+      mensaje: resultado,
+    });
+  });
+});
+
 app.post("/crearCuponera", (req, res) => {
   const ret = interfaz.crearCuponera(req.body.cedula, req.body.monto);
   ret.then((resultado) => {
