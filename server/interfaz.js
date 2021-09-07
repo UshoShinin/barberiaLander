@@ -1686,7 +1686,7 @@ const modificarSaldoCuponera = async (cedula, monto) => {
               mensaje: "Error al modificar saldo de cuponera",
             };
           } else {
-            return { codigo: 400, mensaje: "Saldo modificado correctamente" };
+            return { codigo: 200, mensaje: "Saldo modificado correctamente" };
           }
         }
       }
