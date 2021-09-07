@@ -1386,6 +1386,7 @@ const nuevaEntradaDinero = async (
         });
       })
       .then((resultado) => resultado);
+    return insertoEntradaDinero;
   } catch (error) {
     console.log(error);
   }
