@@ -1,5 +1,5 @@
 import classes from "./FormularioAgenda.module.css";
-import React, { useRef, useReducer,useContext } from "react";
+import React, { useRef, useReducer, useContext } from "react";
 import Button from "../../../components/UI/Button/Button";
 import Input from "../../../components/UI/Input/Input";
 import InputFile from "../../../components/UI/InputFile/InputFile";
@@ -30,6 +30,8 @@ const FormularioAgenda = (props) => {
   const nombreRef = useRef();
   const telefonoRef = useRef();
   const descripcionRef = useRef();
+
+  const height = document.getElementById("root").clientWidth > 1400 ? 11 : 7;
 
   const authCtx = useContext(AuthContext);
 
@@ -70,7 +72,7 @@ const FormularioAgenda = (props) => {
   const submitHandler = (event) => {
     event.preventDefault();
     let services = [];
-    
+
     Object.values(inputState.servicios).forEach((serv) => {
       if (serv.active) {
         services.push(serv.id);
@@ -106,11 +108,11 @@ const FormularioAgenda = (props) => {
       );
       let datosAgenda;
 
-      if (props.agenda === null||props.agenda === undefined) {
-        const user =authCtx.user;
+      if (props.agenda === null || props.agenda === undefined) {
+        const user = authCtx.user;
         //Crear
         datosAgenda = {
-          ciCliente: user===null?'-1':user.ci,
+          ciCliente: user === null ? "-1" : user.ci,
           nombreCliente: inputState.Nombre.value,
           telefono: inputState.Telefono.value,
           descripcion: inputState.Descripcion.value,
@@ -269,7 +271,7 @@ const FormularioAgenda = (props) => {
     inputState.HorariosFiltrados === null ? null : (
       <div className={classes.ComboBox}>
         <ComboBox
-          height={4.8}
+          height={height}
           current={inputState.ComboBox.value}
           onChange={(id) => {
             dispatchInput({ type: "HORARIOS_SELECT", value: id });

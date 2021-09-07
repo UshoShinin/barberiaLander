@@ -15,7 +15,7 @@
 
 .button,
 .disabled {
-  font-size: 1rem;
+  font-size: 1.35rem;
   font-family: "Staatliches";
   letter-spacing: 0.1em;
   width: max-content;
@@ -83,4 +83,9 @@
 .white:hover,
 .white:focus {
   background: var(--clr-neon-white);
+}
+@media (max-width: 1400px) {
+  .button,.disabled {
+    font-size: 1rem;
+  }
 }

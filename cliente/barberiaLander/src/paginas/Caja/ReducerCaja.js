@@ -134,7 +134,7 @@ export const cajaReducer = (state, action) => {
   let mCuponera = null;
   switch (action.type) {
     case "ABRIR_CAJA":
-      return { ...state, cajaAbierta: true };
+      return { ...state, cajaAbierta: true,idCaja:action.id };
     case "CERRAR_CAJA":
       return {
         ...initialState,
@@ -144,18 +144,24 @@ export const cajaReducer = (state, action) => {
       };
     case "CARGA_DE_DATOS":
       const date = new Date();
+      let cajaAbierta = false;
       formatDate(action.payload.agendas[0].fecha);
       let newList = action.payload.agendas.filter(
         (agenda) =>
           formatDate(agenda.fecha).getDate() === date.getDate() &&
           formatDate(agenda.fecha).getMonth() === date.getMonth()
       );
+      if(action.payload.idCaja!==-1){
+        cajaAbierta=true;
+      }
       myState = {
         ...state,
+        idCaja:action.payload.idCaja,
         agendas: [...action.payload.agendas],
         agendasHoy: [...newList],
         Empleados: [...action.payload.empleados],
         productos: [...action.payload.productos],
+        cajaAbierta:cajaAbierta
       };
       return { ...myState };
     case "USER_INPUT_MONTO_I":
@@ -964,6 +970,9 @@ export const cajaReducer = (state, action) => {
           corte: {
             active: !state.servicios.corte.active,
             id: state.servicios.corte.id,
+          },maquina: {
+            active: false,
+            id: state.servicios.maquina.id,
           },
         },
       };
@@ -985,6 +994,10 @@ export const cajaReducer = (state, action) => {
         ...state,
         servicios: {
           ...state.servicios,
+          corte: {
+            active: false,
+            id: state.servicios.corte.id,
+          },
           maquina: {
             active: !state.servicios.maquina.active,
             id: state.servicios.maquina.id,

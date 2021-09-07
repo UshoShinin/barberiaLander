@@ -4,9 +4,9 @@ import "./App.css";
 //IMPORTS PARA LAS PAGINAS
 import Inicio from "./paginas/Inicio/Inicio";
 import Administracion from "./paginas/Administracion";
-import Cuponeras from "./paginas/Cuponeras";
+import Cuponeras from "./paginas/Cuponera/Cuponeras";
 import Productos from "./paginas/Productos";
-import Empleados from "./paginas/Empleados";
+import Empleados from "./paginas/Empleados/Empleados";
 import Slider from "./paginas/Slider";
 import AperturaCierre from "./paginas/Caja/AperturaCierre";
 import CalculoJornal from "./paginas/Caja/CalculoJornal";

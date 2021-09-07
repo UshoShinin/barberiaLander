@@ -90,10 +90,6 @@
     right: 8px;
     bottom: 8px;
   }
-  .myContainer{
-    height: 1680px;
-  }
-
   .bordeIntento{
     border: 2px var(--clr-dark-blue) solid;
     border-radius: 6px;

@@ -10,7 +10,9 @@
   /* color: var(--clr-neon-white); */
   padding: 0.6em;
 }
-
+.labelText{
+  font-size: 1.3rem;
+}
 .alinearCampos{
   position: relative;
   align-items: center;
@@ -54,13 +56,13 @@
   bottom: 15px;
   margin-left: 1.3em;
   display: grid;
-  grid-template-rows: 66px auto 40px;
+  grid-template-rows: 80px auto 45px;
   grid-row-gap: 20px;
 }
 
 .Salida {
   position: absolute;
-  right: 150px;
+  right: 200px;
 }
 
 .Cerrar {
@@ -103,7 +105,9 @@
   grid-row-gap:10px;
   grid-template-rows: 30px 27px auto 27px;
 }
-
+.productos > h2{
+  font-size: 2em;
+}
 .productos > div{
   height: 100%;
   display: grid;
@@ -182,6 +186,7 @@
   width: 100%;  
 }
 .MontoTotal > h2{
+  font-size:2em;
   margin-right: 10px;
 }
 
@@ -206,4 +211,35 @@
 
 .invalid{
   color:var(--clr-neon-red);
+}
+
+.title{
+  font-size: 2.7em;
+}
+.opcionesServicios{
+  font-size: 2em;
+}
+@media (max-width:1400px) {
+  .labelText{
+    font-size: 1rem;
+  }
+  .MontoTotal > h2{
+    font-size:1.5em;
+  }
+  .title{
+    font-size: 2em;
+  }
+  .opcionesServicios{
+    font-size: 1.5em;
+  }
+  .caja {
+    grid-template-rows: 66px auto 40px;
+    grid-row-gap: 20px;
+  }
+  .Salida {
+    right: 150px;
+  }
+  .productos > h2{
+    font-size: 1.5em;
+  }
 }

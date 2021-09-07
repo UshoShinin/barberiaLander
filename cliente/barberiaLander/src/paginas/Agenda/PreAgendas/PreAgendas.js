@@ -4,14 +4,15 @@ import classes from "./PreAgendas.module.css";
 import Marco from "../../../components/UI/Marco/Marco";
 import Lista from "./Lista/Lista";
 import useHttp from "../../../hooks/useHttp";
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useReducer, useState,useContext } from "react";
 import LoaddingSpinner from "../../../components/LoaddingSpinner/LoaddingSpinner";
 import Switch from "../../../components/UI/Switch/Switch";
 import Visualizador from "./Visualizador/Visualizador";
 import {obtenerHorariosDeDia} from "../../../components/Calendario/FuncionesAuxiliares";
 import { getElementById } from "../../../FuncionesAuxiliares/FuncionesAuxiliares";
 import CrearAgenda from "../CrearAgenda";
-
+import AuthContext from "../../../store/AuthContext";
+import { useHistory } from "react-router-dom";
 const initialState = { aceptar: false, rechazar: false };
 
 const reducerChecks = (state, action) => {
@@ -24,11 +25,13 @@ const reducerChecks = (state, action) => {
 };
 
 const PreAgendas = () => {
+  const history = useHistory();
   const [agendasState, setAgendasState] = useState(null);
   const [idAgenda, setIdAgenda] = useState(null);
   const [agendaAModificar, setAgendaAModificar] = useState(null);
   const [horarioAgenda, setHorarioAgenda] = useState(null);
   const [checks, dispatchChecks] = useReducer(reducerChecks,initialState);
+  const authCtx = useContext(AuthContext);
   const obtenerAgendas = (agendas) => {
     let misAgendas = [];
     agendas.mensaje.preAgendas.forEach((agenda) => {
@@ -56,7 +59,8 @@ const PreAgendas = () => {
   const { isLoadingAceptar, errorAceptar, sendRequest: aceptar } = useHttp();
   const { isLoadingRechazar, errorRechazar, sendRequest: rechazar } = useHttp();
   useEffect(() => {
-    fetchAgendas({ url: "/listadoPreAgendas" }, obtenerAgendas);
+    if(authCtx.user===null||authCtx.user.rol!=='Administrador'&&authCtx.user.rol!=='Encargado')history.replace('/');
+    else fetchAgendas({ url: "/listadoPreAgendas" }, obtenerAgendas);
   }, []);
 
   const obtenerHorarios = (horarios) => {
@@ -76,7 +80,6 @@ const PreAgendas = () => {
   };
 
   const aceptarAgenda = (agenda) => {
-    console.log(agenda);
     aceptar(
       {
         url: "/aceptarAgenda",
@@ -103,7 +106,6 @@ const PreAgendas = () => {
 
   return (
     <>
-      {" "}
       {agendaAModificar !== null && (
         <NormalCard>
           <CrearAgenda agenda={agendaAModificar} horario={horarioAgenda} />

@@ -6,6 +6,7 @@
 .container>div{
     padding: 25px;
     border-radius: 25px;
+    overflow: hidden;
 }
 
 .container,.container>div{
@@ -27,7 +28,7 @@
 }
 .container >div >div{
     display: grid;
-    grid-template-columns: max-content 224px;
+    grid-template-columns: max-content 140px;
     align-items: center;
     grid-column-gap:15px;
     grid-row-gap: 18px;
@@ -40,4 +41,9 @@
 }
 .container >div:hover > div > label{
     color:var(--clr-neon-white);
+}
+@media (max-width:990px) {
+    .container>div{
+        padding: 40px;
+    }
 }

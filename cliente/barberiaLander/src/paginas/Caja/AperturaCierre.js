@@ -1,12 +1,10 @@
-import React, { useEffect, useReducer, useRef } from "react";
-import Button from "../../components/UI/Button/Button";
+import React, { useEffect, useReducer, useRef,useContext } from "react";
 import SimpleButton from "../../components/UI/SimpleButton/SimpleButton";
 import Switch from "../../components/UI/Switch/Switch";
 import Input from "../../components/UI/Input/Input";
 import ComboBox from "../../components/ComboBox/ComboBox";
 import Border from "../../components/UI/Border/Border";
 import classesBorder from "../../components/UI/Border/Border.module.css";
-import Card from "../../components/UI/Card/Card";
 import SimpleNote from "../../components/UI/Note/SimpleNote";
 import TextArea from "../../components/UI/TextArea/TextArea";
 import Modal from "../../components/UI/Modal/Modal";
@@ -18,8 +16,11 @@ import { initialState, cajaReducer } from "./ReducerCaja";
 import useHttp from "../../hooks/useHttp";
 import inputs from "./AuxiliaresCaja/inputs";
 import { getElementById } from "../../FuncionesAuxiliares/FuncionesAuxiliares";
+import AuthContext from "../../store/AuthContext";
+import { useHistory } from "react-router-dom";
 
 const AperturaCierre = () => {
+  const authCtx = useContext(AuthContext);
   const [cajaState, dispatchCaja] = useReducer(cajaReducer, initialState);
   const montoIniRef = useRef();
   const montoAgendaRef = useRef();
@@ -33,7 +34,8 @@ const AperturaCierre = () => {
   const montoSalida = useRef();
   const codCuponera = useRef();
   const ticket = useRef();
-
+  const history = useHistory();
+  
   const INPUTS = inputs(cajaState, dispatchCaja);
 
   const salidaSubmitHandler = (e) => {
@@ -53,6 +55,7 @@ const AperturaCierre = () => {
     }
   };
   const obtenerAgendas = (mensaje) => {
+    console.log(mensaje.mensaje);
     dispatchCaja({ type: "CARGA_DE_DATOS", payload: mensaje.mensaje });
   };
   const {
@@ -68,8 +71,7 @@ const AperturaCierre = () => {
   } = useHttp();
 
   const resultadoCaja = (res) => {
-    console.log(res);
-    dispatchCaja({ type: "ABRIR_CAJA" });
+    dispatchCaja({ type: "ABRIR_CAJA",id:res.mensaje.idCaja});
   };
 
   const getRespuesta = (res) => {
@@ -138,7 +140,8 @@ const AperturaCierre = () => {
   } = useHttp();
 
   useEffect(() => {
-    fetchAgendas({ url: "/datosFormularioCaja" }, obtenerAgendas);
+    /* if(authCtx.user===null||authCtx.user.rol!=='Administrador'&&authCtx.user.rol!=='Encargado')history.replace('/');
+    else */ fetchAgendas({ url: "/datosFormularioCaja" }, obtenerAgendas);
   }, []);
 
   return (
@@ -152,14 +155,14 @@ const AperturaCierre = () => {
         <form className={classes.salidaDinero} onSubmit={salidaSubmitHandler}>
           <h1>Salida de dinero</h1>
           <div className={classes.montoSalida}>
-            <label>Monto Salida</label>
+            <label className={classes.labelText}>Monto Salida</label>
             <Input
               ref={montoSalida}
               isValid={cajaState.montoSalida.isValid}
               input={INPUTS[9]}
             />
           </div>
-          <label id="comboSalida" className={classes.text}>
+          <label id="comboSalida" className={`${classes.text} ${classes.labelText}`}>
             Empleado
           </label>
           <div style={{ height: "40px" }}>
@@ -256,7 +259,7 @@ const AperturaCierre = () => {
             className={`${classes.cajaContainer} ${classes.abrirCerrar}`}
           >
             <label
-              className={`${
+              className={`${classes.labelText} ${
                 !cajaState.cajaAbierta ? classes.text : classes.textDisabled
               }`}
             >
@@ -273,7 +276,7 @@ const AperturaCierre = () => {
               action={() => {
                 const monto = parseInt(cajaState.montoInicial.value, 10)
                 const datosEnviar = {
-                  cedula: "48279578",
+                  cedula: '48279578'/* authCtx.user.ciUsuario */,
                   pago: {
                     numeroTicket: cajaState.ticketDebito.value,
                     Efectivo: monto,
@@ -326,7 +329,7 @@ const AperturaCierre = () => {
                 <div className={classes.dobleFild}>
                   <div>
                     <label
-                      className={`${
+                      className={`${classes.labelText} ${
                         cajaState.cajaAbierta
                           ? classes.text
                           : classes.textDisabled
@@ -349,7 +352,7 @@ const AperturaCierre = () => {
                     {!cajaState.sinAgendar.value && (
                       <>
                         <label
-                          className={`${
+                          className={`${classes.labelText} ${
                             cajaState.cajaAbierta
                               ? classes.text
                               : classes.textDisabled
@@ -370,7 +373,7 @@ const AperturaCierre = () => {
                 </div>
                 <div className={classes.comboAgenda}>
                   <label
-                    className={`${
+                    className={`${classes.labelText} ${
                       cajaState.cajaAbierta
                         ? classes.text
                         : classes.textDisabled
@@ -401,7 +404,7 @@ const AperturaCierre = () => {
                   />
                 </div>
                 <h1
-                  className={`${
+                  className={`${classes.title} ${
                     cajaState.cajaAbierta ? classes.text : classes.textDisabled
                   }`}
                 >
@@ -418,7 +421,7 @@ const AperturaCierre = () => {
                               dispatchCaja({ type: "CLICK_CORTE" });
                             }
                       }
-                      className={`${
+                      className={`${classes.opcionesServicios} ${
                         !cajaState.cajaAbierta
                           ? classes.textDisabled
                           : cajaState.servicios.corte.active
@@ -437,7 +440,7 @@ const AperturaCierre = () => {
                               dispatchCaja({ type: "CLICK_BARBA" });
                             }
                       }
-                      className={`${
+                      className={`${classes.opcionesServicios} ${
                         !cajaState.cajaAbierta
                           ? classes.textDisabled
                           : cajaState.servicios.barba.active
@@ -456,7 +459,7 @@ const AperturaCierre = () => {
                               dispatchCaja({ type: "CLICK_MAQUINA" });
                             }
                       }
-                      className={`${
+                      className={`${classes.opcionesServicios} ${
                         !cajaState.cajaAbierta
                           ? classes.textDisabled
                           : cajaState.servicios.maquina.active
@@ -477,7 +480,7 @@ const AperturaCierre = () => {
                               dispatchCaja({ type: "CLICK_BRUSHING" });
                             }
                       }
-                      className={`${
+                      className={`${classes.opcionesServicios} ${
                         !cajaState.cajaAbierta
                           ? classes.textDisabled
                           : cajaState.servicios.brushing.active
@@ -496,7 +499,7 @@ const AperturaCierre = () => {
                               dispatchCaja({ type: "CLICK_DECOLORACION" });
                             }
                       }
-                      className={`${
+                      className={`${classes.opcionesServicios} ${
                         !cajaState.cajaAbierta
                           ? classes.textDisabled
                           : cajaState.servicios.decoloracion.active
@@ -515,7 +518,7 @@ const AperturaCierre = () => {
                               dispatchCaja({ type: "CLICK_CLARITOS" });
                             }
                       }
-                      className={`${
+                      className={`${classes.opcionesServicios} ${
                         !cajaState.cajaAbierta
                           ? classes.textDisabled
                           : cajaState.servicios.claritos.active
@@ -530,7 +533,7 @@ const AperturaCierre = () => {
                 <div className={classes.dobleFild}>
                   <div>
                     <label
-                      className={`${
+                      className={`${classes.labelText} ${
                         cajaState.cajaAbierta
                           ? classes.text
                           : classes.textDisabled
@@ -546,7 +549,7 @@ const AperturaCierre = () => {
                   </div>
                   <div>
                     <label
-                      className={`${
+                      className={`${classes.labelText} ${
                         cajaState.cajaAbierta
                           ? classes.text
                           : classes.textDisabled
@@ -578,7 +581,7 @@ const AperturaCierre = () => {
               <div className={classes.alinearCampos}>
                 <div className={classes.label}>
                   <label
-                    className={`${
+                    className={`${classes.labelText} ${
                       cajaState.cajaAbierta
                         ? classes.text
                         : classes.textDisabled
@@ -655,7 +658,7 @@ const AperturaCierre = () => {
               <div className={classes.alinearCampos}>
                 <div className={classes.label}>
                   <label
-                    className={`${
+                    className={`${classes.labelText} ${
                       cajaState.cajaAbierta
                         ? classes.text
                         : classes.textDisabled
@@ -680,7 +683,7 @@ const AperturaCierre = () => {
                 <div>
                   <label
                     id="Efectivo"
-                    className={`${
+                    className={`${classes.labelText} ${
                       cajaState.cajaAbierta
                         ? classes.text
                         : classes.textDisabled
@@ -712,7 +715,7 @@ const AperturaCierre = () => {
                 <div>
                   <label
                     id="Debito"
-                    className={`${
+                    className={`${classes.labelText} ${
                       cajaState.cajaAbierta
                         ? classes.text
                         : classes.textDisabled
@@ -742,7 +745,7 @@ const AperturaCierre = () => {
                 </div>
                 {cajaState.debito.value && (
                   <div>
-                    <label>Ticket</label>
+                    <label className={classes.labelText}>Ticket</label>
                     <Input
                       ref={ticket}
                       isValid={cajaState.ticketDebito.isValid}
@@ -755,7 +758,7 @@ const AperturaCierre = () => {
                 <div>
                   <label
                     id="Cuponera"
-                    className={`${
+                    className={`${classes.labelText} ${
                       cajaState.cajaAbierta
                         ? classes.text
                         : classes.textDisabled
@@ -784,7 +787,7 @@ const AperturaCierre = () => {
                 </div>
                 {cajaState.cuponera.value && (
                   <div>
-                    <label>Codigo cuponera</label>
+                    <label className={classes.labelText}>Codigo cuponera</label>
                     <Input
                       ref={codCuponera}
                       isValid={cajaState.montoCuponera.isValid}

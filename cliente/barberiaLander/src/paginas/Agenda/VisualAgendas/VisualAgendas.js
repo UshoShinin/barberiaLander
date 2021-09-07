@@ -11,12 +11,16 @@ import {
   faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
 import { animateScroll as scroll } from "react-scroll";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import LoaddingSpinner from "../../../components/LoaddingSpinner/LoaddingSpinner";
 import useHttp from "../../../hooks/useHttp";
 import CrearAgenda from "../CrearAgenda";
+import AuthContext from "../../../store/AuthContext";
+import { useHistory } from "react-router-dom";
 
 const VisualAgendas = () => {
+  const history = useHistory();
+  const authCtx = useContext(AuthContext);
   const [inicio, setInicio] = useState(0);
   const [agendas, setAgendas] = useState(null);
   const [agenda, setAgenda] = useState(null);
@@ -44,7 +48,7 @@ const VisualAgendas = () => {
   };
 
   const obtenerAgenda = (res) => {
-    const agenda = res.mensaje
+    const agenda = res.mensaje;
     let misServicios = {
       barba: false,
       brushing: false,
@@ -68,9 +72,15 @@ const VisualAgendas = () => {
         case 8:
           misServicios.brushing = true;
       }
-    
     });
-    setAgenda({...agenda,servicios:{...misServicios},fecha:{d:parseInt(agenda.fecha.slice(8,10),10),m:parseInt(agenda.fecha.slice(5,7),10)}});
+    setAgenda({
+      ...agenda,
+      servicios: { ...misServicios },
+      fecha: {
+        d: parseInt(agenda.fecha.slice(8, 10), 10),
+        m: parseInt(agenda.fecha.slice(5, 7), 10),
+      },
+    });
   };
 
   const obtenerAgendas = (res) => {
@@ -78,7 +88,8 @@ const VisualAgendas = () => {
   };
 
   useEffect(() => {
-    fetchAgendas({ url: "/listadoAgendas" }, obtenerAgendas);
+    if(authCtx.user===null||authCtx.user.rol==='Cliente')history.replace('/');
+    else fetchAgendas({ url: "/listadoAgendas" }, obtenerAgendas);
   }, []);
 
   let Mostrar = [];

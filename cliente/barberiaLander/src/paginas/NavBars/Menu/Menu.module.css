@@ -118,7 +118,7 @@
   z-index: 999;
   top: 45px;
   background-color: var(--clr-navbar);
-  width: 100%;
+  width: max-content;
   border-radius: 5px;
 }
 

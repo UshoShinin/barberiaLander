@@ -2,6 +2,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
 }
 .container>div{
     padding: 20px;
@@ -36,7 +37,7 @@
 }
 .container >div >div{
     display: grid;
-    grid-template-columns: max-content 224px;
+    grid-template-columns: max-content 150px;
     align-items: center;
     grid-column-gap:10px;
     grid-row-gap: 11px;
