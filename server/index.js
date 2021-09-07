@@ -149,6 +149,14 @@ app.post("/abrirCaja", (req, res) => {
   });
 });
 
+app.post("/crearCuponera", (req, res) => {
+  const ret = interfaz.crearCuponera(req.body.cedula, req.body.monto);
+  ret.then((resultado) => {
+    res.json({
+      mensaje: resultado,
+    });
+  });
+});
 
 // All other GET requests not handled before will return our React app
 /* app.get('*', (req, res) => {

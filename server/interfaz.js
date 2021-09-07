@@ -630,6 +630,14 @@ const insertarAgenda = async (agenda) => {
         idHorario: resultado.recordset[0].IdHorario,
         idAgenda: resultado.recordset[0].IdAgenda,
       };
+      if (agenda.ciCliente !== "-1") {
+        console.log(agenda);
+        return insertarAgendaCliente({
+          cedula: agenda.ciCliente,
+          idAgenda: ret.idAgenda,
+          idHorario: ret.idHorario,
+        });
+      }
       return ret;
     })
     .catch((error) => {
@@ -688,6 +696,7 @@ const insertarServicioAgenda = async (servicioAgenda) => {
 */
 const insertarAgendaCliente = async (datosAgendaCliente) => {
   try {
+    console.log(datosAgendaCliente);
     //Variable que tiene la conexion
     const pool = await sql.connect(conexion);
     //Armo el insert
@@ -699,7 +708,7 @@ const insertarAgendaCliente = async (datosAgendaCliente) => {
       .query(
         "insert into Agenda_Cliente (IdAgenda, IdHorario, Cedula) values (@idAgenda, @idHorario, @ciCliente)"
       );
-    const filasAfectadas = insertarAgendaCliente.rowsAffected;
+    const filasAfectadas = insertAgendaCliente.rowsAffected[0];
     return filasAfectadas;
   } catch (error) {
     console.log(error);
@@ -708,6 +717,7 @@ const insertarAgendaCliente = async (datosAgendaCliente) => {
 
 //Metodo para agregar la agenda a la base, voy a recibir los datos todos dentro del objeto agenda
 const crearSolicitudAgenda = async (agenda) => {
+  console.log(agenda);
   //Esto lo que hace es insertar primero el horario, despues la agenda y al final agenda servicio
   const insertarAgendaCompleto = insertarHorario({
     ciEmpleado: agenda.ciEmpleado,
@@ -724,6 +734,7 @@ const crearSolicitudAgenda = async (agenda) => {
       //Esto lo que hace es devolver la promesa que devuelve el insertar agenda
       //Esto le llega al then de arriba para que pueda hacerle .then abajo y seguir trabajando
       return insertarAgenda({
+        ciCliente: agenda.ciCliente,
         nombre: agenda.nombreCliente,
         descripcion: agenda.descripcion,
         imagenEjemplo: agenda.imagenEjemplo,
@@ -1560,6 +1571,83 @@ const getCaja = async (fecha) => {
   }
 };
 
+//Metodo para crear una cuponera
+const crearCuponera = async (cedula, monto) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Verifico si el cliente ya tiene una cuponera
+    const cuponera = existeCuponera(cedula).then((existe) => {
+      if (existe) {
+        //Si existe devuelvo mensaje de error
+        return { codigo: 400, mensaje: "El cliente ya tiene una cuponera" };
+      } else {
+        return insertarCuponera(cedula, monto).then(resultado => {
+          if(resultado.rowsAffected[0] < 1){
+            return { codigo: 400, mensaje: "Error al crear cuponera" };
+          }else {
+            return { codigo: 200, mensaje: "Cuponera creada correctamente" };
+          }
+        });
+      }
+    });
+    return cuponera;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo auxiliar para insertar una nueva cuponera
+const insertarCuponera = async (cedula, monto) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el insert
+    const cuponera = await pool
+      .request()
+      .input("cedula", sql.VarChar, cedula)
+      .input("monto", sql.VarChar, monto)
+      .query("insert into Cuponera(Cedula, Monto) values(@cedula, @monto)");
+    return cuponera;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo auxiliar que devuelve si existe una cuponera segun una cedula
+const existeCuponera = async (cedula) => {
+  try {
+    //Llamo al metodo de get cuponera para ver si me trae algo o no
+    const existe = getCuponera(cedula).then((cupo) => {
+      if (cupo.rowsAffected[0] === 0) {
+        return false;
+      }
+      return true;
+    });
+    return existe;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo auxiliar para ir a buscar una cuponera
+const getCuponera = async (cedula) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el select
+    const cuponera = await pool
+      .request()
+      .input("cedula", sql.VarChar, cedula)
+      .query(
+        "select IdCuponera as id, Cedula as cedula, Monto as monto from Cuponera C where C.Cedula = @cedula"
+      );
+    return cuponera;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 //Creo un objeto que voy a exportar para usarlo desde el index.js
 //Adentro voy a tener todos los metodos de llamar a la base
 const interfaz = {
@@ -1577,6 +1665,7 @@ const interfaz = {
   login,
   abrirCaja,
   nuevaEntradaDinero,
+  crearCuponera,
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar
