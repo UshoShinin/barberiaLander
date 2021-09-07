@@ -1399,7 +1399,7 @@ const insertarEntradaDinero = async (monto, cedula) => {
     //Hago el insert en la tabla EntradaDinero
     const insertEntradaDinero = await pool
       .request()
-      .input("monto", sql.VarChar, monto)
+      .input("monto", sql.Int, monto)
       .input("cedula", sql.VarChar, cedula)
       .query(
         "insert into EntradaDinero(Cedula, Monto, Fecha) output inserted.IdEntrada values(@cedula, @monto, CAST(GETDATE() AS DATE))"
