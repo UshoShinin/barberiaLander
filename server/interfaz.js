@@ -1282,7 +1282,8 @@ const abrirCaja = async (entrada) => {
       entrada.pago,
       entrada.cedula,
       entrada.productosVendidos,
-      entrada.servicios
+      entrada.servicios,
+      "A" //Esto corresponde a la descripcion de la entrada de dinero
     ).then((resultado) => resultado);
     return { idCaja: idCaja };
   } catch (error) {
@@ -1306,11 +1307,16 @@ const nuevaEntradaDinero = async (
   pago,
   cedula,
   listadoProductos,
-  listadoServicios
+  listadoServicios,
+  descripcion
 ) => {
   try {
     //Hago primero el insert en la tabla entrada
-    const insertoEntradaDinero = insertarEntradaDinero(monto, cedula)
+    const insertoEntradaDinero = insertarEntradaDinero(
+      monto,
+      cedula,
+      descripcion
+    )
       .then((idEntrada) => {
         //Armo un listado para guardar todas las promesas que haya hecho
         const listadoPromesas = [];
@@ -1396,7 +1402,7 @@ const nuevaEntradaDinero = async (
 };
 
 //Metodo auxiliar para hacer el insert en la tabla EntradaDinero
-const insertarEntradaDinero = async (monto, cedula) => {
+const insertarEntradaDinero = async (monto, cedula, descripcion) => {
   try {
     //Creo la conexion
     let pool = await sql.connect(conexion);
@@ -1405,8 +1411,9 @@ const insertarEntradaDinero = async (monto, cedula) => {
       .request()
       .input("monto", sql.Int, monto)
       .input("cedula", sql.VarChar, cedula)
+      .input("descripcion", sql.Char, descripcion)
       .query(
-        "insert into EntradaDinero(Cedula, Monto, Fecha) output inserted.IdEntrada values(@cedula, @monto, CAST(GETDATE() AS DATE))"
+        "insert into EntradaDinero(Cedula, Monto, Fecha, Descripcion) output inserted.IdEntrada values(@cedula, @monto, CAST(GETDATE() AS DATE), @descripcion)"
       );
     return insertEntradaDinero.recordset[0].IdEntrada;
   } catch (error) {
@@ -1576,10 +1583,8 @@ const getCaja = async (fecha) => {
 };
 
 //Metodo para crear una cuponera
-const crearCuponera = async (cedula, monto) => {
+const crearCuponera = async (cedula, monto, caja) => {
   try {
-    //Creo la conexion
-    let pool = await sql.connect(conexion);
     //Verifico si el cliente ya tiene una cuponera
     const cuponera = existeCuponera(cedula).then((existe) => {
       if (existe) {
@@ -1590,7 +1595,28 @@ const crearCuponera = async (cedula, monto) => {
           if (resultado.rowsAffected[0] < 1) {
             return { codigo: 400, mensaje: "Error al crear cuponera" };
           } else {
-            return { codigo: 200, mensaje: "Cuponera creada correctamente" };
+            //Hago la entrada de dinero que corresponde a esto
+            return nuevaEntradaDinero(
+              caja.idCaja,
+              caja.montoTotal,
+              caja.pago.Efectivo,
+              caja.cedula,
+              caja.productosVendidos,
+              caja.servicios,
+              caja.descripcion
+            ).then((resultado) => {
+              if (resultado.codigo === 200) {
+                return {
+                  codigo: 200,
+                  mensaje: "Cuponera creada correctamente",
+                };
+              } else {
+                return {
+                  codigo: 400,
+                  mensaje: "Error al pagar la plata de la cuponera",
+                };
+              }
+            });
           }
         });
       }
@@ -1831,17 +1857,38 @@ const updateCuponeraEntero = async (ciActual, ciNueva, monto) => {
 //Metodo para consultar el saldo de una cuponera
 const getSaldoCuponera = async (cedula) => {
   try {
-    return getCuponera(cedula).then(resultado => {
+    return getCuponera(cedula).then((resultado) => {
       if (resultado.rowsAffected[0] === 0) {
-        return {codigo: 400, mensaje: "El cliente no tiene una cuponera"}
-      }else {
-        return {codigo: 200, mensaje: resultado.recordset[0].monto}
+        return { codigo: 400, mensaje: "El cliente no tiene una cuponera" };
+      } else {
+        return { codigo: 200, mensaje: resultado.recordset[0].monto };
       }
-    })
+    });
   } catch (error) {
     console.log(error);
   }
-}
+};
+
+//Metodo para conseguir el idCaja
+const getIdCajaHoy = async () => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el select
+    const idCaja = await pool
+      .request()
+      .query(
+        "select IdCaja as id from Caja C where C.Fecha = CAST(GETDATE() AS DATE)"
+      );
+    if (idCaja.rowsAffected[0] < 1) {
+      return -1;
+    } else {
+      return idCaja.recordset[0].id;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 //Creo un objeto que voy a exportar para usarlo desde el index.js
 //Adentro voy a tener todos los metodos de llamar a la base
@@ -1864,6 +1911,7 @@ const interfaz = {
   modificarSaldoCuponera,
   updateCuponera,
   getSaldoCuponera,
+  getIdCajaHoy,
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar

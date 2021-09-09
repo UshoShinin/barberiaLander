@@ -170,7 +170,7 @@ app.post("/updateCuponera", (req, res) => {
 });
 
 app.post("/crearCuponera", (req, res) => {
-  const ret = interfaz.crearCuponera(req.body.cedula, req.body.monto);
+  const ret = interfaz.crearCuponera(req.body.cedula, req.body.monto, req.body.caja);
   ret.then((resultado) => {
     res.json({
       mensaje: resultado,
@@ -180,6 +180,15 @@ app.post("/crearCuponera", (req, res) => {
 
 app.use("/getSaldoCuponera", (req, res) => {
   const ret = interfaz.getSaldoCuponera(req.body.cedula);
+  ret.then((resultado) => {
+    res.json({
+      mensaje: resultado,
+    });
+  });
+});
+
+app.use("/getIdCajaHoy", (req, res) => {
+  const ret = interfaz.getIdCajaHoy();
   ret.then((resultado) => {
     res.json({
       mensaje: resultado,
