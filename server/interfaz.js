@@ -1701,6 +1701,148 @@ const modificarSaldoCuponera = async (cedula, monto) => {
   }
 };
 
+//Metodo para modificar la cuponera entera
+const updateCuponera = async (ciActual, ciNueva, monto) => {
+  try {
+    //Verifico si el ciNueva tiene cuponera
+    return existeCuponera(ciNueva).then((existe) => {
+      if (existe) {
+        return { codigo: 400, mensaje: "El nuevo cliente ya tiene cuponera" };
+      } else {
+        //Verifico si al ciActual tiene cuponera
+        return existeCuponera(ciActual).then((existe) => {
+          //Si el ciActual no tiene cuponera devuelvo error
+          if (!existe) {
+            return {
+              codigo: 400,
+              mensaje: "El cliente actual no tiene cuponera",
+            };
+          } else {
+            //Verifico si tengo que actualizar la cedula o monto individualmente o si tengo que actualizar todo junto
+            if (ciNueva === null) {
+              //Solamente actualizo el monto
+              return updateMontoCuponera(ciActual, monto).then((resultado) => {
+                if (resultado === 1) {
+                  return {
+                    codigo: 200,
+                    mensaje: "Saldo modificado correctamente",
+                  };
+                } else {
+                  return { codigo: 400, mensaje: "Error al modificar saldo" };
+                }
+              });
+            } else if (monto === null) {
+              //Solamente actualizo el cliente
+              return updateClienteCuponera(ciActual, ciNueva).then(
+                (resultado) => {
+                  if (resultado === 1) {
+                    return {
+                      codigo: 200,
+                      mensaje: "Cliente modificado correctamente",
+                    };
+                  } else {
+                    return {
+                      codigo: 400,
+                      mensaje: "Error al modificar cliente",
+                    };
+                  }
+                }
+              );
+            } else {
+              //Si entro aca significa de que tengo que actualizar todo de la cuponera
+              return updateCuponeraEntero(ciActual, ciNueva, monto).then(
+                (resultado) => {
+                  if (resultado === 1) {
+                    return {
+                      codigo: 200,
+                      mensaje: "Cuponera modificada correctamente",
+                    };
+                  } else {
+                    return {
+                      codigo: 400,
+                      mensaje: "Error al modificar cuponera",
+                    };
+                  }
+                }
+              );
+            }
+          }
+        });
+      }
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo auxiliar para hacer update al saldo de la cuponera
+const updateMontoCuponera = async (ci, monto) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el update
+    const cuponera = await pool
+      .request()
+      .input("monto", sql.Int, monto)
+      .input("ci", sql.VarChar, ci)
+      .query("update Cuponera set Monto = @monto where Cedula = @ci");
+    //Devuelvo la cantidad de filas afectadas, siempre deberia ser 1
+    return cuponera.rowsAffected[0];
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo auxiliar para hacer update al cliente de la cuponera
+const updateClienteCuponera = async (ciActual, ciNueva) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el update
+    const cuponera = await pool
+      .request()
+      .input("ciNueva", sql.VarChar, ciNueva)
+      .input("ciActual", sql.VarChar, ciActual)
+      .query("update Cuponera set Cedula = @ciNueva where Cedula = @ciActual");
+    //Devuelvo la cantidad de filas afectadas, siempre deberia ser 1
+    return cuponera.rowsAffected[0];
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo auxiliar para hacer update al cliente de la cuponera
+const updateCuponeraEntero = async (ciActual, ciNueva, monto) => {
+  try {
+    return updateMontoCuponera(ciActual, monto).then((filasAfectadas) => {
+      if (filasAfectadas === 1) {
+        return updateClienteCuponera(ciActual, ciNueva).then(
+          (resultado) => resultado
+        );
+      } else {
+        return filasAfectadas;
+      }
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo para consultar el saldo de una cuponera
+const getSaldoCuponera = async (cedula) => {
+  try {
+    return getCuponera(cedula).then(resultado => {
+      if (resultado.rowsAffected[0] === 0) {
+        return {codigo: 400, mensaje: "El cliente no tiene una cuponera"}
+      }else {
+        return {codigo: 200, mensaje: resultado.recordset[0].monto}
+      }
+    })
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 //Creo un objeto que voy a exportar para usarlo desde el index.js
 //Adentro voy a tener todos los metodos de llamar a la base
 const interfaz = {
@@ -1720,6 +1862,8 @@ const interfaz = {
   nuevaEntradaDinero,
   crearCuponera,
   modificarSaldoCuponera,
+  updateCuponera,
+  getSaldoCuponera,
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar

@@ -1,4 +1,4 @@
-const path = require('path');
+const path = require("path");
 const express = require("express");
 const router = express.Router();
 const PORT = process.env.PORT || 3001;
@@ -9,10 +9,8 @@ app.use(express.json()); // To parse the incoming requests with JSON payloads
 //Importo la interfaz. Esto va a tener los metodos para llamar a la base
 const interfaz = require("./interfaz");
 
-
 // Have Node serve the files for our built React app
 /* app.use(express.static(path.resolve(__dirname, '../cliente/barberiaLander/build'))); */
-
 
 app.use("/datosFormularioAgenda", (req, res) => {
   let ret = interfaz.getDatosFormulario();
@@ -158,8 +156,30 @@ app.post("/modificarSaldoCuponera", (req, res) => {
   });
 });
 
+app.post("/updateCuponera", (req, res) => {
+  const ret = interfaz.updateCuponera(
+    req.body.ciActual,
+    req.body.ciNuevo,
+    req.body.monto
+  );
+  ret.then((resultado) => {
+    res.json({
+      mensaje: resultado,
+    });
+  });
+});
+
 app.post("/crearCuponera", (req, res) => {
   const ret = interfaz.crearCuponera(req.body.cedula, req.body.monto);
+  ret.then((resultado) => {
+    res.json({
+      mensaje: resultado,
+    });
+  });
+});
+
+app.use("/getSaldoCuponera", (req, res) => {
+  const ret = interfaz.getSaldoCuponera(req.body.cedula);
   ret.then((resultado) => {
     res.json({
       mensaje: resultado,
@@ -171,7 +191,6 @@ app.post("/crearCuponera", (req, res) => {
 /* app.get('*', (req, res) => {
   res.sendFile(path.resolve(__dirname, '../cliente/barberiaLander/build', 'index.html'));
 }); */
-
 
 //No escribir nada por debajo de esto
 app.listen(PORT, () => {
