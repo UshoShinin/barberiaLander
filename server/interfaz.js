@@ -1406,10 +1406,12 @@ const insertarEntradaDinero = async (monto, cedula, descripcion) => {
   try {
     //Creo la conexion
     let pool = await sql.connect(conexion);
+    //Si el monto es null lo paso a 0
+    let montoAinsertar = monto === null ? 0 : monto;
     //Hago el insert en la tabla EntradaDinero
     const insertEntradaDinero = await pool
       .request()
-      .input("monto", sql.Int, monto)
+      .input("monto", sql.Int, montoAinsertar)
       .input("cedula", sql.VarChar, cedula)
       .input("descripcion", sql.Char, descripcion)
       .query(
@@ -1600,7 +1602,7 @@ const crearCuponera = async (cedula, monto, caja) => {
               caja.idCaja,
               caja.montoTotal,
               caja.pago.Efectivo,
-              caja.cedula,
+              caja.ciEmpleado,
               caja.productosVendidos,
               caja.servicios,
               caja.descripcion
