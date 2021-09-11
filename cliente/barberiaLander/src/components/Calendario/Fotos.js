@@ -1,12 +1,14 @@
+import React from "react";
 import classes from "./Fotos.module.css";
 import ComboBox from "./../../components/ComboBox/ComboBox";
 import { useReducer } from "react";
 import { CSSTransition } from "react-transition-group";
 import { getElementById } from "../../FuncionesAuxiliares/FuncionesAuxiliares";
 const Fotos = (props) => {
+  const Fotitos = JSON.parse(props.fotos);
   const initialState = {
-    Actual: { value: props.fotos[0].foto, mostrar: true },
-    Siguiente: { value: null, mostrar: false },
+    Actual: { value: Fotitos[0].foto, mostrar: true,alt: Fotitos[0].title},
+    Siguiente: { value: null, mostrar: false,alt:'' },
     canChange: true,
   };
   const heightCombo = document.getElementById("root").clientWidth >1400?8:4.8;
@@ -16,45 +18,47 @@ const Fotos = (props) => {
         if (state.Actual.value === null) {
           return {
             canChange: false,
-            Actual: { value: action.value, mostrar: false },
-            Siguiente: { value: state.Siguiente.value, mostrar: false },
+            Actual: { value: action.value, mostrar: false,alt:action.alt },
+            Siguiente: { ...state.Siguiente, mostrar: false },
           };
         }
         return {
-          Actual: { value: state.Actual.value, mostrar: false },
-          Siguiente: { value: action.value, mostrar: false },
+          Actual: { ...state.Actual, mostrar: false },
+          Siguiente: { value: action.value, mostrar: false,alt:action.alt  },
         };
 
       case "MOSTRAR_ACTUAL":
         return {
-          Actual: { value: state.Actual.value, mostrar: true },
-          Siguiente: { value: null, mostrar: false },
+          Actual: { ...state.Actual, mostrar: true },
+          Siguiente: { value: null, mostrar: false,alt:'' },
         };
       case "MOSTRAR_SIGUIENTE":
         return {
-          Actual: { value: null, mostrar: false },
-          Siguiente: { value: state.Siguiente.value, mostrar: true },
+          Actual: { value: null, mostrar: false,alt:'' },
+          Siguiente: { ...state.Siguiente, mostrar: true },
         };
       case "PERMITIR": {
-        console.log("Podes tocar");
         return { ...state, canChange: true };
       }
+      default:
+        return {...state};
     }
   };
   const [state, dispatch] = useReducer(reducer, initialState);
   const Actualizar = () => {
     const imagenActual = getElementById(
-      props.fotos,
+      Fotitos,
       props.currentEmployee
-    ).foto;
+    );
     if (
       state.canChange &&
-      ((state.Actual.mostrar && state.Actual.value !== imagenActual) ||
-        (state.Siguiente.mostrar && state.Siguiente.value !== imagenActual))
+      ((state.Actual.mostrar && state.Actual.value !== imagenActual.foto) ||
+        (state.Siguiente.mostrar && state.Siguiente.value !== imagenActual.foto))
     ) {
       dispatch({
         type: "CHANGE_I",
-        value: imagenActual,
+        value: imagenActual.foto,
+        alt:imagenActual.title
       });
     }
   };
@@ -83,7 +87,7 @@ const Fotos = (props) => {
           exitActive: `${classes.Close}`,
         }}
       >
-        <img className={`${classes.foto}`} src={state.Actual.value} />
+        <img className={`${classes.foto}`} src={state.Actual.value} alt={state.Actual.alt} />
       </CSSTransition>
       <CSSTransition
         key={2}
@@ -106,15 +110,17 @@ const Fotos = (props) => {
           exitActive: `${classes.Close}`,
         }}
       >
-        <img className={`${classes.foto}`} src={state.Siguiente.value} />
+        <img className={`${classes.foto}`} src={state.Siguiente.value}  alt={state.Siguiente.alt} />
       </CSSTransition>
     </>
   );
   const comboChangeHandler = (id) => {
     if (state.canChange) {
+      const empleado = getElementById(Fotitos, id)
       dispatch({
         type: "CHANGE_I",
-        value: getElementById(props.fotos, id).foto,
+        value: empleado.foto,
+        alt:empleado.title
       });
       props.changeEmployee(id);
     }
@@ -134,11 +140,11 @@ const Fotos = (props) => {
             onClick={props.onClick}
             current={props.currentEmployee}
             onChange={comboChangeHandler}
-            opciones={props.fotos}
+            opciones={Fotitos}
           />
         </div>
       </div>
     </>
   );
 };
-export default Fotos;
+export default React.memo(Fotos);

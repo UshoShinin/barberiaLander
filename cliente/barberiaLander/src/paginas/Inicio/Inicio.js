@@ -1,4 +1,3 @@
-import LoaddingSpinner from "../../components/LoaddingSpinner/LoaddingSpinner";
 import classes from "./Inicio.module.css";
 import Slider from "./Slider/Slider";
 import Footer from "../../components/Footer/Footer";
@@ -12,7 +11,7 @@ const Inicio = () => {
       <Slider />
       <div className={classes.Contactanos}>
         <figure>
-          <img src={peluqueros} />
+          <img alt='Empleados de la peluquería' src={peluqueros} />
         </figure>
         <div>
           <h1>Reserva online ahora con nosotros</h1>

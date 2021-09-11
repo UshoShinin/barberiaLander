@@ -27,6 +27,8 @@ export let getMonthChart = (month) => {
     case 7:
       monthChart = 6;
       break;
+    default:
+      break;
   }
   return monthChart;
 };

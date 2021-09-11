@@ -22,6 +22,11 @@ const filtrarHorarios = (empleados, noManeja, id) => {
   return empleados;
 };
 
+const validarTelefono = (tel) => {
+  const telefono = String(parseInt(tel.trim(), 10));
+  return telefono.length === 8;
+};
+
 export const inputReducer = (state, action) => {
   let myState = null; //Esta variable se usa para los servicios
   switch (action.type) {
@@ -56,7 +61,7 @@ export const inputReducer = (state, action) => {
         ...state,
         Telefono: {
           value: state.Telefono.value,
-          isValid: state.Telefono.value.trim().length > 5,
+          isValid:validarTelefono(state.Telefono.value),
         },
       };
     case "RESET_PHONE_IS_VALID":
@@ -75,13 +80,13 @@ export const inputReducer = (state, action) => {
           isValid: state.Descripcion.isValid,
         },
       };
-    case "USER_INPUT_REFERENCIA":
+    /* case "USER_INPUT_REFERENCIA":
       return {
         ...state,
         Referencia: {
           value: action.value,
         },
-      };
+      }; */
     case "CALENDARIO":
       return {
         ...state,
@@ -190,6 +195,8 @@ export const inputReducer = (state, action) => {
         },
       };
       break;
+    default:
+    return{...state};
   }
   if (myState !== null) {
     const servicios = Object.values(myState.servicios);

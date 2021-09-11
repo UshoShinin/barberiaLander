@@ -1,13 +1,11 @@
 import { useEffect, useState } from "react";
 import React from "react";
-import LoaddingSpinner from "../../../../components/LoaddingSpinner/LoaddingSpinner";
 import classes from "./Visualizador.module.css";
 import useHttp from "../../../../hooks/useHttp";
 import SimpleButton from "../../../../components/UI/SimpleButton/SimpleButton";
 import Border from "../../../../components/UI/Border/Border";
-import { Redirect, Route } from "react-router-dom";
 const Visualizador = React.memo((props) => {
-  const { isLoading, error, sendRequest: getAgenda } = useHttp();
+  const getAgenda = useHttp();
   const [agenda, setAgenda] = useState({
     IdAgenda: -1,
     servicios: {
@@ -21,7 +19,6 @@ const Visualizador = React.memo((props) => {
   });
 
   const obtenerAgenda = (respuesta) => {
-    console.log(respuesta)
     let servicios = {
       corte: false,
       barba: false,
@@ -50,6 +47,8 @@ const Visualizador = React.memo((props) => {
         case 8:
           servicios.brushing = true;
           break;
+        default:
+          break;
       }
     });
 
@@ -60,12 +59,12 @@ const Visualizador = React.memo((props) => {
     };
     setAgenda(agendaObtenida);
   };
-
+  const id = props.id;
   useEffect(() => {
-    if (props.id !== null) {
-      getAgenda({ url: "/agendaPorId?idAgenda=" + props.id }, obtenerAgenda);
+    if (id !== null) {
+      getAgenda({ url: "/agendaPorId?idAgenda=" + id }, obtenerAgenda);
     }
-  }, [props.id]);
+  }, [id,getAgenda]);
   const sendAgendas = () => {
     props.mostrarAgenda(agenda);
   };
@@ -224,6 +223,7 @@ const Visualizador = React.memo((props) => {
           </div>
           <div className={classes.foto}>
             <img
+            alt='Foto cliente'
               id="referencia"
               className={`${classes.hide} ${
                 agenda.IdAgenda !== -1 ? classes.show : ""

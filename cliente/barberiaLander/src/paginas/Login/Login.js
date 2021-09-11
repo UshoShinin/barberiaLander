@@ -17,12 +17,9 @@ const Login = (props) => {
   const refCon = useRef();
   const [loginState, dispatchLogin] = useReducer(reducer, initialState);
   const INPUTS = inputs(loginState, dispatchLogin);
-
   const authCtx = useContext(AuthContext);
-
-  const { isLoadingLogin, errorLogin, sendRequest: login } = useHttp();
+  const login = useHttp();
   const getRespuesta = (res) => {
-    console.log(res);
     if (res.mensaje.ciUsuario !== undefined) {
       authCtx.login(res.mensaje);
       history.replace('/');

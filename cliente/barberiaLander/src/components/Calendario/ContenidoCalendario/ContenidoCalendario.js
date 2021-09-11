@@ -1,5 +1,5 @@
 import Dias from "../Dias/Dias";
-import {getYearChart} from "../Dias/GeneradorDias";
+import {getYearChart} from "../../../hooks/useDayGenerator";
 import classes from './ContenidoCalendario.module.css';
 export const days = (date,diasAMostrar,actividad,obtenerHorarios,lostFocus) => {
 
@@ -11,7 +11,6 @@ const getHorarios = (horarios) => {
   let cantidadMeses;
   let diasMostrar;
     const Day = date;
-    const diaActual = Day.getDate();
     const month = Day.getMonth()+1;
     const year = Day.getFullYear();
     diasMostrar = diasAMostrar;

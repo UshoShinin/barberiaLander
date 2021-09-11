@@ -1,9 +1,10 @@
 import classes from "./NavBar.module.css";
 import { NavLink } from "react-router-dom";
-import { useContext, useReducer, useState } from "react";
+import { useContext, useReducer } from "react";
 import AuthContext from "../../store/AuthContext";
 import Menu from "./Menu/Menu";
-import Logo from "../../recursos/LogoChiquitoB.png";
+import NavButton from "./NavButton/NavButton";
+/* import Logo from "../../recursos/LogoChiquitoB.png"; */
 
 const NavLinks = (props) => {
   const initialState = { place: -1, active: -1 };
@@ -18,6 +19,8 @@ const NavLinks = (props) => {
           place: -1,
           active: state.active === action.value ? -1 : action.value,
         };
+      default:
+        return{...state}
     }
   };
 
@@ -69,20 +72,20 @@ const NavLinks = (props) => {
           <span data="Historial de Cajas">Historial de Cajas</span>
         </NavLink>{" "}
       </li> */}
-     {/*  {authCtx.user !== null &&
+      {/*  {authCtx.user !== null &&
         (authCtx.user.rol === "Administrador" ||
           authCtx.user.rol === "Encargado") && ( */}
-          <li>
-            <NavLink
-              onClick={NavOnClick}
-              exact
-              activeClassName={classes.active}
-              to="/caja/aperturacierre"
-            >
-              <span data="Abrir/Cerra Caja">Abrir/Cerra Caja</span>
-            </NavLink>
-          </li>
-       {/*  )} */}
+      <li>
+        <NavLink
+          onClick={NavOnClick}
+          exact
+          activeClassName={classes.active}
+          to="/caja/aperturacierre"
+        >
+          <span data="Abrir/Cerra Caja">Abrir/Cerra Caja</span>
+        </NavLink>
+      </li>
+      {/*  )} */}
       {authCtx.user !== null &&
         (authCtx.user.rol === "Administrador" ||
           authCtx.user.rol === "Encargado") && (
@@ -108,17 +111,7 @@ const NavLinks = (props) => {
           <span data="Slider">Slider</span>
         </NavLink>
       </li> */}
-      {/* <li>
-        <NavLink 
-          onClick={NavOnClick}
-          exact
-          activeClassName={classes.active}
-          
-          to="/cuponeras"
-        >
-          <span data="Cuponeras">Cuponeras</span>
-        </NavLink>
-      </li> */}
+
       <li>
         <NavLink
           onClick={NavOnClick}
@@ -138,7 +131,7 @@ const NavLinks = (props) => {
             to="/registro"
           >
             <span data="Registro">Registro</span>
-          </NavLink>{" "}
+          </NavLink>
         </li>
       )}
       {!isLoggedIn && (
@@ -150,10 +143,9 @@ const NavLinks = (props) => {
             to="/login"
           >
             <span data="Login">Login</span>
-          </NavLink>{" "}
+          </NavLink>
         </li>
       )}
-      {/* <li><NavLink onClick={props.onClick()} exact activeClassName="active"  to="/caja/movimientocaja">Movimiento de Caja</NavLink>    </li>  */}
       {authCtx.user !== null &&
         (authCtx.user.rol === "Administrador" ||
           authCtx.user.rol === "Encargado") && (
@@ -182,6 +174,11 @@ const NavLinks = (props) => {
           >
             <span data="Visualizar Agendas">Visualizar Agendas</span>
           </NavLink>
+        </li>
+      )}
+      {isLoggedIn && (
+        <li>
+          <NavButton onClick={authCtx.logout}>Log Out</NavButton>
         </li>
       )}
     </ul>

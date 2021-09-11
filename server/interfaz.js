@@ -549,8 +549,8 @@ const verificarHorarioModificarAgenda = async (horario) => {
     //Separo el listado
     const lista = horarios.recordset;
     //Paso a valores numericos los datos del horario que me pasan por parametro para poder trabajar mejor
-    let horaInicio = parseInt(horario.horario.i.replace(":", ""));
-    let horaFin = parseInt(horario.horario.f.replace(":", ""));
+    let horaInicio = parseInt(horario.i.replace(":", ""));
+    let horaFin = parseInt(horario.f.replace(":", ""));
     //Esta variable es la que devuelvo al final, arranca en true y en el for se evalua para pasar a false
     let puedoInsertar = true;
     //Recorro los horarios del empleado

@@ -17,13 +17,7 @@ const Registro = (props) => {
   const refConR = useRef();
   const [registroState, dispatchRegistro] = useReducer(reducer, initialState);
   const INPUTS = inputs(registroState, dispatchRegistro);
-
-  const {
-    isLoadingRegistro,
-    errorRegistro,
-    sendRequest: registrarse,
-  } = useHttp();
-
+  const registrarse = useHttp();
   const getRespuesta = (res)=>{
     console.log(res);
   }
@@ -44,7 +38,6 @@ const Registro = (props) => {
         telefono: registroState.telefono.value,
         contra: registroState.contra.value
       };
-      console.log("Registrado maquinola");
       registrarse(
         {
           url: "/registroCliente",

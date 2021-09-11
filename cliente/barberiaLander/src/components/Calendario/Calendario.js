@@ -9,7 +9,7 @@ const Calendario = (props) => {
   console.log("ReCarge");
   
   const [currentCalendar, setCurrentCalendar] = useState(0); //Se utiliza para gestionar el mes
-  const empleadosFotos = extraerFotos(props.empleados); /* De la lista de empleados se extraen solo las fotos para mandar
+  const empleadosFotos = JSON.stringify(extraerFotos(props.empleados)); /* De la lista de empleados se extraen solo las fotos para mandar
   solo los nombres ci y fotos */
   // Como no tenemos todo pronto en la base de datos voya tener que armar unos tiempos y servicios y tiempos provicionales
   const move = document.getElementById("root").clientWidth>1400?23.66:19;
@@ -35,7 +35,7 @@ const Calendario = (props) => {
   };
   return (
     <div className={classes.container} tabIndex={-1} id="Calendario">
-      <Fotos fotos={empleadosFotos} currentEmployee = {props.currentEmployee} changeEmployee = {props.changeEmployee} onClick={props.onClick} active={props.comboEmployeeActive}/>
+      <Fotos fotos={empleadosFotos}  currentEmployee = {props.currentEmployee} changeEmployee = {props.changeEmployee} onClick={props.onClick} active={props.comboEmployeeActive} />
       <Mes
         month={props.date.getMonth()}
         prev={prevCalendar}

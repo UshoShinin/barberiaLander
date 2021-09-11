@@ -1,14 +1,13 @@
 import classes from "./FormularioAgenda.module.css";
-import React, { useRef, useReducer, useContext } from "react";
+import React, { useRef, useReducer, useContext, useCallback } from "react";
 import Button from "../../../components/UI/Button/Button";
 import Input from "../../../components/UI/Input/Input";
-import InputFile from "../../../components/UI/InputFile/InputFile";
 import TextArea from "../../../components/UI/TextArea/TextArea";
 import Calendario from "../../../components/Calendario/Calendario";
 import { calcularTiempo } from "../../../components/Calendario/FuncionesAuxiliares";
 
 import CheckBoxAgenda from "./CheckBoxAgenda";
-import { DaysGenerator } from "../../../components/Calendario/Dias/GeneradorDias";
+import useDayGenerator from "../../../hooks/useDayGenerator";
 import { getElementById } from "../../../FuncionesAuxiliares/FuncionesAuxiliares";
 
 import { inputReducer } from "./ReduerFormularioAgenda";
@@ -26,13 +25,11 @@ const FormularioAgenda = (props) => {
     inputReducer,
     props.initialState
   );
-  console.log(inputState);
   const nombreRef = useRef();
   const telefonoRef = useRef();
   const descripcionRef = useRef();
-
   const height = document.getElementById("root").clientWidth > 1400 ? 11 : 7;
-
+  const DaysGenerator = useDayGenerator();
   const authCtx = useContext(AuthContext);
 
   const calendarioHandler = (horarios) => {
@@ -124,6 +121,7 @@ const FormularioAgenda = (props) => {
           }`,
           horario: { i: inicio, f: fin },
         };
+        props.onSaveDatosAgenda(datosAgenda);
       } else {
         //Modificar
         const fechita = `${year}-${mes.length > 1 ? mes : "0" + mes}-${
@@ -131,7 +129,6 @@ const FormularioAgenda = (props) => {
         }`;
         datosAgenda = {
           idAgenda: props.agenda.idagenda,
-          idHorario: props.agenda.idHorario,
           nombreCliente: inputState.Nombre.value,
           telefono: inputState.Telefono.value,
           descripcion: inputState.Descripcion.value,
@@ -139,16 +136,24 @@ const FormularioAgenda = (props) => {
           servicios: services,
           fecha: fechita,
           horario: {
+            idHorario: props.agenda.idHorario,
             i: inicio,
             f: fin,
             ciEmpleado: inputState.Employee.value,
             fecha: fechita,
           },
         };
+        props.onUpdateDatosAgenda(datosAgenda);
       }
-      props.onSaveDatosAgenda(datosAgenda);
+      
     }
   };
+  const changeEmployeeHandler = useCallback((id) => {
+    dispatchInput({ type: "CHANGE_EMPLOYEE", value: id });
+  }, []);
+  const calendarioOnClick = useCallback(() => {
+    dispatchInput({ type: "CLICK_EMPLOYEE" });
+  }, []);
 
   let diasMostrar;
   let diasSeleccionables = [];
@@ -167,12 +172,15 @@ const FormularioAgenda = (props) => {
       getElementById(inputState.HorariosFiltrados, inputState.Employee.value),
       inputState.servicios
     );
+    const fechas = JSON.stringify(
+      getElementById(inputState.HorariosFiltrados, inputState.Employee.value)
+        .fechas
+    );
     diasMostrar = DaysGenerator(
-      date.getDate(),
+      date.getDate() ,
       date.getMonth() + 1,
       date.getFullYear(),
-      getElementById(inputState.HorariosFiltrados, inputState.Employee.value)
-        .fechas,
+      fechas,
       tiempoNecesario
     );
 
@@ -298,15 +306,12 @@ const FormularioAgenda = (props) => {
         diasAMostrar={diasMostrar}
         currentEmployee={inputState.Employee.value}
         comboEmployeeActive={inputState.Employee.active}
-        changeEmployee={(id) => {
-          dispatchInput({ type: "CHANGE_EMPLOYEE", value: id });
-        }}
-        onClick={() => {
-          dispatchInput({ type: "CLICK_EMPLOYEE" });
-        }}
+        changeEmployee={changeEmployeeHandler}
+        onClick={calendarioOnClick}
       />
     );
   }
+  console.log("Running FormularioAgenda");
   return (
     <>
       <form onSubmit={submitHandler}>

@@ -24,17 +24,8 @@ const VisualAgendas = () => {
   const [inicio, setInicio] = useState(0);
   const [agendas, setAgendas] = useState(null);
   const [agenda, setAgenda] = useState(null);
-  const {
-    isLoadingAgendas,
-    errorAgendas,
-    sendRequest: fetchAgendas,
-  } = useHttp();
-
-  const {
-    isLoadingModificar,
-    errorModificar,
-    sendRequest: getAgenda,
-  } = useHttp();
+  const fetchAgendas = useHttp();
+  const  getAgenda = useHttp();
 
   const moveFHandler = () => {
     setInicio((prev) => {
@@ -61,16 +52,24 @@ const VisualAgendas = () => {
       switch (s) {
         case 1:
           misServicios.corte = true;
+          break;
         case 4:
           misServicios.barba = true;
+          break;
         case 5:
           misServicios.maquina = true;
+          break;
         case 6:
           misServicios.claritos = true;
+          break;
         case 7:
           misServicios.decoloracion = true;
+          break;
         case 8:
           misServicios.brushing = true;
+          break;
+        default:
+          break;
       }
     });
     setAgenda({
@@ -86,11 +85,11 @@ const VisualAgendas = () => {
   const obtenerAgendas = (res) => {
     setAgendas(res.mensaje.agendas);
   };
-
+  const user = authCtx.user;
   useEffect(() => {
-    if(authCtx.user===null||authCtx.user.rol==='Cliente')history.replace('/');
+    if(user===null||user.rol==='Cliente')history.replace('/');
     else fetchAgendas({ url: "/listadoAgendas" }, obtenerAgendas);
-  }, []);
+  }, [user,history,fetchAgendas]);
 
   let Mostrar = [];
   let tope = null;

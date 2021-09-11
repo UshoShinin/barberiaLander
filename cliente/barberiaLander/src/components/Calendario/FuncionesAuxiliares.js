@@ -18,7 +18,7 @@ export const obtenerHorariosDeDia = (dia, myMonth, fechas) => {
   if (fechas) {
     /* Recorre las fechas y cuando encuentra la que tiene el día y mes mandados devuelve los horarios */
     for (let i = 0; i < fechas.length; i++) {
-      if (fechas[i].dia == dia && fechas[i].mes == myMonth) {
+      if (fechas[i].dia === dia && fechas[i].mes === myMonth) {
         return fechas[i].horarios;
       }
     }

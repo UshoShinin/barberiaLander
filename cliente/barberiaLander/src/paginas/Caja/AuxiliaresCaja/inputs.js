@@ -215,7 +215,7 @@ const inputs = (cajaState,dispatchCaja) => {
       id: 12,
       type: "number",
       value: cajaState.codCuponera.value,
-      placeholder: "Codigo cuponera",
+      placeholder: "Cédula cliente",
       disabled: !cajaState.cajaAbierta,
       onChange: (event) => {
         dispatchCaja({

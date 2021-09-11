@@ -1,15 +1,11 @@
 import NormalCard from "../../../components/UI/Card/NormalCard";
-import Card from "../../../components/UI/Card/Card";
 import classes from "./PreAgendas.module.css";
-import Marco from "../../../components/UI/Marco/Marco";
 import Lista from "./Lista/Lista";
 import useHttp from "../../../hooks/useHttp";
-import { useEffect, useReducer, useState,useContext } from "react";
+import { useEffect, useReducer, useState, useContext } from "react";
 import LoaddingSpinner from "../../../components/LoaddingSpinner/LoaddingSpinner";
 import Switch from "../../../components/UI/Switch/Switch";
 import Visualizador from "./Visualizador/Visualizador";
-import {obtenerHorariosDeDia} from "../../../components/Calendario/FuncionesAuxiliares";
-import { getElementById } from "../../../FuncionesAuxiliares/FuncionesAuxiliares";
 import CrearAgenda from "../CrearAgenda";
 import AuthContext from "../../../store/AuthContext";
 import { useHistory } from "react-router-dom";
@@ -18,9 +14,11 @@ const initialState = { aceptar: false, rechazar: false };
 const reducerChecks = (state, action) => {
   switch (action.type) {
     case "ACEPTAR":
-      return {aceptar:!state.aceptar,rechazar:false}
+      return { aceptar: !state.aceptar, rechazar: false };
     case "RECHAZAR":
-      return {aceptar:false,rechazar:!state.rechazar}
+      return { aceptar: false, rechazar: !state.rechazar };
+    default:
+      return { ...state };
   }
 };
 
@@ -29,8 +27,7 @@ const PreAgendas = () => {
   const [agendasState, setAgendasState] = useState(null);
   const [idAgenda, setIdAgenda] = useState(null);
   const [agendaAModificar, setAgendaAModificar] = useState(null);
-  const [horarioAgenda, setHorarioAgenda] = useState(null);
-  const [checks, dispatchChecks] = useReducer(reducerChecks,initialState);
+  const [checks, dispatchChecks] = useReducer(reducerChecks, initialState);
   const authCtx = useContext(AuthContext);
   const obtenerAgendas = (agendas) => {
     let misAgendas = [];
@@ -43,42 +40,31 @@ const PreAgendas = () => {
   const getRespuesta = (res) => {
     console.log(res);
   };
-  const getRespuestaEliminar = (res) =>{
+  const getRespuestaEliminar = (res) => {
     console.log(res);
-  }
-  const {
-    isLoadingPreAgendas,
-    errorPreAgendas,
-    sendRequest: fetchAgendas,
-  } = useHttp();
-  const {
-    isLoadingHorarios,
-    errorHorarios,
-    sendRequest: fetchHorarios,
-  } = useHttp();
-  const { isLoadingAceptar, errorAceptar, sendRequest: aceptar } = useHttp();
-  const { isLoadingRechazar, errorRechazar, sendRequest: rechazar } = useHttp();
+  };
+  const fetchAgendas = useHttp();
+
+  const aceptar = useHttp();
+  const rechazar = useHttp();
+  const user = authCtx.user;
   useEffect(() => {
-    if(authCtx.user===null||authCtx.user.rol!=='Administrador'&&authCtx.user.rol!=='Encargado')history.replace('/');
+    if (
+      user === null ||
+      (user.rol !== "Administrador" && user.rol !== "Encargado")
+    )
+      history.replace("/");
     else fetchAgendas({ url: "/listadoPreAgendas" }, obtenerAgendas);
-  }, []);
-
-  const obtenerHorarios = (horarios) => {
-    setHorarioAgenda(
-      obtenerHorariosDeDia(
-        agendaAModificar.fecha.d,
-        agendaAModificar.fecha.m,
-        getElementById(horarios, agendaAModificar.ciPeluquero).fechas
-      )
-    );
-  };
-
+  }, [user, history, fetchAgendas]);
   const showAgenda = (agendita) => {
-    //Creo que todo lo de los horarios no es necesario y se puede eliminar
-    setAgendaAModificar({...agendita,fecha:{d:parseInt(agendita.fecha.slice(8,10),10),m:parseInt(agendita.fecha.slice(5,7),10)}})
-    fetchHorarios({ url: "/datosFormularioAgenda"},obtenerHorarios);
+    setAgendaAModificar({
+      ...agendita,
+      fecha: {
+        d: parseInt(agendita.fecha.slice(8, 10), 10),
+        m: parseInt(agendita.fecha.slice(5, 7), 10),
+      },
+    });
   };
-
   const aceptarAgenda = (agenda) => {
     aceptar(
       {
@@ -92,7 +78,6 @@ const PreAgendas = () => {
   };
 
   const rechazarAgenda = (agenda) => {
-    /* console.log(agenda); */
     rechazar(
       {
         url: "/eliminarAgenda",
@@ -108,13 +93,13 @@ const PreAgendas = () => {
     <>
       {agendaAModificar !== null && (
         <NormalCard>
-          <CrearAgenda agenda={agendaAModificar} horario={horarioAgenda} />
+          <CrearAgenda agenda={agendaAModificar} />
         </NormalCard>
       )}
       {agendaAModificar === null && (
         <NormalCard className={classes.ajuste}>
-          {isLoadingPreAgendas && <LoaddingSpinner />}
-          {!isLoadingPreAgendas && (
+          {agendasState === null && <LoaddingSpinner />}
+          {agendasState !== null && (
             <div className={classes.container}>
               <div className={classes.listado}>
                 {agendasState !== null && (
@@ -130,13 +115,23 @@ const PreAgendas = () => {
                     <h2>Aceptar todo</h2>
                   </div>
                   <div className={classes.actions}>
-                    <Switch onCheck={()=>{dispatchChecks({type:'ACEPTAR'})}} active={checks.aceptar} />
+                    <Switch
+                      onCheck={() => {
+                        dispatchChecks({ type: "ACEPTAR" });
+                      }}
+                      active={checks.aceptar}
+                    />
                   </div>
                   <div className={classes.label}>
                     <h2>Rechazar todo</h2>
                   </div>
                   <div className={classes.actions}>
-                    <Switch onCheck={()=>{dispatchChecks({type:'RECHAZAR'})}} active={checks.rechazar} />
+                    <Switch
+                      onCheck={() => {
+                        dispatchChecks({ type: "RECHAZAR" });
+                      }}
+                      active={checks.rechazar}
+                    />
                   </div>
                 </div>
               </div>
@@ -146,7 +141,7 @@ const PreAgendas = () => {
             </div>
           )}
         </NormalCard>
-      )}{" "}
+      )}
     </>
   );
 };

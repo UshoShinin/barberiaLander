@@ -1,6 +1,5 @@
 import classes from "./Dias.module.css";
 import { getMonthChart, getDayIndex } from "./FunctionsDias";
-import { getDayOfDate } from "../FuncionesAuxiliares";
 
 const Dias = (props) => {
   let classFirstDay;
@@ -42,6 +41,8 @@ const Dias = (props) => {
     case 7:
       classFirstDay = classes.Dom;
       break;
+      default:
+        break;
   }
   primerDia = props.diasMostrar[0];
   diasAuxiliares = props.diasMostrar.filter((dia)=>(dia.num!==1));

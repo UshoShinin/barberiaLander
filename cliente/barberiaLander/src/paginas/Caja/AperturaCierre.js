@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useRef,useContext } from "react";
+import React, { useEffect, useReducer, useRef, useContext } from "react";
 import SimpleButton from "../../components/UI/SimpleButton/SimpleButton";
 import Switch from "../../components/UI/Switch/Switch";
 import Input from "../../components/UI/Input/Input";
@@ -35,8 +35,14 @@ const AperturaCierre = () => {
   const codCuponera = useRef();
   const ticket = useRef();
   const history = useHistory();
-  
+
   const INPUTS = inputs(cajaState, dispatchCaja);
+
+  //Llamadas al backend
+  const modificarCuponera = useHttp();
+  const cobrarCaja = useHttp();
+  const abrirCaja = useHttp();
+  const fetchAgendas = useHttp();
 
   const salidaSubmitHandler = (e) => {
     e.preventDefault();
@@ -55,28 +61,72 @@ const AperturaCierre = () => {
     }
   };
   const obtenerAgendas = (mensaje) => {
-    console.log(mensaje.mensaje);
     dispatchCaja({ type: "CARGA_DE_DATOS", payload: mensaje.mensaje });
   };
-  const {
-    isLoadingModificar,
-    errorModificar,
-    sendRequest: cobrarCaja,
-  } = useHttp();
-
-  const {
-    isLoadingAbrirCaja,
-    errorAbrirCaja,
-    sendRequest: abrirCaja,
-  } = useHttp();
 
   const resultadoCaja = (res) => {
-    dispatchCaja({ type: "ABRIR_CAJA",id:res.mensaje.idCaja});
+    dispatchCaja({ type: "ABRIR_CAJA", id: res.mensaje.idCaja });
   };
 
   const getRespuesta = (res) => {
     console.log(res);
   };
+  const getRespuestaModificar = (res) => {
+    if (res.mensaje.codigo !== 400) {
+      const montoE =
+        cajaState.montoEfectivo.value.length > 0
+          ? cajaState.montoEfectivo.value
+          : 0;
+      const montoD =
+        cajaState.montoDebito.value.length > 0
+          ? cajaState.montoDebito.value
+          : 0;
+      const montoC =
+        cajaState.montoCuponera.value.length > 0
+          ? cajaState.montoCuponera.value
+          : 0;
+      let productosVendidos = cajaState.productosAgregados.map((p) => {
+        return { idProducto: p.id, cantidad: p.stock };
+      });
+      let servicios = Object.values(cajaState.servicios).filter(
+        (s) => s.active
+      );
+      servicios = servicios.length > 0 ? servicios : null;
+      productosVendidos =
+        productosVendidos.length > 0 ? productosVendidos : null;
+      const agenda = getElementById(
+        cajaState.agendas,
+        cajaState.comboAgenda.value
+      );
+      const datosEnviar = {
+        idCaja: cajaState.idCaja,
+        fecha: cajaState.fecha,
+        ciEmpleado: cajaState.sinAgendar.value
+          ? cajaState.comboAgenda.value
+          : agenda.empleado,
+        montoTotal: cajaState.montoTotal.value,
+        pago: {
+          numeroTicket: cajaState.ticketDebito.value,
+          Efectivo: parseInt(montoE, 10),
+          Debito: parseInt(montoD, 10),
+          Cuponera: parseInt(montoC, 10),
+        },
+        productosVendidos,
+        servicios,
+        descripcion: null,
+      };
+      cobrarCaja(
+        {
+          url: "/entradaCaja",
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: datosEnviar,
+        },
+        getRespuesta
+      );
+    }
+  };
+
   const submitHandler = (e) => {
     e.preventDefault();
     let agenda;
@@ -123,26 +173,24 @@ const AperturaCierre = () => {
 
       const cuponera = document.getElementById("Cuponera");
       cuponera.className = `${cuponera.className} ${classes.invalid}`;
-    } else if(cajaState.debito.value&&!cajaState.ticketDebito.isValid){
+    } else if (cajaState.debito.value && !cajaState.ticketDebito.isValid) {
       ticket.current.focus();
-    }else if(cajaState.cuponera.value&&!cajaState.codCuponera.isValid){
+    } else if (cajaState.cuponera.value && !cajaState.codCuponera.isValid) {
       codCuponera.current.focus();
     } else if (!cajaState.montoTotal.isValid) montoTotal.current.focus();
     else {
       dispatchCaja({ type: "SHOW_JORNAL" });
     }
   };
-
-  const {
-    isLoadingAgendas,
-    errorAgendas,
-    sendRequest: fetchAgendas,
-  } = useHttp();
-
+  const user = authCtx.user;
   useEffect(() => {
-    /* if(authCtx.user===null||authCtx.user.rol!=='Administrador'&&authCtx.user.rol!=='Encargado')history.replace('/');
-    else */ fetchAgendas({ url: "/datosFormularioCaja" }, obtenerAgendas);
-  }, []);
+    if (
+      user === null ||
+      (user.rol !== "Administrador" && user.rol !== "Encargado")
+    )
+      history.replace("/");
+    else fetchAgendas({ url: "/datosFormularioCaja" }, obtenerAgendas);
+  }, [user,history,fetchAgendas]);
 
   return (
     <>
@@ -162,7 +210,10 @@ const AperturaCierre = () => {
               input={INPUTS[9]}
             />
           </div>
-          <label id="comboSalida" className={`${classes.text} ${classes.labelText}`}>
+          <label
+            id="comboSalida"
+            className={`${classes.text} ${classes.labelText}`}
+          >
             Empleado
           </label>
           <div style={{ height: "40px" }}>
@@ -194,7 +245,6 @@ const AperturaCierre = () => {
           show={cajaState.jornal.show}
           aceptar={() => {
             dispatchCaja({ type: "HIDE_JORNAL" });
-            console.log(cajaState);
             const montoE =
               cajaState.montoEfectivo.value.length > 0
                 ? cajaState.montoEfectivo.value
@@ -235,16 +285,39 @@ const AperturaCierre = () => {
               },
               productosVendidos,
               servicios,
+              descripcion: null,
             };
-            cobrarCaja(
-              {
-                url: "/entradaCaja",
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: datosEnviar,
-              },
-              getRespuesta
-            );
+            if (cajaState.cuponera.value) {
+              const datosCuponera = {
+                cedula: cajaState.codCuponera.value,
+                monto: -parseInt(
+                  cajaState.cantidadMedios.value > 1
+                    ? cajaState.montoCuponera.value
+                    : cajaState.montoTotal.value,
+                  10
+                ),
+              };
+              console.log(datosCuponera);
+              modificarCuponera(
+                {
+                  url: "/modificarSaldoCuponera",
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: datosCuponera,
+                },
+                getRespuestaModificar
+              );
+            } else {
+              cobrarCaja(
+                {
+                  url: "/entradaCaja",
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: datosEnviar,
+                },
+                getRespuesta
+              );
+            }
           }}
           rechazar={() => {
             dispatchCaja({ type: "HIDE_JORNAL" });
@@ -274,17 +347,18 @@ const AperturaCierre = () => {
               disabled={cajaState.cajaAbierta}
               className={classes.Abrir}
               action={() => {
-                const monto = parseInt(cajaState.montoInicial.value, 10)
+                const monto = parseInt(cajaState.montoInicial.value, 10);
                 const datosEnviar = {
-                  cedula: '48279578'/* authCtx.user.ciUsuario */,
+                  cedula: authCtx.user.ciUsuario,
+                  montoTotal: monto,
                   pago: {
-                    numeroTicket: cajaState.ticketDebito.value,
+                    numeroTicket: "",
                     Efectivo: monto,
                     Debito: 0,
                     Cuponera: 0,
                   },
-                  productosVendidos:null,
-                  servicios:null,
+                  productosVendidos: null,
+                  servicios: null,
                 };
                 abrirCaja(
                   {
@@ -787,10 +861,10 @@ const AperturaCierre = () => {
                 </div>
                 {cajaState.cuponera.value && (
                   <div>
-                    <label className={classes.labelText}>Codigo cuponera</label>
+                    <label className={classes.labelText}>Cédula Cliente</label>
                     <Input
                       ref={codCuponera}
-                      isValid={cajaState.montoCuponera.isValid}
+                      isValid={cajaState.codCuponera.isValid}
                       input={INPUTS[11]}
                     />
                   </div>
@@ -823,14 +897,14 @@ const AperturaCierre = () => {
 
 const resetChecks = () => {
   const efectivo = document.getElementById("Efectivo");
-  if (efectivo.classList[1] !== undefined)
-    efectivo.classList.remove(efectivo.classList[1]);
+  if (efectivo.classList[2] !== undefined)
+    efectivo.classList.remove(efectivo.classList[2]);
   const debito = document.getElementById("Debito");
-  if (debito.classList[1] !== undefined)
-    debito.classList.remove(debito.classList[1]);
+  if (debito.classList[2] !== undefined)
+    debito.classList.remove(debito.classList[2]);
   const cuponera = document.getElementById("Cuponera");
-  if (cuponera.classList[1] !== undefined)
-    cuponera.classList.remove(cuponera.classList[1]);
+  if (cuponera.classList[2] !== undefined)
+    cuponera.classList.remove(cuponera.classList[2]);
 };
 
 export default AperturaCierre;

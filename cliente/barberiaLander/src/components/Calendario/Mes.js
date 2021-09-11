@@ -33,16 +33,16 @@ const Mes = (props) => {
   const changeTitle = () => {
     switch (move) {
       case 1:
-          setMyMonth((prev) => prev + 1);
+        setMyMonth((prev) => prev + 1);
         break;
       case -1:
-          setMyMonth((prev) => prev - 1);
+        setMyMonth((prev) => prev - 1);
         break;
       default:
         break;
     }
   };
-  switch (myMonth%12) {
+  switch (myMonth % 12) {
     case 1:
       monthName = "Enero";
       classMonth = classes.Enero;
@@ -91,6 +91,8 @@ const Mes = (props) => {
       monthName = "Diciembre";
       classMonth = classes.Diciembre;
       break;
+    default:
+      break;
   }
   return (
     <div className={classes.container}>
@@ -112,7 +114,9 @@ const Mes = (props) => {
           <FontAwesomeIcon
             onClick={moveLeft}
             icon={faAngleLeft}
-            className={`${classes.flecha} ${!canMoveLeft?classes.inactive:''}`}
+            className={`${classes.flecha} ${
+              !canMoveLeft ? classes.inactive : ""
+            }`}
           />
         </div>
       </CSSTransition>
@@ -134,7 +138,9 @@ const Mes = (props) => {
           <FontAwesomeIcon
             onClick={moveRight}
             icon={faAngleRight}
-            className={`${classes.flecha} ${!canMoveRight?classes.inactive:''}`}
+            className={`${classes.flecha} ${
+              !canMoveRight ? classes.inactive : ""
+            }`}
           />
         </div>
       </CSSTransition>

@@ -159,7 +159,7 @@ app.post("/modificarSaldoCuponera", (req, res) => {
 app.post("/updateCuponera", (req, res) => {
   const ret = interfaz.updateCuponera(
     req.body.ciActual,
-    req.body.ciNuevo,
+    req.body.ciNueva,
     req.body.monto
   );
   ret.then((resultado) => {
@@ -179,7 +179,8 @@ app.post("/crearCuponera", (req, res) => {
 });
 
 app.use("/getSaldoCuponera", (req, res) => {
-  const ret = interfaz.getSaldoCuponera(req.body.cedula);
+  let cedula = req.query.cedula;
+  const ret = interfaz.getSaldoCuponera(cedula);
   ret.then((resultado) => {
     res.json({
       mensaje: resultado,

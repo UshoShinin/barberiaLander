@@ -25,9 +25,9 @@ const validarCI = (ci) => {
   return false;
 };
 
-const ordenar = (a,b)=>{
-  return a.id-b.id;
-}
+const ordenar = (a, b) => {
+  return a.id - b.id;
+};
 
 const validarTelefono = (tel) => {
   const telefono = String(parseInt(tel.trim(), 10));
@@ -57,13 +57,13 @@ const validarContraseña = (con) => {
         numeros++;
       }
     }
-    if(letras > 5){
-      if(numeros > 0){
-        valido=true;
-      }else{
+    if (letras > 5) {
+      if (numeros > 0) {
+        valido = true;
+      } else {
         problema = "La contraseña debe tener al menos 1 número";
       }
-    }else{
+    } else {
       problema = "La contraseña debe tener al menos 6 letras";
     }
   } else {
@@ -76,7 +76,7 @@ export const reducer = (state, action) => {
   let valido = false;
   let validoAux = false;
   let problemasAux;
-  let problem=-1;
+  let problem = -1;
   switch (action.type) {
     case "INPUT_CI_U":
       return {
@@ -93,23 +93,31 @@ export const reducer = (state, action) => {
       };
     case "BLUR_CI_U":
       valido = validarCI(state.ciUsuario.value);
-      problemasAux=state.problemas.filter((p)=>p.id!==1);
-      if(!valido)problemasAux=[...problemasAux,{id:1,pro:'Escriba la cédula sin puntos ni guiones, esta debe tener entre 7 y 8 carácteres'}]; 
-      else problemasAux=[...problemasAux,{id:1,pro:''}];
+      problemasAux = state.problemas.filter((p) => p.id !== 1);
+      if (!valido)
+        problemasAux = [
+          ...problemasAux,
+          {
+            id: 1,
+            pro: "Escriba la cédula sin puntos ni guiones, esta debe tener entre 7 y 8 carácteres",
+          },
+        ];
+      else problemasAux = [...problemasAux, { id: 1, pro: "" }];
       problemasAux.sort(ordenar);
-        for(let i= 0; i<state.problemas.length;i++){
-          if(problemasAux[i].pro!=='') {
-            problem=i;
-            break;
-          }
+      for (let i = 0; i < state.problemas.length; i++) {
+        if (problemasAux[i].pro !== "") {
+          problem = i;
+          break;
         }
+      }
       return {
         ...state,
         ciUsuario: {
           value: state.ciUsuario.value,
           isValid: valido,
-        },problemas:[...problemasAux],
-        problema:problem
+        },
+        problemas: [...problemasAux],
+        problema: problem,
       };
 
     case "INPUT_NOM":
@@ -124,26 +132,31 @@ export const reducer = (state, action) => {
           value: state.nombre.value,
           isValid: null,
         },
-      };  
+      };
     case "BLUR_NOM":
       valido = state.nombre.value.trim().length > 2;
-      problemasAux=state.problemas.filter((p)=>p.id!==2);
-      if(!valido)problemasAux=[...problemasAux,{id:2,pro:'El nombre debe tener más de 2 carácteres'}]; 
-      else problemasAux=[...problemasAux,{id:2,pro:''}];
+      problemasAux = state.problemas.filter((p) => p.id !== 2);
+      if (!valido)
+        problemasAux = [
+          ...problemasAux,
+          { id: 2, pro: "El nombre debe tener más de 2 carácteres" },
+        ];
+      else problemasAux = [...problemasAux, { id: 2, pro: "" }];
       problemasAux.sort(ordenar);
-        for(let i= 0; i<state.problemas.length;i++){
-          if(problemasAux[i].pro!=='') {
-            problem=i;
-            break;
-          }
+      for (let i = 0; i < state.problemas.length; i++) {
+        if (problemasAux[i].pro !== "") {
+          problem = i;
+          break;
         }
+      }
       return {
         ...state,
         nombre: {
           value: state.nombre.value,
           isValid: valido,
-        },problemas:[...problemasAux],
-        problema:problem
+        },
+        problemas: [...problemasAux],
+        problema: problem,
       };
 
     case "INPUT_APE":
@@ -161,23 +174,28 @@ export const reducer = (state, action) => {
       };
     case "BLUR_APE":
       valido = state.apellido.value.trim().length > 2;
-      problemasAux=state.problemas.filter((p)=>p.id!==3);
-      if(!valido)problemasAux=[...problemasAux,{id:3,pro:'El apellido debe tener más de 2 carácteres'}]; 
-      else problemasAux=[...problemasAux,{id:3,pro:''}];
+      problemasAux = state.problemas.filter((p) => p.id !== 3);
+      if (!valido)
+        problemasAux = [
+          ...problemasAux,
+          { id: 3, pro: "El apellido debe tener más de 2 carácteres" },
+        ];
+      else problemasAux = [...problemasAux, { id: 3, pro: "" }];
       problemasAux.sort(ordenar);
-        for(let i= 0; i<state.problemas.length;i++){
-          if(problemasAux[i].pro!=='') {
-            problem=i;
-            break;
-          }
+      for (let i = 0; i < state.problemas.length; i++) {
+        if (problemasAux[i].pro !== "") {
+          problem = i;
+          break;
         }
+      }
       return {
         ...state,
         apellido: {
           value: state.apellido.value,
           isValid: state.apellido.value.trim().length > 2,
-        },problemas:[...problemasAux],
-        problema:problem
+        },
+        problemas: [...problemasAux],
+        problema: problem,
       };
 
     case "INPUT_TEL":
@@ -195,23 +213,28 @@ export const reducer = (state, action) => {
       };
     case "BLUR_TEL":
       valido = validarTelefono(state.telefono.value);
-      problemasAux=state.problemas.filter((p)=>p.id!==4);
-      if(!valido)problemasAux=[...problemasAux,{id:4,pro:'El telefono deber ser un número de 8 dígitos'}]; 
-      else problemasAux=[...problemasAux,{id:4,pro:''}];
+      problemasAux = state.problemas.filter((p) => p.id !== 4);
+      if (!valido)
+        problemasAux = [
+          ...problemasAux,
+          { id: 4, pro: "El telefono deber ser un número de 8 dígitos" },
+        ];
+      else problemasAux = [...problemasAux, { id: 4, pro: "" }];
       problemasAux.sort(ordenar);
-        for(let i= 0; i<state.problemas.length;i++){
-          if(problemasAux[i].pro!=='') {
-            problem=i;
-            break;
-          }
+      for (let i = 0; i < state.problemas.length; i++) {
+        if (problemasAux[i].pro !== "") {
+          problem = i;
+          break;
         }
+      }
       return {
         ...state,
         telefono: {
           value: state.telefono.value,
-          isValid:valido ,
-        },problemas:[...problemasAux],
-        problema:problem
+          isValid: valido,
+        },
+        problemas: [...problemasAux],
+        problema: problem,
       };
 
     case "INPUT_CONT":
@@ -229,29 +252,39 @@ export const reducer = (state, action) => {
       };
     case "BLUR_CONT":
       valido = validarContraseña(state.contra.value);
-      validoAux =state.contraR.value === state.contra.value && state.contra.isValid;
-      problemasAux=state.problemas.filter((p)=>p.id!==5&&p.id!==6);
-      if(!valido.value)problemasAux=[...problemasAux,{id:5,pro:valido.problema}]; 
-      else problemasAux=[...problemasAux,{id:5,pro:''}];
-      if(!validoAux)problemasAux=[...problemasAux,{id:6,pro:'La contraseña y la repetición de contraseña deben coincidir'}]; 
-      else problemasAux=[...problemasAux,{id:6,pro:''}];
+      validoAux =
+        state.contraR.value === state.contra.value && state.contra.isValid;
+      problemasAux = state.problemas.filter((p) => p.id !== 5 && p.id !== 6);
+      if (!valido.value)
+        problemasAux = [...problemasAux, { id: 5, pro: valido.problema }];
+      else problemasAux = [...problemasAux, { id: 5, pro: "" }];
+      if (!validoAux)
+        problemasAux = [
+          ...problemasAux,
+          {
+            id: 6,
+            pro: "La contraseña y la repetición de contraseña deben coincidir",
+          },
+        ];
+      else problemasAux = [...problemasAux, { id: 6, pro: "" }];
       problemasAux.sort(ordenar);
-        for(let i= 0; i<state.problemas.length;i++){
-          if(problemasAux[i].pro!=='') {
-            problem=i;
-            break;
-          }
+      for (let i = 0; i < state.problemas.length; i++) {
+        if (problemasAux[i].pro !== "") {
+          problem = i;
+          break;
         }
+      }
       return {
         ...state,
         contra: {
           value: state.contra.value,
           isValid: valido.valido,
-        },problemas:[...problemasAux],
-        problema:problem,
+        },
+        problemas: [...problemasAux],
+        problema: problem,
         contraR: {
           value: state.contraR.value,
-          isValid:validoAux,
+          isValid: validoAux,
         },
       };
     case "INPUT_CONT2":
@@ -269,23 +302,33 @@ export const reducer = (state, action) => {
       };
     case "BLUR_CONT2":
       valido = state.contraR.value === state.contra.value;
-      problemasAux=state.problemas.filter((p)=>p.id!==6);
-      if(!valido)problemasAux=[...problemasAux,{id:6,pro:'La contraseña y la repetición de contraseña deben coincidir'}]; 
-      else problemasAux=[...problemasAux,{id:6,pro:''}];
+      problemasAux = state.problemas.filter((p) => p.id !== 6);
+      if (!valido)
+        problemasAux = [
+          ...problemasAux,
+          {
+            id: 6,
+            pro: "La contraseña y la repetición de contraseña deben coincidir",
+          },
+        ];
+      else problemasAux = [...problemasAux, { id: 6, pro: "" }];
       problemasAux.sort(ordenar);
-        for(let i= 0; i<state.problemas.length;i++){
-          if(problemasAux[i].pro!=='') {
-            problem=i;
-            break;
-          }
+      for (let i = 0; i < state.problemas.length; i++) {
+        if (problemasAux[i].pro !== "") {
+          problem = i;
+          break;
         }
+      }
       return {
         ...state,
         contraR: {
           value: state.contraR.value,
-          isValid:valido,
-        },problemas:[...problemasAux],
-        problema:problem
+          isValid: valido,
+        },
+        problemas: [...problemasAux],
+        problema: problem,
       };
+    default:
+      return { ...state };
   }
 };

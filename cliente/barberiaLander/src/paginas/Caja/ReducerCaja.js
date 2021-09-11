@@ -7,7 +7,7 @@ import { resetAgendaProductos } from "./AuxiliaresCaja/reseteos";
 const today = new Date();
 export const initialState = {
   idCaja: 1,
-  fecha:new Date(),
+  fecha: new Date(),
   cajaAbierta: false,
   desc: "AbrirCaja",
   montoInicial: { value: "", isValid: null },
@@ -81,15 +81,8 @@ export const initialState = {
   ],
 };
 
-
-
 const orden = (a, b) => {
-  if (a.id > b.id) {
-    return 1;
-  } else if (a.id < b.id) {
-    return -1;
-  }
-  return 0;
+  return a.id - b.id;
 };
 
 const validarMonto = (value) => {
@@ -134,7 +127,7 @@ export const cajaReducer = (state, action) => {
   let mCuponera = null;
   switch (action.type) {
     case "ABRIR_CAJA":
-      return { ...state, cajaAbierta: true,idCaja:action.id };
+      return { ...state, cajaAbierta: true, idCaja: action.id };
     case "CERRAR_CAJA":
       return {
         ...initialState,
@@ -151,17 +144,17 @@ export const cajaReducer = (state, action) => {
           formatDate(agenda.fecha).getDate() === date.getDate() &&
           formatDate(agenda.fecha).getMonth() === date.getMonth()
       );
-      if(action.payload.idCaja!==-1){
-        cajaAbierta=true;
+      if (action.payload.idCaja !== -1) {
+        cajaAbierta = true;
       }
       myState = {
         ...state,
-        idCaja:action.payload.idCaja,
+        idCaja: action.payload.idCaja,
         agendas: [...action.payload.agendas],
         agendasHoy: [...newList],
         Empleados: [...action.payload.empleados],
         productos: [...action.payload.productos],
-        cajaAbierta:cajaAbierta
+        cajaAbierta: cajaAbierta,
       };
       return { ...myState };
     case "USER_INPUT_MONTO_I":
@@ -209,12 +202,12 @@ export const cajaReducer = (state, action) => {
         posicion = null;
       }
       total = parseInt(state.montoTotalProd.value, 10);
-      if(total===0){
-        total='';
-        validoTotal=null;
-      }else{
-        total=String(total);
-        validoTotal=validarMonto(total);
+      if (total === 0) {
+        total = "";
+        validoTotal = null;
+      } else {
+        total = String(total);
+        validoTotal = validarMonto(total);
       }
       return {
         ...state,
@@ -222,9 +215,8 @@ export const cajaReducer = (state, action) => {
         soloHoy: { value: false },
         comboAgenda: { value: posicion, active: false },
         propinaAgenda: { value: "", isValid: null },
-        servicios:{...initialState.servicios},
-        montoAgenda:{value:'',isValid:null},
-
+        servicios: { ...initialState.servicios },
+        montoAgenda: { value: "", isValid: null },
       };
     case "CLICK_S_H":
       nuevoEstado = !state.soloHoy.value;
@@ -277,7 +269,7 @@ export const cajaReducer = (state, action) => {
         },
       };
     case "CHANGE_COMBO_AGENDA":
-      mAgenda=0;
+      mAgenda = 0;
       let baseServicios = {
         corte: { active: false, id: 1 },
         barba: { active: false, id: 4 },
@@ -286,7 +278,7 @@ export const cajaReducer = (state, action) => {
         decoloracion: { active: false, id: 7 },
         brushing: { active: false, id: 8 },
       };
-      if(!state.sinAgendar.value){
+      if (!state.sinAgendar.value) {
         getElementById(state.agendas, action.value).servicios.forEach((s) => {
           switch (s) {
             case 1:
@@ -307,30 +299,32 @@ export const cajaReducer = (state, action) => {
             case 8:
               baseServicios.brushing.active = true;
               break;
+            default:
+              break;
           }
         });
         mAgenda = calcularPrecio(baseServicios);
       }
       mPropina =
-      state.propinaAgenda.value.length > 0
-      ? parseInt(state.propinaAgenda.value, 10)
-      : 0;
+        state.propinaAgenda.value.length > 0
+          ? parseInt(state.propinaAgenda.value, 10)
+          : 0;
       mProducto =
-      state.montoTotalProd.value.length > 0
-      ? parseInt(state.montoTotalProd.value, 10)
-      : 0;
+        state.montoTotalProd.value.length > 0
+          ? parseInt(state.montoTotalProd.value, 10)
+          : 0;
       total = mProducto + mAgenda + mPropina;
-      if(total===0){
-        total='';
+      if (total === 0) {
+        total = "";
         validoTotal = null;
-      }else{
+      } else {
         total = String(total);
         validoTotal = validarMonto(total);
       }
-      if(mAgenda===0){
-        mAgenda='';
+      if (mAgenda === 0) {
+        mAgenda = "";
         valido = null;
-      }else{
+      } else {
         mAgenda = String(mAgenda);
         valido = validarMonto(mAgenda);
       }
@@ -690,6 +684,8 @@ export const cajaReducer = (state, action) => {
           siguiente = !state.cuponera.value;
           myState = { ...state, cuponera: { value: siguiente } };
           break;
+        default:
+          break;
       }
       if (siguiente) cantidad = state.cantidadMedios.value + 1;
       else cantidad = state.cantidadMedios.value - 1;
@@ -726,6 +722,8 @@ export const cajaReducer = (state, action) => {
             ...myState,
             montoCuponera: { value: total, isValid: valido },
           };
+          break;
+        default:
           break;
       }
       return { ...myState };
@@ -894,24 +892,6 @@ export const cajaReducer = (state, action) => {
           isValid: state.descripcionSalida.isValid,
         },
       };
-    //Posiblemente tenga que sacarlos
-    case "FOCUS_DESCRIPCION_SALIDA":
-      return {
-        ...state,
-        descripcionSalida: {
-          value: state.descripcionSalida.value,
-          isValid: null,
-        },
-      };
-    case "BLUR_DESCRIPCION_SALIDA":
-      valido = validarMonto(state.descripcionSalida.value);
-      return {
-        ...state,
-        descripcionSalida: {
-          value: state.descripcionSalida.value,
-          isValid: valido,
-        },
-      };
     case "USER_COD_CUPONERA":
       return {
         ...state,
@@ -970,7 +950,8 @@ export const cajaReducer = (state, action) => {
           corte: {
             active: !state.servicios.corte.active,
             id: state.servicios.corte.id,
-          },maquina: {
+          },
+          maquina: {
             active: false,
             id: state.servicios.maquina.id,
           },
@@ -1041,6 +1022,8 @@ export const cajaReducer = (state, action) => {
         },
       };
       break;
+    default:
+      return {...state};
   }
   if (myState !== null) {
     mAgenda = calcularPrecio(myState.servicios);

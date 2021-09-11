@@ -4,9 +4,11 @@ import AuthContext from "../../store/AuthContext";
 const Empleados = () => {
     const history = useHistory();
     const authCtx = useContext(AuthContext);
+    console.log('Carge');
+    const user = authCtx.user
     useEffect(()=>{
-        if(authCtx.user===null||authCtx.user.rol!=='Administrador'&&authCtx.user.rol!=='Encargado')history.replace('/');
-    },[])
+        if(user===null||(user.rol!=='Administrador'&&user.rol!=='Encargado'))history.replace('/');
+    },[history,user])
     return (
         <div className="container">
         <h1 className="text-center" style= {{paddingTop: "%30"}}>

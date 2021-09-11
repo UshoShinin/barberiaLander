@@ -1,13 +1,13 @@
 import CSSTransition from "react-transition-group/CSSTransition";
 import classes from "./Note.module.css";
 const Note = (props) => {
-    console.log(props.show);
   return (
     <CSSTransition
       mountOnEnter
       unmountOnExit
       in={props.show}
       timeout={160}
+      onEnter={()=>{setTimeout(props.onClose,3000)}}
       classNames={{
         enter: ``,
         enterActive: `${classes.NoteOpen}`,

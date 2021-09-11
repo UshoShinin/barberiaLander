@@ -1,7 +1,7 @@
 import FormularioAgenda from "./FormularioAgenda/FormularioAgenda";
 import NormalCard from "../../components/UI/Card/NormalCard";
 import useHttp from "../../hooks/useHttp";
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext,useCallback } from "react";
 import LoaddingSpinner from "../../components/LoaddingSpinner/LoaddingSpinner";
 import AuthContext from "../../store/AuthContext";
 import { getElementById } from "../../FuncionesAuxiliares/FuncionesAuxiliares";
@@ -18,7 +18,7 @@ const getRespuesta = (res) => {
 };
 const CrearAgenda = (props) => { 
   const authCtx = useContext(AuthContext);
-
+  console.log('Running Crear Agenda');
   let initialState = {
     Nombre: { value: "", isValid: null },
     Horarios: null,
@@ -43,14 +43,10 @@ const CrearAgenda = (props) => {
     ciCliente : '-1',
   };
   const [stateAgenda, setStateAgenda] = useState(initialState);
-  const {
-    isLoadingModificar,
-    errorModificar,
-    sendRequest: mandarAgenda,
-  } = useHttp();
+  const mandarAgenda = useHttp();
+  const mandarAgendaModificar = useHttp();
 
   const guardarDatosAgendaHandler = (enteredDatosAgenda) => {
-    console.log(enteredDatosAgenda);
     mandarAgenda(
       {
         url: "/crearAgenda",
@@ -61,14 +57,27 @@ const CrearAgenda = (props) => {
       getRespuesta
     );
   };
+  const modificarDatosAgendaHandler = (enteredDatosAgenda) => {
+    console.log(enteredDatosAgenda);
+    mandarAgendaModificar(
+      {
+        url: "/modificarAgenda",
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: enteredDatosAgenda,
+      },
+      getRespuesta
+    );
+  };
 
   /* Carga inicial de datos */
-  const obtenerHorarios = (horarios) => {
-    const agenda = props.agenda;
+  const misServicios = initialState.servicios;
+  const agenda = props.agenda;
+  const obtenerHorarios = useCallback((horarios) => {
     let nombre;
     let telefono;
     let ciCliente;
-    let servicios = { ...initialState.servicios };
+    let servicios = { ...misServicios };
     let Calendario = { value: null, dia: null };
     let descripcion = { value: "", isValid: null };
     let empleados = horarios.mensaje.empleados;
@@ -130,21 +139,13 @@ const CrearAgenda = (props) => {
         ciCliente:ciCliente
       };
     });
-  };
-  const {
-    isLoadingGet,
-    errorGet,
-    sendRequest: fetchHorarios /* Alias */,
-  } = useHttp();
+  },[authCtx,agenda,misServicios]);
+  const fetchHorarios = useHttp();
 
   /* Se ejecuta al inicio para que se cargen los datos */
   useEffect(() => {
-    if(props.agenda!==null){
-      console.log('Tengo datos');
-    }else{console.log('No tengo datos');}
     fetchHorarios({ url: "/datosFormularioAgenda" }, obtenerHorarios);
-
-  }, []);
+  }, [fetchHorarios]);
   return (
     <div className="nuevaAgenda">
       <NormalCard>
@@ -152,6 +153,7 @@ const CrearAgenda = (props) => {
         {stateAgenda.Horarios !== null && (
           <FormularioAgenda
             onSaveDatosAgenda={guardarDatosAgendaHandler}
+            onUpdateDatosAgenda={modificarDatosAgendaHandler}
             agenda={
               props.agenda !== null
                 ? {

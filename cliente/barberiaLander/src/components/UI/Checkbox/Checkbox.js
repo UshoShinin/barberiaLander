@@ -1,6 +1,6 @@
 import classes from "./Checkbox.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck,faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faCheck } from "@fortawesome/free-solid-svg-icons";
 const Checkbox = (props) => {
   //Es realmente un div con un propiedad onClick para que el usuario peuda interactuar
   //Verifica si ya estaba activado o no. como Tick uso FontAwesoma

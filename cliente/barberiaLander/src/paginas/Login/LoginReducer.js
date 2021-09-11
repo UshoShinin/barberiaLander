@@ -142,5 +142,7 @@ export const reducer = (state, action) => {
         problemas: [...problemasAux],
         problema: problem,
       };
+    default:
+      return { ...state };
   }
 };
