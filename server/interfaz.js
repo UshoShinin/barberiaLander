@@ -73,7 +73,7 @@ const cancelarAgenda = async (idAgenda, idHorario) => {
 const eliminarDatosAgenda = async (idAgenda, idHorario) => {
   try {
     //Aca hago las llamadas a todos los metodos individuales
-    const resultado = eliminarServicioAgendaPorIdAgenda(idAgenda)
+    return eliminarServicioAgendaPorIdAgenda(idAgenda)
       .then((serviciosBorrados) => {
         //Aca llamo al eliminar los datos de la agenda (HAY QUE VER EL TEMA DE ELIMINAR LA AGENDA DE UN CLIENTE)
         if (serviciosBorrados < 0) {
@@ -85,6 +85,10 @@ const eliminarDatosAgenda = async (idAgenda, idHorario) => {
         if (agendaEliminada < 0) {
           return { codigo: 400, mensaje: "Error al eliminar la agenda" };
         }
+        return eliminarAgendaCliente(idAgenda);
+      })
+      .then((agendaClienteEliminada) => {
+        //Aca se deberia verificar de que se haya eliminado la agenda del cliente pero no es necesario
         return eliminarHorario(idHorario);
       })
       .then((horarioEliminado) => {
@@ -93,7 +97,6 @@ const eliminarDatosAgenda = async (idAgenda, idHorario) => {
         }
         return { codigo: 200, mensaje: "Agenda eliminada correctamente" };
       });
-    return resultado;
   } catch (error) {
     console.log(error);
   }
@@ -121,7 +124,7 @@ const eliminarHorario = async (idHorario) => {
   try {
     //variable que tiene la conexion
     const pool = await sql.connect(conexion);
-    //Hago el delete de la agenda
+    //Hago el delete del horario
     const deleteHorario = await pool
       .request()
       .input("idHorario", sql.Int, idHorario)
@@ -134,7 +137,24 @@ const eliminarHorario = async (idHorario) => {
     console.log(error);
   }
 };
-
+//Metodo auxiliar para eliminar de la tabla AgendaCliente
+const eliminarAgendaCliente = async (idAgenda) => {
+  try {
+    //variable que tiene la conexion
+    const pool = await sql.connect(conexion);
+    //Hago el delete de la agenda
+    const deleteAgendaCliente = await pool
+      .request()
+      .input("idAgenda", sql.Int, idAgenda)
+      .query("delete from Agenda_Cliente where IdAgenda = @idAgenda");
+    //Separo la cantidad de filas afectadas
+    const filasAfectadas = deleteAgendaCliente.rowsAffected;
+    //Devuelvo la cantidad de filas afectadas
+    return filasAfectadas;
+  } catch (error) {
+    console.log(error);
+  }
+};
 //Conseguir datos para el listado de agendas
 const getDatosListadoAgendas = async () => {
   //variable que tiene la conexion
@@ -743,7 +763,6 @@ const crearSolicitudAgenda = async (agenda) => {
       });
     })
     .then((resAgenda) => {
-      //ACA TENGO QUE HACER EL INSERT EN LA TABLA AGENDA CLIENTE, PERO ANTES TENGO QUE VERIFICAR DE SI TIENE O NO UN CLIENTE REGISTRADO
       //El resultado de la promesa de insertarAgenda es un objeto con idHorario y idAgenda
       return insertarServicioAgenda({
         idAgenda: resAgenda.idAgenda,
@@ -1019,7 +1038,7 @@ const updatesAgendaEntero = async (nuevaAgenda) => {
       if (isNaN(serviciosModificados)) {
         return serviciosModificados;
       } else {
-        return {codigo: 200, mensaje: "Agenda modificada correctamente"};
+        return { codigo: 200, mensaje: "Agenda modificada correctamente" };
       }
     });
 };
@@ -1894,6 +1913,84 @@ const getIdCajaHoy = async () => {
   }
 };
 
+//Metodo para la salida de dinero
+const nuevaSalidaDinero = async (idCaja, descripcion, monto, fecha, cedula) => {
+  try {
+    //Primero tengo que hacer el insert en la tabla SalidaDinero
+    return insertarSalidaDinero(descripcion, monto, fecha, cedula)
+      .then((respuestaSalida) => {
+        if (respuestaSalida.filasAfectadas < 1) {
+          return {
+            codigo: 400,
+            mensaje: "Error al insertar la Salida de Dinero",
+          };
+        } else {
+          return insertarCajaSalida(idCaja, respuestaSalida.idSalida);
+        }
+      })
+      .then((respuesta) => {
+        if (respuesta < 1) {
+          return {
+            codigo: 400,
+            mensaje: "Error al insertar la Salida en la Caja ",
+          };
+        } else {
+          return {
+            codigo: 200,
+            mensaje: "Salida de dinero registrada correctamente",
+          };
+        }
+      });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo auxiliar para insertar en la tabla SalidaDinero
+const insertarSalidaDinero = async (descripcion, monto, fecha, cedula) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el insert
+    const salida = await pool
+      .request()
+      .input("descripcion", sql.VarChar, descripcion)
+      .input("monto", sql.Int, monto)
+      .input("fecha", sql.Date, fecha)
+      .input("cedula", sql.VarChar, cedula)
+      .query(
+        "insert into SalidaDinero (Descripcion, Monto, Fecha, Cedula) output inserted.IdSalida values(@descripcion, @monto, @fecha, @cedula)"
+      );
+    //Devuelvo la cantidad de filas afectadas y el idSalida
+    return {
+      filasAfectadas: salida.rowsAffected[0],
+      idSalida: salida.recordset[0],
+    };
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo auxiliar para insertar en la tabla Caja_Salida
+const insertarCajaSalida = async (idCaja, idSalida) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el insert
+    const resultado = await pool
+      .request()
+      .input("idCaja", sql.Int, idCaja)
+      .input("idSalida", sql.Int, idSalida)
+      .query(
+        "insert into Caja_Salida (IdCaja, IdSalida) values(@idCaja, @idSalida)"
+      );
+    //Devuelvo la cantidad de filas afectadas y el idSalida
+    return resultado.rowsAffected[0];
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 //Creo un objeto que voy a exportar para usarlo desde el index.js
 //Adentro voy a tener todos los metodos de llamar a la base
 const interfaz = {
@@ -1916,6 +2013,7 @@ const interfaz = {
   updateCuponera,
   getSaldoCuponera,
   getIdCajaHoy,
+  nuevaSalidaDinero,
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar

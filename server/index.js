@@ -121,6 +121,22 @@ app.post("/entradaCaja", (req, res) => {
   });
 });
 
+app.post("/salidaCaja", (req, res) => {
+  console.log(req.body);
+  const ret = interfaz.nuevaSalidaDinero(
+    req.body.idCaja,
+    req.body.descripcion,
+    req.body.monto,
+    req.body.fecha,
+    req.body.cedula
+  );
+  ret.then((resultado) => {
+    res.json({
+      mensaje: resultado,
+    });
+  });
+});
+
 app.post("/registroCliente", (req, res) => {
   const ret = interfaz.registrarCliente(req.body);
   ret.then((resultado) => {
