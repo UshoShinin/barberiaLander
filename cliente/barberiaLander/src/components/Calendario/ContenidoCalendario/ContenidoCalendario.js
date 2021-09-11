@@ -5,9 +5,9 @@ export const days = (date,diasAMostrar,actividad,obtenerHorarios,lostFocus) => {
 
 const getHorarios = (horarios) => {
   /* console.log(horarios) */
+ 
   obtenerHorarios(horarios);
 }
-
   let cantidadMeses;
   let diasMostrar;
     const Day = date;

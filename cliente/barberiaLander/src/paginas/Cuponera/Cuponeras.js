@@ -9,9 +9,8 @@ import inputs from "./inputs";
 import useHttp from "../../hooks/useHttp";
 import AuthContext from "../../store/AuthContext";
 import { useHistory } from "react-router-dom";
-import Note from '../../components/UI/Note/Note';
+import Note from "../../components/UI/Note/Note";
 const Cuponeras = () => {
-  
   const authCtx = useContext(AuthContext);
   const history = useHistory();
   const [cuponeraState, dispatchCuponera] = useReducer(reducer, initialState);
@@ -35,15 +34,27 @@ const Cuponeras = () => {
 
   const sendModificar = useHttp();
 
-  const  sendConsultar = useHttp();
+  const sendConsultar = useHttp();
 
   const sendFormulario = useHttp();
+
+  const entradaDinero = useHttp();
 
   const getRespuestaCrear = (res) => {
     if (res.mensaje.codigo === 400) {
       dispatchCuponera({ type: "CREAR_PROBLEMA", value: res.mensaje.mensaje });
     } else {
       dispatchCuponera({ type: "CREAR_RESET" });
+    }
+  };
+  const getRespuestaCaja = (res) => {
+    if (res.mensaje.codigo === 400) {
+      dispatchCuponera({
+        type: "AGREGAR_PROBLEMA",
+        value: res.mensaje.mensaje,
+      });
+    } else {
+      dispatchCuponera({ type: "AGREGAR_RESET" });
     }
   };
   const getRespuestaAgregar = (res) => {
@@ -53,7 +64,31 @@ const Cuponeras = () => {
         value: res.mensaje.mensaje,
       });
     } else {
-      dispatchCuponera({ type: "AGREGAR_RESET" });
+      let monto = parseInt(cuponeraState.Agregar.monto.value, 10);
+      const caja = {
+        idCaja: cuponeraState.idCaja,
+        fecha: new Date(),
+        ciEmpleado: authCtx.user.ciUsuario,
+        montoTotal: monto,
+        pago: {
+          numeroTicket: "",
+          Efectivo: monto,
+          Debito: 0,
+          Cuponera: 0,
+        },
+        productosVendidos: null,
+        servicios: null,
+        descripcion: "X",//No sabemos que letra deberíamos utilizar
+      };
+      entradaDinero(
+        {
+          url: "/entradaCaja",
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: caja,
+        },
+        getRespuestaCaja
+      );
     }
   };
   const getRespuestaModificar = (res) => {
@@ -74,7 +109,10 @@ const Cuponeras = () => {
         value: res.mensaje.mensaje,
       });
     } else {
-      dispatchCuponera({ type: "SHOW_SALDO",value:'Saldo: $'+res.mensaje.mensaje});
+      dispatchCuponera({
+        type: "SHOW_SALDO",
+        value: "Saldo: $" + res.mensaje.mensaje,
+      });
     }
   };
 
@@ -82,12 +120,11 @@ const Cuponeras = () => {
     if (res.mensaje !== -1)
       dispatchCuponera({ type: "CARGAR_DATOS", value: res.mensaje });
   };
-  const user =authCtx.user;
+  const user = authCtx.user;
   useEffect(() => {
-    if (user === null || user.rol === "Cliente")
-      history.replace("/");
+    if (user === null || user.rol === "Cliente") history.replace("/");
     else sendFormulario({ url: "/getIdCajaHoy" }, obtenerDatos);
-  }, [user,history,sendFormulario]);
+  }, [user, history, sendFormulario]);
   const crearHandler = () => {
     const Crear = cuponeraState.Crear;
     if (!Crear.cedula.isValid) refCrearCi.current.focus();
@@ -175,7 +212,7 @@ const Cuponeras = () => {
         value: "La cedula nueva y la anterior no pueden coincidir",
       });
     } else {
-      const miMonto =parseInt(Modificar.monto.value, 10);
+      const miMonto = parseInt(Modificar.monto.value, 10);
       const data = {
         ciActual:
           Modificar.cedulaAnterior.isValid === true
@@ -185,7 +222,7 @@ const Cuponeras = () => {
           Modificar.cedulaNueva.isValid === true
             ? Modificar.cedulaNueva.value
             : null,
-        monto: isNaN(miMonto)?null:miMonto,
+        monto: isNaN(miMonto) ? null : miMonto,
       };
       console.log(data);
       sendModificar(
@@ -204,14 +241,21 @@ const Cuponeras = () => {
     const Consultar = cuponeraState.Consultar;
     if (!Consultar.cedula.isValid) refConsultar.current.focus();
     else {
-      const url = "/getSaldoCuponera?cedula=" +Consultar.cedula.value;
-      sendConsultar({url},getRespuestaConsultar);
+      const url = "/getSaldoCuponera?cedula=" + Consultar.cedula.value;
+      sendConsultar({ url }, getRespuestaConsultar);
     }
   };
 
   return (
     <Marco className={classes.container}>
-      <Note show={cuponeraState.Saldo.show} onClose={()=>{dispatchCuponera({type:'HIDE_SALDO'})}}>{cuponeraState.Saldo.text}</Note>
+      <Note
+        show={cuponeraState.Saldo.show}
+        onClose={() => {
+          dispatchCuponera({ type: "HIDE_SALDO" });
+        }}
+      >
+        {cuponeraState.Saldo.text}
+      </Note>
       <Border disabled={!cuponeraState.active}>
         <h1
           className={`${
@@ -246,7 +290,9 @@ const Cuponeras = () => {
             input={INPUTS[1]}
           />
         </div>
-        <p className={classes.textP}>{CrearP !== -1 ? cuponeraState.Crear.problemas[CrearP].pro : ""}</p>
+        <p className={classes.textP}>
+          {CrearP !== -1 ? cuponeraState.Crear.problemas[CrearP].pro : ""}
+        </p>
         <Button disabled={!cuponeraState.active} action={crearHandler}>
           Crear
         </Button>

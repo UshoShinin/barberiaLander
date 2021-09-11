@@ -5,9 +5,7 @@ import React from 'react';
 import { useState } from "react";
 import { days } from "./ContenidoCalendario/ContenidoCalendario";
 import {extraerFotos} from './FuncionesAuxiliares';
-const Calendario = (props) => {
-  console.log("ReCarge");
-  
+const Calendario = (props) => { 
   const [currentCalendar, setCurrentCalendar] = useState(0); //Se utiliza para gestionar el mes
   const empleadosFotos = JSON.stringify(extraerFotos(props.empleados)); /* De la lista de empleados se extraen solo las fotos para mandar
   solo los nombres ci y fotos */

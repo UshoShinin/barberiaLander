@@ -114,5 +114,6 @@
 @media (max-width: 1400px) {
   .input {
     font-size: 1em;
+    max-width: 140px;
   }
 }
