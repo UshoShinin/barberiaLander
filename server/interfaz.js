@@ -1964,7 +1964,7 @@ const insertarSalidaDinero = async (descripcion, monto, fecha, cedula) => {
     //Devuelvo la cantidad de filas afectadas y el idSalida
     return {
       filasAfectadas: salida.rowsAffected[0],
-      idSalida: salida.recordset[0],
+      idSalida: salida.recordset[0].IdSalida,
     };
   } catch (error) {
     console.log(error);
