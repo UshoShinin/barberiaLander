@@ -111,7 +111,8 @@ app.post("/entradaCaja", (req, res) => {
     req.body.pago,
     req.body.ciEmpleado,
     req.body.productosVendidos,
-    req.body.servicios
+    req.body.servicios,
+    req.body.descripcion
   );
   ret.then((resultado) => {
     res.json({
@@ -170,7 +171,11 @@ app.post("/updateCuponera", (req, res) => {
 });
 
 app.post("/crearCuponera", (req, res) => {
-  const ret = interfaz.crearCuponera(req.body.cedula, req.body.monto, req.body.caja);
+  const ret = interfaz.crearCuponera(
+    req.body.cedula,
+    req.body.monto,
+    req.body.caja
+  );
   ret.then((resultado) => {
     res.json({
       mensaje: resultado,
