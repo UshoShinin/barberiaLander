@@ -253,8 +253,8 @@ const getEmpleadosFormulario = async () => {
         id: empleados.recordset[i].Cedula,
         title: empleados.recordset[i].Nombre,
         foto: empleados.recordset[i].Img,
-        //fechas: [], Esto se le agrega en otro metodo
-        //duracionServicio: [], Esto se le agrega en otro metodo
+        entrada: empleados.recordset[i].HorarioEntrada,
+        salida: empleados.recordset[i].HorarioSalida
       };
       arrayRetorno.push(empleadoAux);
     }
@@ -1470,6 +1470,7 @@ const insertarEntradaEfectivo = async (idEntrada, idMedioPago, monto) => {
 
 //Metodo auxiliar para hacer el insert en la tabla EntradaDebito
 const insertarEntradaDebito = async (idEntrada, idMedioPago, monto, ticket) => {
+  console.log(idEntrada, idMedioPago, monto, ticket);
   try {
     //Creo la conexion
     let pool = await sql.connect(conexion);
@@ -1990,6 +1991,13 @@ const insertarCajaSalida = async (idCaja, idSalida) => {
     console.log(error);
   }
 };
+
+//Metodo para cerrar la caja
+const cierreCaja = async () => {
+  //Llamo al metodo que me devuelve el total de los efectivo
+}
+
+
 
 //Creo un objeto que voy a exportar para usarlo desde el index.js
 //Adentro voy a tener todos los metodos de llamar a la base
