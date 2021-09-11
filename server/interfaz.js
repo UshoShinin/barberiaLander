@@ -60,7 +60,6 @@ const aceptarAgenda = async (id, horario) => {
 //Metodo para rechazar/cancelar una agenda
 const cancelarAgenda = async (idAgenda, idHorario) => {
   try {
-    //Aca va la verificacion de si tiene permisos para hacer esta accion
     //Llamo al metodo que elimina todos los datos
     const resultado = eliminarDatosAgenda(idAgenda, idHorario).then(
       (mensaje) => mensaje
@@ -78,21 +77,21 @@ const eliminarDatosAgenda = async (idAgenda, idHorario) => {
       .then((serviciosBorrados) => {
         //Aca llamo al eliminar los datos de la agenda (HAY QUE VER EL TEMA DE ELIMINAR LA AGENDA DE UN CLIENTE)
         if (serviciosBorrados < 0) {
-          return "Error al eliminar los servicios";
+          return { codigo: 400, mensaje: "Error al eliminar los servicios" };
         }
         return eliminarAgenda(idAgenda);
       })
       .then((agendaEliminada) => {
         if (agendaEliminada < 0) {
-          return "Error al eliminar la agenda";
+          return { codigo: 400, mensaje: "Error al eliminar la agenda" };
         }
         return eliminarHorario(idHorario);
       })
       .then((horarioEliminado) => {
         if (horarioEliminado < 0) {
-          return "Error al eliminar el horario";
+          return { codigo: 400, mensaje: "Error al eliminar el horario" };
         }
-        return "Agenda eliminada correctamente";
+        return { codigo: 200, mensaje: "Agenda eliminada correctamente" };
       });
     return resultado;
   } catch (error) {
@@ -729,7 +728,7 @@ const crearSolicitudAgenda = async (agenda) => {
       //El resultado de la promesa de insertarHorario es el id del horario que se acaba de insertar
       //Controlo de que si el id es -1 es porque dio error
       if (resHorario.idAgenda < 0) {
-        throw "Error al insertar agenda";
+        throw { codigo: 400, mensaje: "Error al insertar agenda" };
       }
       //Esto lo que hace es devolver la promesa que devuelve el insertar agenda
       //Esto le llega al then de arriba para que pueda hacerle .then abajo y seguir trabajando
@@ -755,9 +754,9 @@ const crearSolicitudAgenda = async (agenda) => {
     .then((resServicioAgenda) => {
       //El resultado de la promesa de insertarServicioAgenda es la cantidad de filas afectadas, es decir la cantidad de registros que se guardaron en la tabla
       if (resServicioAgenda === agenda.servicios.length) {
-        return "Agenda insertada correctamente";
+        return { codigo: 200, mensaje: "Agenda insertada correctamente" };
       } else {
-        return "Error al insertar agenda";
+        return { codigo: 400, mensaje: "Error al insertar agenda" };
       }
     })
     .catch((error) => {
@@ -979,7 +978,7 @@ const modificarAgenda = async (nuevaAgenda) => {
     const resultado = verificarHorarioModificarAgenda(nuevaAgenda.horario)
       .then((horarioLibre) => {
         if (!horarioLibre) {
-          return "El horario ya esta ocupado";
+          return { codigo: 400, mensaje: "El horario ya esta ocupado" };
         } else {
           return updatesAgendaEntero(nuevaAgenda);
         }
@@ -996,17 +995,17 @@ const modificarAgenda = async (nuevaAgenda) => {
 //Metodo auxiliar para hacer los update para modificar una agenda
 const updatesAgendaEntero = async (nuevaAgenda) => {
   //Llamo a todos los metodos de update individuales
-  const resultado = updateHorario(nuevaAgenda.horario)
+  return updateHorario(nuevaAgenda.horario)
     .then((filasAfectadasHorario) => {
       if (filasAfectadasHorario < 1) {
-        return "Error al actualizar el Horario";
+        return { codigo: 400, mensaje: "Error al actualizar el Horario" };
       } else {
         return updateAgenda(nuevaAgenda);
       }
     })
     .then((filasAfectadasAgenda) => {
       if (filasAfectadasAgenda < 1) {
-        return "Error al actualizar Agenda";
+        return { codigo: 400, mensaje: "Error al actualizar Agenda" };
       } else {
         let servicios = {
           idAgenda: nuevaAgenda.idAgenda,
@@ -1020,10 +1019,7 @@ const updatesAgendaEntero = async (nuevaAgenda) => {
       if (isNaN(serviciosModificados)) {
         return serviciosModificados;
       } else {
-        return (
-          serviciosModificados +
-          " ahora son los que tienen la agenda modificada"
-        );
+        return {codigo: 200, mensaje: "Agenda modificada correctamente"};
       }
     });
 };
@@ -1070,7 +1066,7 @@ const updateAgenda = async (agenda) => {
       .input("nombreCliente", sql.VarChar, agenda.nombreCliente)
       .input("desc", sql.VarChar, agenda.descripcion)
       .input("img", sql.VarChar, agenda.imagenEjemplo)
-      .input("tel", sql.Date, agenda.fecha)
+      .input("tel", sql.Date, agenda.tel)
       .query(
         "update Agenda set NombreCliente = @nombreCliente, Descripcion = @desc, Img = @img, Tel = @tel where IdAgenda = @idAgenda"
       );
@@ -1098,7 +1094,10 @@ const modificarServicioAgenda = async (nuevosServicios) => {
         //Verifico cuantas filas fueron afectadas por  el delete
         //Si no se afecto ninguna fila (0 afectadas) devuelvo error
         if (serviciosEliminados <= 0) {
-          return "No se pudieron eliminar los servicios";
+          return {
+            codigo: 400,
+            mensaje: "No se pudieron eliminar los servicios",
+          };
         } else {
           //Si hubo filas afectadas entonces se eliminaron todos los servicios de esa agenda y ahora hay que insertar los nuevos
           return insertarServicioAgenda(nuevosServicios);
@@ -1108,7 +1107,10 @@ const modificarServicioAgenda = async (nuevosServicios) => {
         //Verifico que se hayan insertado los nuevos servicios
         //Si la cantidad de filas afectadas no es la misma que la cantidad de servicios que me mandan, devuelvo error
         if (serviciosInsertados !== nuevosServicios.servicios.length) {
-          return "No se pudieron insertar los nuevos servicios";
+          return {
+            codigo: 400,
+            mensaje: "No se pudieron insertar los nuevos servicios",
+          };
         } else {
           return serviciosInsertados;
         }
@@ -1844,9 +1846,9 @@ const updateCuponeraEntero = async (ciActual, ciNueva, monto) => {
   try {
     return updateMontoCuponera(ciActual, monto).then((filasAfectadas) => {
       if (filasAfectadas === 1) {
-        return updateClienteCuponera(ciActual, ciNueva).then(
-          (resultado) => resultado
-        );
+        return updateClienteCuponera(ciActual, ciNueva).then((resultado) => {
+          return resultado;
+        });
       } else {
         return filasAfectadas;
       }
