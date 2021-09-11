@@ -54,7 +54,7 @@
 .container > div > div > .textLDisabled {
   color: var(--clr-inActive);
   transition: color 180ms linear;
-  font-size: 1.4em;
+  font-size: 1.8em;
 }
 .container > div:hover > div > .textL {
   color: var(--clr-neon-white);

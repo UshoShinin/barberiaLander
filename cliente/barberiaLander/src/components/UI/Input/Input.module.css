@@ -16,7 +16,7 @@
 }
 
 .input {
-  font-size: 1.25em;
+  font-size: 1.7em;
 }
 .input {
   font-family: "Aleo", serif;
@@ -29,7 +29,7 @@
   color: var(--clr-inActive);
   transition: border 250ms linear, box-shadow 250ms linear, color 250ms linear;
   width: 100%;
-  max-width: 140px;
+  max-width: 200px;
   padding: 0.1em 0;
 }
 
