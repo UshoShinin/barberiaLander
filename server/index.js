@@ -218,6 +218,18 @@ app.use("/getIdCajaHoy", (req, res) => {
   });
 });
 
+app.use("/getDatosFormularioModificarAgenda", (req, res) => {
+  let id = req.query.idAgenda;
+  let ret = interfaz.getDatosFormularioModificarAgenda(id);
+  ret.then((resultado) => {
+    res.json({
+      mensaje: resultado,
+    });
+  });
+});
+
+
+
 // All other GET requests not handled before will return our React app
 /* app.get('*', (req, res) => {
   res.sendFile(path.resolve(__dirname, '../cliente/barberiaLander/build', 'index.html'));

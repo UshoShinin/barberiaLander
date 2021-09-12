@@ -254,7 +254,7 @@ const getEmpleadosFormulario = async () => {
         title: empleados.recordset[i].Nombre,
         foto: empleados.recordset[i].Img,
         entrada: empleados.recordset[i].HorarioEntrada,
-        salida: empleados.recordset[i].HorarioSalida
+        salida: empleados.recordset[i].HorarioSalida,
       };
       arrayRetorno.push(empleadoAux);
     }
@@ -1995,9 +1995,118 @@ const insertarCajaSalida = async (idCaja, idSalida) => {
 //Metodo para cerrar la caja
 const cierreCaja = async () => {
   //Llamo al metodo que me devuelve el total de los efectivo
-}
+};
 
+//Conseguir datos para formularios
+const getDatosFormularioModificarAgenda = async (idAgenda) => {
+  let retorno = getEmpleadosFormulario()
+    .then((listadoEmpleados) => {
+      return agregarDuracionEmpleados(listadoEmpleados);
+    })
+    .then((listadoEmpleadosDuracion) => {
+      return agregarFechasEmpleadosModificar(
+        listadoEmpleadosDuracion,
+        idAgenda
+      );
+    })
+    .then((listadoEmpleadosConFecha) => {
+      return agregarHorariosEmpleadoModificar(
+        listadoEmpleadosConFecha,
+        idAgenda
+      );
+    })
+    .then((listadoCompleto) => {
+      return agregarServiciosRetorno(listadoCompleto);
+    })
+    .then((listadoConServicios) => listadoConServicios);
+  return retorno;
+};
 
+//Metodo para agregarle las fechas agendadas a los
+//Espero que me llegue un listado de empleados
+//Devuelve una promesa
+const agregarFechasEmpleadosModificar = async (listadoEmpleados, idAgenda) => {
+  try {
+    //variable que tiene la conexion
+    const pool = await sql.connect(conexion);
+    //Voy a buscar las fechas de todas las agendas aceptadas
+    const fechasAgenda = await pool
+      .request()
+      .input("idAgenda", sql.Int, idAgenda)
+      .query(
+        "select E.Cedula, H.Fecha from Empleado E, Agenda A, Horario H where E.Cedula = H.Cedula and A.IdHorario = H.IdHorario and A.Aceptada = 1 and A.IdAgenda <> @idAgenda group by H.Fecha, E.Cedula"
+      );
+    //Armo el array de retorno
+    let arrayRetorno = [];
+    //Recorro todos los empleados y por cada uno le agrego las fechas de las agendas
+    for (let i = 0; i < listadoEmpleados.length; i++) {
+      //Armo un empleado aux que tiene un array de fechas
+      let empleadoAux = {
+        ...listadoEmpleados[i],
+        fechas: [],
+      };
+      //Recorro las fechas de las agendas para agregarlas
+      for (let j = 0; j < fechasAgenda.recordset.length; j++) {
+        if (empleadoAux.id === fechasAgenda.recordset[j].Cedula) {
+          //Creo el objeto fecha para agregar al empleado
+          let fechaAux = {
+            dia: fechasAgenda.recordset[j].Fecha.getUTCDate(),
+            mes: fechasAgenda.recordset[j].Fecha.getMonth() + 1,
+            horarios: [],
+          };
+          empleadoAux.fechas.push(fechaAux);
+        }
+      }
+      arrayRetorno.push(empleadoAux);
+    }
+    return arrayRetorno;
+  } catch (error) {
+    console.log(error);
+  }
+};
+//Metodo para agregar los horarios de las agendas al empleado
+//Me llega un empleado y le tengo que agregar los horarios a ese empleado
+//Devuelve una promesa
+const agregarHorariosEmpleadoModificar = async (listadoEmpleados) => {
+  try {
+    //variable que tiene la conexion
+    const pool = await sql.connect(conexion);
+    //Consigo los datos de los horarios
+    const horarios = await pool
+      .request()
+      .input("idAgenda", sql.Int, idAgenda)
+      .query(
+        "select H.IdHorario, H.Cedula, H.HoraInicio, H.HoraFin, H.Fecha from Horario H, Agenda A where H.IdHorario = A.IdHorario and A.Aceptada = 1 and A.Aceptada = 1 and A.IdAgenda <> @idAgenda order by Cedula, HoraInicio"
+      );
+    //Recorro todos los empleados para ir agregando uno por uno sus horarios
+    for (let k = 0; k < listadoEmpleados.length; k++) {
+      //Recorro las fechas del empleado en el cual estoy parado
+      for (let j = 0; j < listadoEmpleados[k].fechas.length; j++) {
+        //Recorro el array de horarios para ver cuales le tengo que asignar
+        for (let i = 0; i < horarios.recordset.length; i++) {
+          //Tengo que verificar de que la fecha del horario sea la fecha correspondiente
+          if (
+            listadoEmpleados[k].fechas[j].dia ===
+              horarios.recordset[i].Fecha.getUTCDate() &&
+            listadoEmpleados[k].fechas[j].mes ===
+              horarios.recordset[i].Fecha.getMonth() + 1 &&
+            horarios.recordset[i].Cedula == listadoEmpleados[k].id
+          ) {
+            //Creo objeto auxiliar horario para agregar
+            let horarioAux = {
+              i: horarios.recordset[i].HoraInicio,
+              f: horarios.recordset[i].HoraFin,
+            };
+            listadoEmpleados[k].fechas[j].horarios.push(horarioAux);
+          }
+        }
+      }
+    }
+    return listadoEmpleados;
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 //Creo un objeto que voy a exportar para usarlo desde el index.js
 //Adentro voy a tener todos los metodos de llamar a la base
@@ -2022,6 +2131,7 @@ const interfaz = {
   getSaldoCuponera,
   getIdCajaHoy,
   nuevaSalidaDinero,
+  getDatosFormularioModificarAgenda,
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar
