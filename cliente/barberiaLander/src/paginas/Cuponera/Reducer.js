@@ -41,7 +41,7 @@ export const initialState = {
       { id: 2, pro: "" },
     ],
   },
-  Saldo: { show: false, text: "" },
+  Mensaje: { show: false, text: "" },
 };
 
 const validarCI = (ci, execpcion) => {
@@ -76,9 +76,11 @@ export const reducer = (state, action) => {
   let valido = false;
   let problemasAux;
   let problem = -1;
+  let myState;
   switch (action.type) {
     case "CARGAR_DATOS":
       return { ...state, idCaja: action.value, active: true };
+
     case "CREAR_CI_I":
       problemasAux = state.Crear.problemas.filter((p) => p.id !== 3);
       problemasAux = [...problemasAux, { id: 3, pro: "" }];
@@ -157,11 +159,6 @@ export const reducer = (state, action) => {
           problemas: [...problemasAux],
           problema: problem,
         },
-      };
-    case "CREAR_RESET":
-      return {
-        ...state,
-        Crear: { ...initialState.Crear },
       };
     case "CREAR_MONTO_I":
       return {
@@ -334,11 +331,6 @@ export const reducer = (state, action) => {
           problema: problem,
         },
       };
-    case "AGREGAR_RESET":
-      return {
-        ...state,
-        Agregar: { ...initialState.Agregar },
-      };
 
     case "MODIFICAR_CI_A_I":
       problemasAux = state.Modificar.problemas.filter((p) => p.id !== 4);
@@ -404,7 +396,6 @@ export const reducer = (state, action) => {
           problema: problem,
         },
       };
-
     case "MODIFICAR_CI_N_I":
       problemasAux = state.Modificar.problemas.filter((p) => p.id !== 4);
       problemasAux = [...problemasAux, { id: 4, pro: "" }];
@@ -468,7 +459,6 @@ export const reducer = (state, action) => {
           problema: problem,
         },
       };
-
     case "MODIFICAR_PROBLEMA":
       problemasAux = state.Modificar.problemas.filter((p) => p.id !== 4);
       problemasAux = [
@@ -540,11 +530,6 @@ export const reducer = (state, action) => {
           problemas: [...problemasAux],
           problema: problem,
         },
-      };
-    case "MODIFICAR_RESET":
-      return {
-        ...state,
-        Modificar: { ...initialState.Modificar },
       };
 
     case "CONSULTAR_CI_I":
@@ -629,16 +614,28 @@ export const reducer = (state, action) => {
           problema: problem,
         },
       };
-    case "CONSULTAR_RESET":
-      return {
-        ...state,
-        Consultar: { ...initialState.Consultar },
-      };
-    case "SHOW_SALDO":
-      return {...state,Saldo:{show:true,text:action.value}};
-    case "HIDE_SALDO":
-      return {...state,Saldo:{...state.Saldo,show:false}};
+
+    case "SHOW_MENSAJE":
+      switch (action.reset) {
+        case "CREAR":
+          myState = { ...state, Crear: { ...initialState.Crear } };
+          break;
+        case "AGREGAR":
+          myState = { ...state, Agregar: { ...initialState.Agregar } };
+          break;
+        case "MODIFICAR":
+          myState = { ...state, Modificar: { ...initialState.Modificar } };
+          break;
+        case "CONSULTAR":
+          myState = { ...state, Consultar: { ...initialState.Consultar } };
+          break;
+        default:
+          myState = { ...state };
+      }
+      return { ...myState, Mensaje: { show: true, text: action.value } };
+    case "HIDE_MENSAJE":
+      return { ...state, Mensaje: { ...state.Mensaje, show: false } };
     default:
-      return {...state}
+      return { ...state };
   }
 };

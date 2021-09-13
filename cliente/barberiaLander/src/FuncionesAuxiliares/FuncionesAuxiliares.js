@@ -27,16 +27,15 @@ export const calcularPrecio = (servicios) => {
   let ignorar;
   servicesList.forEach((ser) => {
     if (ser.active && ser.id !== ignorar) {
-      /* if (ser.id === 1 && servicesList[1].active) {
+      if (ser.id === 1 && servicesList[1].active) {
         ignorar = servicesList[1].id;
         total += getElementById(costoServicios, 2).price;
       } else if (ser.id === 4 && servicesList[2].active) {
         ignorar = servicesList[2].id;
         total += getElementById(costoServicios, 3).price;
       } else {
-        
-      } */
-      total += getElementById(costoServicios, ser.id).price;
+        total += getElementById(costoServicios, ser.id).price;
+      }
     }
   });
   return total;

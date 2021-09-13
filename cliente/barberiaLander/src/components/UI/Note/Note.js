@@ -7,7 +7,9 @@ const Note = (props) => {
       unmountOnExit
       in={props.show}
       timeout={160}
-      onEnter={()=>{setTimeout(props.onClose,3000)}}
+      onEnter={() => {
+        setTimeout(props.onClose, 3000);
+      }}
       classNames={{
         enter: ``,
         enterActive: `${classes.NoteOpen}`,
@@ -16,9 +18,13 @@ const Note = (props) => {
       }}
     >
       <div className={classes.Note}>
-        <p>{props.children}</p>
+        <div className={classes.text}>
+          <p>{props.children}</p>
+        </div>
         <div className={classes.LoadingBar}>
-            <span className={`${classes.Bar} ${props.show?classes.BarClose:''}`}></span>
+          <span
+            className={`${classes.Bar} ${props.show ? classes.BarClose : ""}`}
+          ></span>
         </div>
       </div>
     </CSSTransition>

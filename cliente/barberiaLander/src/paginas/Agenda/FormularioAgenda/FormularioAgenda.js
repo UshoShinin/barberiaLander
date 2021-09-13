@@ -38,7 +38,7 @@ const FormularioAgenda = (props) => {
   const height = document.getElementById("root").clientWidth > 1400 ? 11 : 7;
   const DaysGenerator = useDayGenerator();
   const authCtx = useContext(AuthContext);
-  const [diasMostrar,setDiasMostrar] = useState(null);
+  const [diasMostrar, setDiasMostrar] = useState(null);
 
   const calendarioHandler = (horarios) => {
     let misHorarios = [];
@@ -52,9 +52,17 @@ const FormularioAgenda = (props) => {
         i++;
       });
     } else {
-      let H = 8;
-      let M = 0;
-      while (H < 23) {
+      const Employee = getElementById(
+        inputState.HorariosFiltrados,
+        inputState.Employee.value
+      );
+      const entrada = transformStringNumber(Employee.entrada);
+      const salida = transformStringNumber(Employee.salida);
+      console.log(entrada);
+      console.log(salida);
+      let H = entrada.h;
+      let M = entrada.m;
+      while (H < salida.h || M < salida.m) {
         misHorarios.push({
           id: i,
           title: `${H}:${M < 10 ? "0" + M : M}`,
@@ -77,7 +85,10 @@ const FormularioAgenda = (props) => {
   const submitHandler = (event) => {
     event.preventDefault();
     let services = [];
-
+    let timeNeed = calcularTiempo(
+      getElementById(inputState.HorariosFiltrados, inputState.Employee.value),
+      inputState.servicios
+    );
     Object.values(inputState.servicios).forEach((serv) => {
       if (serv.active) {
         services.push(serv.id);
@@ -106,9 +117,10 @@ const FormularioAgenda = (props) => {
         inputState.ComboBox.title.length < 5
           ? "0" + inputState.ComboBox.title
           : inputState.ComboBox.title;
+      console.log(tiempoNecesario);
       const fin = transformNumberString(
         minutosAHorarios(
-          horarioEnMinutos(transformStringNumber(inicio)) + tiempoNecesario
+          horarioEnMinutos(transformStringNumber(inicio)) + timeNeed
         )
       );
       let datosAgenda;
@@ -129,6 +141,7 @@ const FormularioAgenda = (props) => {
           }`,
           horario: { i: inicio, f: fin },
         };
+        console.log(datosAgenda);
         props.onSaveDatosAgenda(datosAgenda);
       } else {
         //Modificar
@@ -169,60 +182,76 @@ const FormularioAgenda = (props) => {
     realDate.getMonth(),
     realDate.getDate()
   );
-  const JSONHorariosFiltrados = JSON.stringify(inputState.HorariosFiltrados);
-  const ciEmplo = inputState.Employee.value;
-  const cargarDiasMostrar = useCallback(() => {
-    let misDias;
-    let misHorarios = JSON.parse(JSONHorariosFiltrados);
-    if (misHorarios !== null && ciEmplo !== null) {
-      tiempoNecesario = calcularTiempo(
-        getElementById(misHorarios, ciEmplo),
-        inputState.servicios
-      );
-      const fechas = JSON.stringify(
-        getElementById(misHorarios, ciEmplo).fechas
-      );
-      misDias = DaysGenerator(
-        date.getDate(),
-        date.getMonth() + 1,
-        date.getFullYear(),
-        fechas,
-        tiempoNecesario
-      );
-
-      //Activación de día
-      if (
-        inputState.Calendario.dia !== null &&
-        inputState.Calendario.dia !== undefined
-      ) {
-        const diaSelect = inputState.Calendario.dia.d;
-        const mesSelect = inputState.Calendario.dia.m;
-        for (let i = 0; i < misDias.length; i++) {
-          for (let j = 0; j < misDias[i].dias.length; j++) {
-            const myDia = misDias[i].dias[j];
+  const JSONDia = JSON.stringify(inputState.Calendario.dia);
+  const activarDias = useCallback(
+    (misDias) => {
+      const dia = JSON.parse(JSONDia);
+      let dias = [...misDias];
+      if (dia !== null && dia !== undefined) {
+        const diaSelect = dia.d;
+        const mesSelect = dia.m;
+        for (let i = 0; i < dias.length; i++) {
+          for (let j = 0; j < dias[i].dias.length; j++) {
+            const myDia = dias[i].dias[j];
             if (myDia.activo !== null) {
               if (myDia.num === diaSelect && myDia.mes === mesSelect) {
-                misDias[i].dias[j].activo = true;
+                dias[i].dias[j].activo = true;
+              } else {
+                dias[i].dias[j].activo = false;
               }
             }
           }
         }
       } else {
-        for (let i = 0; i < misDias.length; i++) {
-          for (let j = 0; j < misDias[i].dias.length; j++) {
-            misDias[i].dias[j].activo = false;
+        for (let i = 0; i < dias.length; i++) {
+          for (let j = 0; j < dias[i].dias.length; j++) {
+            dias[i].dias[j].activo = false;
           }
         }
       }
-      return misDias;
+      console.log(dias);
+      return dias;
+    },
+    [JSONDia]
+  );
+
+  const JSONHorariosFiltrados = JSON.stringify(inputState.HorariosFiltrados);
+  const ciEmplo = inputState.Employee.value;
+  const JSONservicios = JSON.stringify(inputState.servicios);
+
+  const cargarDiasMostrar = useCallback(() => {
+    let misDias;
+    let misHorarios = JSON.parse(JSONHorariosFiltrados);
+    let misServicios = JSON.parse(JSONservicios);
+    if (misHorarios !== null && ciEmplo !== null) {
+      tiempoNecesario = calcularTiempo(
+        getElementById(misHorarios, ciEmplo),
+        misServicios
+      );
+      const Empo = getElementById(misHorarios, ciEmplo);
+      const fechas = JSON.stringify(Empo.fechas);
+      misDias = DaysGenerator(
+        date.getDate(),
+        date.getMonth() + 1,
+        date.getFullYear(),
+        fechas,
+        tiempoNecesario,
+        Empo.entrada,
+        Empo.salida
+      );
+      return activarDias(misDias);
     }
-  }, [JSONHorariosFiltrados, ciEmplo]);
+  }, [JSONHorariosFiltrados, ciEmplo, JSONservicios]);
   useEffect(() => {
     let misHorarios = JSON.parse(JSONHorariosFiltrados);
     if (misHorarios !== null && ciEmplo !== null) {
-       setDiasMostrar(cargarDiasMostrar());
+      setDiasMostrar(cargarDiasMostrar());
     }
-  }, [JSONHorariosFiltrados, ciEmplo]);
+  }, [JSONHorariosFiltrados, ciEmplo, JSONservicios, cargarDiasMostrar]);
+  //Activación
+  useEffect(() => {
+    setDiasMostrar((prev) => activarDias(prev));
+  }, [JSONDia]);
   //Inputs del sistema
   const INPUTS = [
     {
@@ -309,7 +338,7 @@ const FormularioAgenda = (props) => {
   /* Calendario con todas sus empleados y horarios */
   /* Si no se hizo la precarga de datos se carga null */
   let calendarioContent = null;
-  if (inputState.HorariosFiltrados !== null&&diasMostrar!==null) {
+  if (inputState.HorariosFiltrados !== null && diasMostrar !== null) {
     calendarioContent = (
       <Calendario
         date={date}
@@ -377,6 +406,9 @@ const FormularioAgenda = (props) => {
                 <label htmlFor="3">Descripción:</label>
               </div>
               <TextArea ref={descripcionRef} isValid={null} input={INPUTS[2]} />
+              {inputState.problema !== -1 && (
+                <p>{inputState.problemas[inputState.problema].pro}</p>
+              )}
             </div>
             {/* <InputFile
               input={INPUTS[3]}

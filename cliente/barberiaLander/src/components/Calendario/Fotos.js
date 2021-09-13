@@ -6,8 +6,12 @@ import { CSSTransition } from "react-transition-group";
 import { getElementById } from "../../FuncionesAuxiliares/FuncionesAuxiliares";
 const Fotos = (props) => {
   const Fotitos = JSON.parse(props.fotos);
+  const imagenActual = getElementById(
+    Fotitos,
+    props.currentEmployee
+  );
   const initialState = {
-    Actual: { value: Fotitos[0].foto, mostrar: true,alt: Fotitos[0].title},
+    Actual: { value: imagenActual.foto, mostrar: true,alt: Fotitos[0].title},
     Siguiente: { value: null, mostrar: false,alt:'' },
     canChange: true,
   };
@@ -73,7 +77,6 @@ const Fotos = (props) => {
         unmountOnExit
         timeout={220}
         onExited={() => {
-          console.log("MOSTRAR_SIGUIENTE");
           dispatch({ type: "MOSTRAR_SIGUIENTE" });
           setTimeout(() => {
             dispatch({ type: "PERMITIR" });
@@ -96,7 +99,6 @@ const Fotos = (props) => {
         unmountOnExit
         timeout={220}
         onExited={() => {
-          console.log("MOSTRAR_ACTUAL");
           dispatch({ type: "MOSTRAR_ACTUAL" });
           setTimeout(() => {
             dispatch({ type: "PERMITIR" });

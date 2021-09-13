@@ -36,11 +36,13 @@ export const inputReducer = (state, action) => {
         Nombre: { value: action.value, isValid: state.Nombre.isValid },
       };
     case "FOCUS_INPUT_NAME":
+      const largo = state.Nombre.value.trim().length;
+      
       return {
         ...state,
         Nombre: {
           value: state.Nombre.value,
-          isValid: state.Nombre.value.trim().length > 5,
+          isValid: largo > 2 && largo<21,
         },
       };
     case "RESET_NAME_IS_VALID":
@@ -213,16 +215,17 @@ export const inputReducer = (state, action) => {
         }
       }
     });
+    const currentEmpo = buscar(myState.Employee.value,horariosAuxiliares)!==null?myState.Employee.value:horariosAuxiliares[0].id;
     myState = {
       ...myState,
       Calendario: { value: null, dia: null },
       ComboBox: {
         value: 1,
         active: false,
-        title: " ",
+        title: "",
       },
       HorariosFiltrados: [...horariosAuxiliares],
-      Employee: { value: horariosAuxiliares[0].id, active: false },
+      Employee: { value: currentEmpo, active: false },
     };
   }
   return myState;

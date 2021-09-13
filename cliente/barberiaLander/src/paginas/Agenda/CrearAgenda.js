@@ -1,7 +1,7 @@
 import FormularioAgenda from "./FormularioAgenda/FormularioAgenda";
 import NormalCard from "../../components/UI/Card/NormalCard";
 import useHttp from "../../hooks/useHttp";
-import { useState, useEffect, useContext,useCallback } from "react";
+import { useState, useEffect, useContext, useCallback } from "react";
 import LoaddingSpinner from "../../components/LoaddingSpinner/LoaddingSpinner";
 import AuthContext from "../../store/AuthContext";
 import { getElementById } from "../../FuncionesAuxiliares/FuncionesAuxiliares";
@@ -11,14 +11,14 @@ import {
   getIdByTitle,
   cargarHorariosEnMinutos,
   calcularTiempo,
-  transformNumberString
+  transformNumberString,
 } from "../../components/Calendario/FuncionesAuxiliares";
 const getRespuesta = (res) => {
   console.log(res);
 };
-const CrearAgenda = (props) => { 
+const CrearAgenda = (props) => {
   const authCtx = useContext(AuthContext);
-  console.log('Running Crear Agenda');
+  console.log("Running Crear Agenda");
   let initialState = {
     Nombre: { value: "", isValid: null },
     Horarios: null,
@@ -40,7 +40,12 @@ const CrearAgenda = (props) => {
       decoloracion: { active: false, id: 7 },
       brushing: { active: false, id: 8 },
     },
-    ciCliente : '-1',
+    ciCliente: "-1",
+    problema: -1,
+    problemas: [
+      { id: 1, pro: "" },
+      { id: 2, pro: "" },
+    ],
   };
   const [stateAgenda, setStateAgenda] = useState(initialState);
   const mandarAgenda = useHttp();
@@ -58,7 +63,6 @@ const CrearAgenda = (props) => {
     );
   };
   const modificarDatosAgendaHandler = (enteredDatosAgenda) => {
-    console.log(enteredDatosAgenda);
     mandarAgendaModificar(
       {
         url: "/modificarAgenda",
@@ -73,7 +77,7 @@ const CrearAgenda = (props) => {
   /* Carga inicial de datos */
   const misServicios = initialState.servicios;
   const agenda = props.agenda;
-  const obtenerHorarios = useCallback((horarios) => {
+  const obtenerHorarios = (horarios) => {
     let nombre;
     let telefono;
     let ciCliente;
@@ -82,7 +86,7 @@ const CrearAgenda = (props) => {
     let descripcion = { value: "", isValid: null };
     let empleados = horarios.mensaje.empleados;
     let comboBox = { value: null, active: false, title: "" };
-    let id=1;
+    let id = 1;
     if (agenda !== null) {
       let empleado = getElementById(
         horarios.mensaje.empleados,
@@ -100,15 +104,30 @@ const CrearAgenda = (props) => {
         decoloracion: { active: agenda.servicios.decoloracion, id: 7 },
         brushing: { active: agenda.servicios.brushing, id: 8 },
       };
-      horarios = obtenerHorariosDeDia(agenda.fecha.d,agenda.fecha.m,empleado.fechas);
+      horarios = obtenerHorariosDeDia(
+        agenda.fecha.d,
+        agenda.fecha.m,
+        empleado.fechas
+      );
       tiempo = calcularTiempo(empleado, servicios);
-      const resultado = horarios!==null?horariosAgendarDisponibles(horarios, tiempo).map((h)=>{id++;return {id:id,title:transformNumberString(h)}}):cargarHorariosEnMinutos(8*60,22*60);
-      const position = getIdByTitle(resultado,agenda.horario.i);
+      const resultado =
+        horarios !== null
+          ? horariosAgendarDisponibles(
+              horarios,
+              tiempo,
+              empleado.entrada,
+              empleado.salida
+            ).map((h) => {
+              id++;
+              return { id: id, title: transformNumberString(h) };
+            })
+          : cargarHorariosEnMinutos(8 * 60, 22 * 60);
+      const position = getIdByTitle(resultado, agenda.horario.i);
       Calendario = {
         value: resultado,
         dia: { ...agenda.fecha },
       };
-      comboBox =  { value: position, active: false, title: agenda.horario.i };
+      comboBox = { value: position, active: false, title: agenda.horario.i };
     } else {
       nombre = { value: "", isValid: null };
       telefono = { value: "", isValid: null };
@@ -118,7 +137,6 @@ const CrearAgenda = (props) => {
         ciCliente = authCtx.user.ciUsuario;
       }
     }
-
     setStateAgenda((prev) => {
       return {
         ...prev,
@@ -135,17 +153,26 @@ const CrearAgenda = (props) => {
         },
         servicios: { ...servicios },
         Calendario: { ...Calendario },
-        ComboBox:{...comboBox},
-        ciCliente:ciCliente
+        ComboBox: { ...comboBox },
+        ciCliente: ciCliente,
       };
     });
-  },[authCtx,agenda,misServicios]);
+  };
   const fetchHorarios = useHttp();
 
   /* Se ejecuta al inicio para que se cargen los datos */
   useEffect(() => {
-    fetchHorarios({ url: "/datosFormularioAgenda" }, obtenerHorarios);
-  }, [fetchHorarios]);
+    if (agenda !== null) {
+      fetchHorarios(
+        {
+          url: "/getDatosFormularioModificarAgenda?idAgenda=" + agenda.idagenda,
+        },
+        obtenerHorarios
+      );
+    } else {
+      fetchHorarios({ url: "/datosFormularioAgenda" }, obtenerHorarios);
+    }
+  }, []);
   return (
     <div className="nuevaAgenda">
       <NormalCard>

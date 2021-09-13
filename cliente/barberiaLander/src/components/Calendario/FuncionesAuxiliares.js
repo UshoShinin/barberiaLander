@@ -41,14 +41,15 @@ export const horariosDisponibilidad = (
   dia,
   mes,
   fechas,
-  servicios
+  servicios,entrada,salida
 ) => {
   const horarios = obtenerHorariosDeDia(dia, mes, fechas);
   if (diasTotales < 1 || diaSemana === 7)
     return { valido: false, horariosDisponibles: [] };
   if (horarios === null) return { valido: true, horariosDisponibles: [] };
   else {
-    const resultado = horariosAgendarDisponibles(horarios, servicios);
+    
+    const resultado = horariosAgendarDisponibles(horarios, servicios,entrada,salida);
     if (resultado.length > 0) {
       return {
         valido: true,
@@ -82,9 +83,9 @@ export const minutosAHorarios = (minutos) => {
   return { h: (minutos - (minutos % 60)) / 60, m: minutos % 60 };
 };
 /* Carga todos los horarios disponibles dentro de una lista de ghrarios y una cantidad de tiempo que es necesario ocupar */
-export const horariosAgendarDisponibles = (horarios, timeNeed) => {
-  let hora = "08:00";
-  const horaCierre = "22:00";
+export const horariosAgendarDisponibles = (horarios, timeNeed,entrada,salida) => {
+  let hora = entrada;
+  const horaCierre = salida;
   let horariosDisponibles = [];
   let inicio = 0;
   let tengoTiempo;

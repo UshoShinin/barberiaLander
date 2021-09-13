@@ -19,6 +19,31 @@ const Item = (props) => {
         )}
       </div>
       <div className={classes.contentBotones}>
+        <SimpleButton
+        className={classes.accept}
+          action={() => {
+            props.aceptar({
+              idAgenda: item.idAgenda,
+              ciEmpleado: item.ciEmpleado,
+              horario: { i: item.horaInicio, f: item.horaFin },
+              fecha: item.fecha,
+            });
+          }}
+        >
+          <FontAwesomeIcon icon={faCheck} />
+        </SimpleButton>
+        <SimpleButton
+        className={classes.deny}
+          color="red"
+          action={() => {
+            props.rechazar({
+              idAgenda: item.idAgenda,
+              idHorario: item.idHorario,
+            });
+          }}
+        >
+          <FontAwesomeIcon icon={faTimes} />
+        </SimpleButton>
         <div className={classes.info}>
           <SimpleButton
             color="white"
@@ -27,31 +52,6 @@ const Item = (props) => {
             }}
           >
             <FontAwesomeIcon icon={faSearch} />
-          </SimpleButton>
-        </div>
-        <div className={classes.actions}>
-          <SimpleButton
-            action={() => {
-              props.aceptar({
-                idAgenda: item.idAgenda,
-                ciEmpleado: item.ciEmpleado,
-                horario: { i: item.horaInicio, f: item.horaFin },
-                fecha: item.fecha,
-              });
-            }}
-          >
-            <FontAwesomeIcon icon={faCheck} />
-          </SimpleButton>
-          <SimpleButton
-            color="red"
-            action={() => {
-              props.rechazar({
-                idAgenda: item.idAgenda,
-                idHorario:item.idHorario,
-              });
-            }}
-          >
-            <FontAwesomeIcon icon={faTimes} />
           </SimpleButton>
         </div>
       </div>

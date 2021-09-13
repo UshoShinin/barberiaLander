@@ -44,7 +44,11 @@ const Cuponeras = () => {
     if (res.mensaje.codigo === 400) {
       dispatchCuponera({ type: "CREAR_PROBLEMA", value: res.mensaje.mensaje });
     } else {
-      dispatchCuponera({ type: "CREAR_RESET" });
+      dispatchCuponera({
+        type: "SHOW_MENSAJE",
+        value: 'Cuponera creada correctamente',
+        reset:'CREAR'
+      });
     }
   };
   const getRespuestaCaja = (res) => {
@@ -54,7 +58,11 @@ const Cuponeras = () => {
         value: res.mensaje.mensaje,
       });
     } else {
-      dispatchCuponera({ type: "AGREGAR_RESET" });
+      dispatchCuponera({
+        type: "SHOW_MENSAJE",
+        value: 'Saldo agregado satisfactoriamente',
+        reset:'AGREGAR'
+      });
     }
   };
   const getRespuestaAgregar = (res) => {
@@ -98,7 +106,11 @@ const Cuponeras = () => {
         value: res.mensaje.mensaje,
       });
     } else {
-      dispatchCuponera({ type: "MODIFICAR_RESET" });
+      dispatchCuponera({
+        type: "SHOW_MENSAJE",
+        value: res.mensaje.mensaje,
+        reset:'MODIFICAR'
+      });
     }
   };
 
@@ -110,8 +122,9 @@ const Cuponeras = () => {
       });
     } else {
       dispatchCuponera({
-        type: "SHOW_SALDO",
+        type: "SHOW_MENSAJE",
         value: "Saldo: $" + res.mensaje.mensaje,
+        reset:'CONSULTAR'
       });
     }
   };
@@ -122,6 +135,10 @@ const Cuponeras = () => {
   };
   const user = authCtx.user;
   useEffect(() => {
+    dispatchCuponera({
+      type: "SHOW_MENSAJE",
+      value: 'Cuponera modificada correctamente muy correctamente',
+    });
     if (user === null || user.rol === "Cliente") history.replace("/");
     else sendFormulario({ url: "/getIdCajaHoy" }, obtenerDatos);
   }, [user, history, sendFormulario]);
@@ -249,12 +266,12 @@ const Cuponeras = () => {
   return (
     <Marco className={classes.container}>
       <Note
-        show={cuponeraState.Saldo.show}
+        show={cuponeraState.Mensaje.show}
         onClose={() => {
-          dispatchCuponera({ type: "HIDE_SALDO" });
+          dispatchCuponera({ type: "HIDE_MENSAJE" });
         }}
       >
-        {cuponeraState.Saldo.text}
+        {cuponeraState.Mensaje.text}
       </Note>
       <Border disabled={!cuponeraState.active}>
         <h1

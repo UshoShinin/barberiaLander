@@ -7,8 +7,7 @@
   bottom: 0;
 }
 .cajaContainer {  
-  /* color: var(--clr-neon-white); */
-  padding: 0.6em;
+  padding: 1.2em;
 }
 .labelText{
   font-size: 1.3rem;
@@ -56,7 +55,7 @@
   bottom: 15px;
   margin-left: 1.3em;
   display: grid;
-  grid-template-rows: 80px auto 45px;
+  grid-template-rows: max-content auto max-content;
   grid-row-gap: 20px;
 }
 
@@ -76,7 +75,7 @@
 .agenda{
   height: 100%;
   display: grid;
-  grid-template-rows: 38px 60px 40px auto 28px;
+  grid-template-rows: max-content 80px max-content auto max-content;
   grid-row-gap:10px
 }
 
@@ -103,7 +102,7 @@
 .productos{
   display: grid;
   grid-row-gap:10px;
-  grid-template-rows: 30px 27px auto 27px;
+  grid-template-rows: max-content max-content auto max-content;
 }
 .productos > h2{
   font-size: 2em;
@@ -220,6 +219,9 @@
   font-size: 2em;
 }
 @media (max-width:1400px) {
+  .cajaContainer {  
+    padding: 0.6em;
+  }
   .labelText{
     font-size: 1rem;
   }

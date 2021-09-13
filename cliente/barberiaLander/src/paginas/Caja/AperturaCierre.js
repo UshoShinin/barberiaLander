@@ -43,7 +43,10 @@ const AperturaCierre = () => {
   const cobrarCaja = useHttp();
   const abrirCaja = useHttp();
   const fetchAgendas = useHttp();
-
+  const salidaDinero = useHttp();
+  const getRespuestaSalida = (res) => {
+    console.log(res);
+  };
   const salidaSubmitHandler = (e) => {
     e.preventDefault();
     if (!cajaState.montoSalida.isValid) {
@@ -55,9 +58,19 @@ const AperturaCierre = () => {
       const data = {
         monto: cajaState.montoSalida.value,
         descripcion: cajaState.descripcionSalida.value,
-        empleado: cajaState.comboSalida.value,
+        cedula: cajaState.comboSalida.value,
+        idCaja: cajaState.idCaja,
+        fecha: new Date(),
       };
-      console.log(data);
+      salidaDinero(
+        {
+          url: "/salidaCaja",
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: data,
+        },
+        getRespuestaSalida
+      );
     }
   };
   const obtenerAgendas = (mensaje) => {
@@ -71,56 +84,75 @@ const AperturaCierre = () => {
   const getRespuesta = (res) => {
     console.log(res);
   };
-  const getRespuestaModificar = (res) => {
-    if (res.mensaje.codigo !== 400) {
-      const montoE =
+
+  const EntradaDeDinero = () => {
+    let montoE = 0;
+    let montoD = 0;
+    let montoC = 0;
+    let propina = 0;
+    if (cajaState.cantidadMedios.value === 1) {
+      if (cajaState.efectivo.value)
+        montoE = parseInt(cajaState.montoTotal.value, 10);
+      else if (cajaState.debito.value)
+        montoD = parseInt(cajaState.montoTotal.value, 10);
+      else if (cajaState.cuponera.value)
+        montoC = parseInt(cajaState.montoTotal.value, 10);
+    } else {
+      montoE =
         cajaState.montoEfectivo.value.length > 0
           ? cajaState.montoEfectivo.value
           : 0;
-      const montoD =
+      montoD =
         cajaState.montoDebito.value.length > 0
           ? cajaState.montoDebito.value
           : 0;
-      const montoC =
+      montoC =
         cajaState.montoCuponera.value.length > 0
           ? cajaState.montoCuponera.value
           : 0;
-      let productosVendidos = cajaState.productosAgregados.map((p) => {
-        return { idProducto: p.id, cantidad: p.stock };
-      });
-      let servicios = Object.values(cajaState.servicios).filter(
-        (s) => s.active
-      );
-      servicios = servicios.length > 0 ? servicios : null;
-      productosVendidos =
-        productosVendidos.length > 0 ? productosVendidos : null;
-      const agenda = getElementById(
-        cajaState.agendas,
-        cajaState.comboAgenda.value
-      );
-      const datosEnviar = {
-        idCaja: cajaState.idCaja,
-        fecha: cajaState.fecha,
-        ciEmpleado: cajaState.sinAgendar.value
-          ? cajaState.comboAgenda.value
-          : agenda.empleado,
-        montoTotal: cajaState.montoTotal.value,
-        pago: {
-          numeroTicket: cajaState.ticketDebito.value,
-          Efectivo: parseInt(montoE, 10),
-          Debito: parseInt(montoD, 10),
-          Cuponera: parseInt(montoC, 10),
-        },
-        productosVendidos,
-        servicios,
-        descripcion: null,
-      };
+      propina =
+        cajaState.propinaAgenda.value.length > 0
+          ? cajaState.propinaAgenda.value
+          : 0;
+    }
+    let productosVendidos = cajaState.productosAgregados.map((p) => {
+      return { idProducto: p.id, cantidad: p.stock };
+    });
+    let servicios = Object.values(cajaState.servicios).filter((s) => s.active);
+    servicios = servicios.length > 0 ? servicios : null;
+    productosVendidos = productosVendidos.length > 0 ? productosVendidos : null;
+    const agenda = getElementById(
+      cajaState.agendas,
+      cajaState.comboAgenda.value
+    );
+    const datosEnviar = {
+      idCaja: cajaState.idCaja,
+      fecha: cajaState.fecha,
+      ciEmpleado: cajaState.sinAgendar.value
+        ? cajaState.comboAgenda.value
+        : agenda.empleado,
+      montoTotal: cajaState.montoTotal.value,
+      pago: {
+        numeroTicket: cajaState.ticketDebito.value,
+        Efectivo: parseInt(montoE, 10),
+        Debito: parseInt(montoD, 10),
+        Cuponera: parseInt(montoC, 10),
+        propina:parseInt(propina, 10),
+      },
+      productosVendidos,
+      servicios,
+      descripcion: null,
+    };
+    return datosEnviar;
+  };
+  const getRespuestaModificar = (res) => {
+    if (res.mensaje.codigo !== 400) {
       cobrarCaja(
         {
           url: "/entradaCaja",
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: datosEnviar,
+          body: EntradaDeDinero(),
         },
         getRespuesta
       );
@@ -190,7 +222,7 @@ const AperturaCierre = () => {
     )
       history.replace("/");
     else fetchAgendas({ url: "/datosFormularioCaja" }, obtenerAgendas);
-  }, [user,history,fetchAgendas]);
+  }, [user, history, fetchAgendas]);
 
   return (
     <>
@@ -245,48 +277,6 @@ const AperturaCierre = () => {
           show={cajaState.jornal.show}
           aceptar={() => {
             dispatchCaja({ type: "HIDE_JORNAL" });
-            const montoE =
-              cajaState.montoEfectivo.value.length > 0
-                ? cajaState.montoEfectivo.value
-                : 0;
-            const montoD =
-              cajaState.montoDebito.value.length > 0
-                ? cajaState.montoDebito.value
-                : 0;
-            const montoC =
-              cajaState.montoCuponera.value.length > 0
-                ? cajaState.montoCuponera.value
-                : 0;
-            let productosVendidos = cajaState.productosAgregados.map((p) => {
-              return { idProducto: p.id, cantidad: p.stock };
-            });
-            let servicios = Object.values(cajaState.servicios).filter(
-              (s) => s.active
-            );
-            servicios = servicios.length > 0 ? servicios : null;
-            productosVendidos =
-              productosVendidos.length > 0 ? productosVendidos : null;
-            const agenda = getElementById(
-              cajaState.agendas,
-              cajaState.comboAgenda.value
-            );
-            const datosEnviar = {
-              idCaja: cajaState.idCaja,
-              fecha: cajaState.fecha,
-              ciEmpleado: cajaState.sinAgendar.value
-                ? cajaState.comboAgenda.value
-                : agenda.empleado,
-              montoTotal: cajaState.montoTotal.value,
-              pago: {
-                numeroTicket: cajaState.ticketDebito.value,
-                Efectivo: parseInt(montoE, 10),
-                Debito: parseInt(montoD, 10),
-                Cuponera: parseInt(montoC, 10),
-              },
-              productosVendidos,
-              servicios,
-              descripcion: null,
-            };
             if (cajaState.cuponera.value) {
               const datosCuponera = {
                 cedula: cajaState.codCuponera.value,
@@ -308,12 +298,13 @@ const AperturaCierre = () => {
                 getRespuestaModificar
               );
             } else {
+              console.log(EntradaDeDinero());
               cobrarCaja(
                 {
                   url: "/entradaCaja",
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
-                  body: datosEnviar,
+                  body: EntradaDeDinero(),
                 },
                 getRespuesta
               );

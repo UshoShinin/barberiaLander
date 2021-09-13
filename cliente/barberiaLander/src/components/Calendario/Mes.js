@@ -16,17 +16,17 @@ const Mes = (props) => {
   const [move, setMove] = useState(0);
   const moveLeft = () => {
     if (canMoveLeft) {
-      props.prev();
       setShow(false);
       setMove(-1);
+      props.prev();
     }
   };
 
   const moveRight = () => {
     if (canMoveRight) {
-      props.next();
       setShow(false);
       setMove(1);
+      props.next();
     }
   };
 

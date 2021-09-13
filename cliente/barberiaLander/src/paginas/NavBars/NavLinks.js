@@ -4,7 +4,10 @@ import { useContext, useReducer } from "react";
 import AuthContext from "../../store/AuthContext";
 import Menu from "./Menu/Menu";
 import NavButton from "./NavButton/NavButton";
-/* import Logo from "../../recursos/LogoChiquitoB.png"; */
+import LogoAzulH from "../../recursos/LogoChiquitoAzulHerramientas.png";
+import LogoAzul from "../../recursos/LogoChiquitoAzul2test2.png";
+import LogoRojo from "../../recursos/LogoChiquitoRojo2test2.png";
+import Logo from "../../recursos/LogoChiquitoBlanco2.png";
 
 const NavLinks = (props) => {
   const initialState = { place: -1, active: -1 };
@@ -48,9 +51,11 @@ const NavLinks = (props) => {
   return (
     <ul className={classes.navbarUl}>
       {/* <li><Link to="/" className="navbar-brand">Lander</Link></li>  */}
-      {/* <li className={classes.Logo}>
-        <img src={Logo}/>
-      </li> */}
+      <li className={classes.Logo}>
+        <img className={classes.base} src={LogoAzulH}/>
+        <img className={classes.blur} src={LogoAzulH}/>
+        <img className={classes.brillo} src={LogoAzulH}/>
+      </li>
       <li>
         <NavLink
           onClick={NavOnClick}
@@ -72,9 +77,9 @@ const NavLinks = (props) => {
           <span data="Historial de Cajas">Historial de Cajas</span>
         </NavLink>{" "}
       </li> */}
-      {/*  {authCtx.user !== null &&
+       {authCtx.user !== null &&
         (authCtx.user.rol === "Administrador" ||
-          authCtx.user.rol === "Encargado") && ( */}
+          authCtx.user.rol === "Encargado") && (
       <li>
         <NavLink
           onClick={NavOnClick}
@@ -85,7 +90,7 @@ const NavLinks = (props) => {
           <span data="Abrir/Cerra Caja">Abrir/Cerra Caja</span>
         </NavLink>
       </li>
-      {/*  )} */}
+      )}
       {authCtx.user !== null &&
         (authCtx.user.rol === "Administrador" ||
           authCtx.user.rol === "Encargado") && (

@@ -5,7 +5,7 @@ export const getYearChart = () => {
   return 6;
 }
 const useDayGenerator = () => {
-    const DaysGenerator = useCallback((diaActual , month, year,fechas,timeNeed) => {
+    const DaysGenerator = useCallback((diaActual , month, year,fechas,timeNeed,entrada,salida) => {
         console.log('Running DaysGenerator');
         const misFechas = JSON.parse(fechas);
         const dayIndex = getDayIndex(
@@ -43,7 +43,7 @@ const useDayGenerator = () => {
           diasAuxiliares.push({
             num: diaAuxiliar,
             mes:month,
-            disponibilidad: horariosDisponibilidad(diaSemana, diasTotales,i, myMonth+idMonth,misFechas,timeNeed),
+            disponibilidad: horariosDisponibilidad(diaSemana, diasTotales,i, myMonth+idMonth,misFechas,timeNeed,entrada,salida),
             activo:diaSemana ===0 ? null:false,
           });
           diaAuxiliar++;
@@ -65,7 +65,7 @@ const useDayGenerator = () => {
             diasAuxiliares.push({
               num: i,
               mes:myMonth,
-              disponibilidad: horariosDisponibilidad(diaSemana, diasTotales,i, myMonth,misFechas,timeNeed),
+              disponibilidad: horariosDisponibilidad(diaSemana, diasTotales,i, myMonth,misFechas,timeNeed,entrada,salida),
               activo:diaSemana ===0 ? null:false,
             });
             diaSemana++;
