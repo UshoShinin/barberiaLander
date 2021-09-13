@@ -6,7 +6,6 @@ const sql = require("mssql");
 //Aceptar una agenda
 const aceptarAgenda = async (id, horario) => {
   try {
-    /* console.log(horario); */
     //Verifico que el horario siga estando disponible
     const horarioDisponible = verificarHorario({
       ciEmpleado: horario.ciEmpleado,
@@ -519,7 +518,6 @@ const getAgendaPorId = async (idAgenda) => {
       serviciosAgenda.forEach((servicio) => {
         ret.servicios.push(servicio.IdServicio);
       });
-      console.log(agenda);
       return ret;
     } else {
       return "No existe una agenda con ese id";
@@ -534,7 +532,6 @@ const getAgendaPorId = async (idAgenda) => {
 //Este metodo es utilizado para verificar el horario al momento de aceptar una agenda y crearla
 //Devuelve una promesa con true o false
 const verificarHorario = async (horario) => {
-  console.log(horario);
   try {
     //variable que tiene la conexion
     const pool = await sql.connect(conexion);
@@ -620,7 +617,6 @@ const verificarHorarioModificarAgenda = async (horario) => {
 //Este es un metodo que dado los datos de un horario lo inserta en la base de datos
 //Es un metodo auxiliar que devuelve el id del horario en caso de que se inserte, si no devuelve -1
 const insertarHorario = async (horario) => {
-  console.log(horario);
   const pool = await sql.connect(conexion);
   const resultado = await verificarHorario(horario)
     .then((puedoInsertar) => {
@@ -674,8 +670,7 @@ const insertarAgenda = async (agenda) => {
         idHorario: resultado.recordset[0].IdHorario,
         idAgenda: resultado.recordset[0].IdAgenda,
       };
-      if (agenda.ciCliente !== "-1") {
-        console.log(agenda);
+      if (agenda.ciCliente !== undefined) {
         return insertarAgendaCliente({
           cedula: agenda.ciCliente,
           idAgenda: ret.idAgenda,
@@ -740,7 +735,6 @@ const insertarServicioAgenda = async (servicioAgenda) => {
 */
 const insertarAgendaCliente = async (datosAgendaCliente) => {
   try {
-    console.log(datosAgendaCliente);
     //Variable que tiene la conexion
     const pool = await sql.connect(conexion);
     //Armo el insert
@@ -759,11 +753,34 @@ const insertarAgendaCliente = async (datosAgendaCliente) => {
   }
 };
 
+//Metodo que se va a usar para ver si insertamos la agenda con 0 o con 1 en aceptada
+const verificarManejoAgenda = async (agenda) => {
+  try {
+    if (agenda.aceptada === 1) {
+      return verificarHorario({
+        ciEmpleado: agenda.ciEmpleado,
+        i: agenda.horario.i,
+        f: agenda.horario.f,
+        fecha: agenda.fecha,
+      }).then((horarioDisponible) => {
+        if (horarioDisponible) {
+          return crearSolicitudAgenda(agenda).then((resultado) => resultado);
+        } else {
+          return { codigo: 400, mensaje: "El horario ya fue ocupado" };
+        }
+      });
+    } else {
+      return crearSolicitudAgenda(agenda).then((resultado) => resultado);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 //Metodo para agregar la agenda a la base, voy a recibir los datos todos dentro del objeto agenda
 const crearSolicitudAgenda = async (agenda) => {
-  console.log(agenda);
   //Esto lo que hace es insertar primero el horario, despues la agenda y al final agenda servicio
-  const insertarAgendaCompleto = insertarHorario({
+  return insertarHorario({
     ciEmpleado: agenda.ciEmpleado,
     i: agenda.horario.i,
     f: agenda.horario.f,
@@ -783,7 +800,7 @@ const crearSolicitudAgenda = async (agenda) => {
         descripcion: agenda.descripcion,
         imagenEjemplo: agenda.imagenEjemplo,
         telefono: agenda.telefono,
-        aceptada: 0, //Esto hay que ver porque capaz se puede modificar para que siempre me lo manden y no lo tenga que hardcodear
+        aceptada: agenda.aceptada, //Esto hay que ver porque capaz se puede modificar para que siempre me lo manden y no lo tenga que hardcodear
         idHorario: resHorario,
       });
     })
@@ -806,7 +823,6 @@ const crearSolicitudAgenda = async (agenda) => {
     .catch((error) => {
       return error;
     });
-  return insertarAgendaCompleto;
 };
 
 //Metodo auxiliar para conseguir todas las agendas aceptadas
@@ -1439,7 +1455,6 @@ const nuevaEntradaDinero = async (
         });
       })
       .then((resultado) => {
-        console.log(resultado);
         return resultado;
       });
     return insertoEntradaDinero;
@@ -1497,7 +1512,6 @@ const insertarEntradaEfectivo = async (idEntrada, idMedioPago, monto) => {
 
 //Metodo auxiliar para hacer el insert en la tabla EntradaDebito
 const insertarEntradaDebito = async (idEntrada, idMedioPago, monto, ticket) => {
-  console.log(idEntrada, idMedioPago, monto, ticket);
   try {
     //Creo la conexion
     let pool = await sql.connect(conexion);
@@ -2166,7 +2180,7 @@ const interfaz = {
   getDatosListadoAgendas,
   getPreAgendas,
   getAgendaPorId,
-  crearSolicitudAgenda,
+  verificarManejoAgenda,
   getAgendasAceptadas,
   datosFormularioCaja,
   modificarAgenda,
@@ -2183,6 +2197,7 @@ const interfaz = {
   nuevaSalidaDinero,
   getDatosFormularioModificarAgenda,
   updateManejarAgenda,
+  verificarHorario,
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar
