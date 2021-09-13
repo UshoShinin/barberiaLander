@@ -228,7 +228,15 @@ app.use("/getDatosFormularioModificarAgenda", (req, res) => {
   });
 });
 
-
+app.use("/manejoDeAgendas", (req, res) => {
+  let valor = req.query.aceptarRechazar;
+  let ret = interfaz.updateManejarAgenda(valor);
+  ret.then((resultado) => {
+    res.json({
+      mensaje: resultado,
+    });
+  });
+});
 
 // All other GET requests not handled before will return our React app
 /* app.get('*', (req, res) => {

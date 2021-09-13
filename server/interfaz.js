@@ -2022,14 +2022,6 @@ const insertarCajaSalida = async (idCaja, idSalida) => {
 //Metodo para cerrar la caja
 const cierreCaja = async () => {
   //Llamo al metodo que me devuelve el total de los efectivo
-
-
-
-
-
-
-
-
 };
 
 //Conseguir datos para formularios
@@ -2055,6 +2047,29 @@ const getDatosFormularioModificarAgenda = async (idAgenda) => {
     })
     .then((listadoConServicios) => listadoConServicios);
   return retorno;
+};
+
+//Metodo para cambiar el manejo de agendas
+const updateManejarAgenda = async (valor) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el update
+    const resultado = await pool
+      .request()
+      .input("valor", sql.Int, valor)
+      .query("update ManejarAgendas set AceptarRechazar = @valor");
+    return {
+      codigo: 200,
+      mensaje: "Manejo de agendas actualizado correctamente",
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      codigo: 400,
+      mensaje: "Error al actualizar el manejo de agendas",
+    };
+  }
 };
 
 //Metodo para agregarle las fechas agendadas a los
@@ -2167,6 +2182,7 @@ const interfaz = {
   getIdCajaHoy,
   nuevaSalidaDinero,
   getDatosFormularioModificarAgenda,
+  updateManejarAgenda,
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar
