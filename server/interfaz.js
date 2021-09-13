@@ -26,7 +26,7 @@ const aceptarAgenda = async (id, horario) => {
         //Si la agenda esta aceptada devuelvo eso
         if (agenda.recordset[0].Aceptada) {
           let ret = {
-            codigo: 400,
+            codigo: 401,
             mensaje: "La agenda ya fue aceptada previamente",
           };
           return ret;
@@ -397,6 +397,28 @@ const agregarServiciosRetorno = async (listado) => {
   });
   return retorno;
 };
+//Agregar el manejo de agendas al array que devuelvo
+const agregarManejoAgendas = async (listado) => {
+  let retorno = getManejoAgendas().then((resultado) => {
+    //Armo el array entero con todo
+    let objetoRetorno = {
+      ...listado,
+      manejoAgenda: resultado,
+    };
+    return objetoRetorno;
+  });
+  return retorno;
+};
+//Metodo auxiliar para conseguir el manejo de agendas
+const getManejoAgendas = async () => {
+  //variable que tiene la conexion
+  const pool = await sql.connect(conexion);
+  //Consigo el listado de servicios
+  const manejoAgenda = await pool
+    .request()
+    .query("select * from ManejarAgendas");
+  return manejoAgenda.recordset[0];
+};
 //Conseguir datos para formularios
 const getDatosFormulario = async () => {
   let retorno = getEmpleadosFormulario()
@@ -412,7 +434,10 @@ const getDatosFormulario = async () => {
     .then((listadoCompleto) => {
       return agregarServiciosRetorno(listadoCompleto);
     })
-    .then((listadoConServicios) => listadoConServicios);
+    .then((listadoConServicios) => {
+      return agregarManejoAgendas(listadoConServicios);
+    })
+    .then((listadoCompleto) => listadoCompleto);
   return retorno;
 };
 
@@ -1151,7 +1176,7 @@ const eliminarServicioAgendaPorIdAgenda = async (idAgenda) => {
       .input("idAgenda", sql.Int, idAgenda)
       .query("delete from Agenda_Servicio where IdAgenda = @idAgenda");
     //Separo la cantidad de filas afectadas
-    const filasAfectadas = deleteAgendaServicio.rowsAffected;
+    const filasAfectadas = deleteAgendaServicio.rowsAffected[0];
     //Devuelvo la cantidad de filas afectadas
     return filasAfectadas;
   } catch (error) {
@@ -1336,7 +1361,8 @@ const nuevaEntradaDinero = async (
     const insertoEntradaDinero = insertarEntradaDinero(
       monto,
       cedula,
-      descripcion
+      descripcion,
+      pago.propina
     )
       .then((idEntrada) => {
         //Armo un listado para guardar todas las promesas que haya hecho
@@ -1423,7 +1449,7 @@ const nuevaEntradaDinero = async (
 };
 
 //Metodo auxiliar para hacer el insert en la tabla EntradaDinero
-const insertarEntradaDinero = async (monto, cedula, descripcion) => {
+const insertarEntradaDinero = async (monto, cedula, descripcion, propina) => {
   try {
     //Creo la conexion
     let pool = await sql.connect(conexion);
@@ -1435,8 +1461,9 @@ const insertarEntradaDinero = async (monto, cedula, descripcion) => {
       .input("monto", sql.Int, montoAinsertar)
       .input("cedula", sql.VarChar, cedula)
       .input("descripcion", sql.Char, descripcion)
+      .input("propina", sql.Int, propina)
       .query(
-        "insert into EntradaDinero(Cedula, Monto, Fecha, Descripcion) output inserted.IdEntrada values(@cedula, @monto, CAST(GETDATE() AS DATE), @descripcion)"
+        "insert into EntradaDinero(Cedula, Monto, Fecha, Descripcion, Propina) output inserted.IdEntrada values(@cedula, @monto, CAST(GETDATE() AS DATE), @descripcion, @propina)"
       );
     return insertEntradaDinero.recordset[0].IdEntrada;
   } catch (error) {
@@ -1995,6 +2022,14 @@ const insertarCajaSalida = async (idCaja, idSalida) => {
 //Metodo para cerrar la caja
 const cierreCaja = async () => {
   //Llamo al metodo que me devuelve el total de los efectivo
+
+
+
+
+
+
+
+
 };
 
 //Conseguir datos para formularios
@@ -2067,7 +2102,7 @@ const agregarFechasEmpleadosModificar = async (listadoEmpleados, idAgenda) => {
 //Metodo para agregar los horarios de las agendas al empleado
 //Me llega un empleado y le tengo que agregar los horarios a ese empleado
 //Devuelve una promesa
-const agregarHorariosEmpleadoModificar = async (listadoEmpleados) => {
+const agregarHorariosEmpleadoModificar = async (listadoEmpleados, idAgenda) => {
   try {
     //variable que tiene la conexion
     const pool = await sql.connect(conexion);
