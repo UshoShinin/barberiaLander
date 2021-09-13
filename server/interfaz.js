@@ -476,6 +476,19 @@ const getPreAgendas = async () => {
   return ret;
 };
 
+//Metodo para devolver los datos para el listado de preagendas
+const datosListadoPreagendas = async (listadoPreagendas) => {
+  try {
+    return getPreAgendas()
+      .then((listado) => {
+        return agregarManejoAgendas(listado);
+      })
+      .then((listadoPreagendas) => listadoPreagendas);
+  } catch (error) {
+    console.log();
+  }
+};
+
 //Conseguir los datos de una agenda por su id
 const getAgendaPorId = async (idAgenda) => {
   try {
@@ -2172,13 +2185,56 @@ const agregarHorariosEmpleadoModificar = async (listadoEmpleados, idAgenda) => {
   }
 };
 
+//Metodo para modificar stock de producto
+const modificarStockProducto = async (idProducto, cantidad) => {
+  try {
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo auxiliar para conseguir un producto por su id
+const getProductoPorId = async (idProducto) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el update
+    const producto = await pool
+      .request()
+      .input("idProducto", sql.Int, idProducto)
+      .query("select * from Producto where IdProducto = @idProducto");
+    return producto.rowsAffected[0];
+  } catch (error) {
+    console.log();
+  }
+};
+
+//Metodo auxiliar para modificar stock de un producto
+const updateStockProducto = async (idProducto, nuevaCantidad) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el update
+    const resultado = await pool
+      .request()
+      .input("idProducto", sql.Int, idProducto)
+      .input("cantidad", sql.Int, cantidad)
+      .query(
+        "update Producto set Stock = @cantidad where IdProducto = @idProducto"
+      );
+    return resultado.rowsAffected[0];
+  } catch (error) {
+    console.log();
+  }
+};
+
 //Creo un objeto que voy a exportar para usarlo desde el index.js
 //Adentro voy a tener todos los metodos de llamar a la base
 const interfaz = {
   getDatosFormulario,
   aceptarAgenda,
   getDatosListadoAgendas,
-  getPreAgendas,
+  datosListadoPreagendas,
   getAgendaPorId,
   verificarManejoAgenda,
   getAgendasAceptadas,

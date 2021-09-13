@@ -47,7 +47,7 @@ app.use("/listadoAgendas", (req, res) => {
 });
 
 app.use("/listadoPreAgendas", (req, res) => {
-  let ret = interfaz.getPreAgendas();
+  let ret = interfaz.datosListadoPreagendas();
   ret.then((resultado) => {
     res.json({
       mensaje: resultado,
