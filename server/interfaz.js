@@ -1413,8 +1413,8 @@ const nuevaEntradaDinero = async (
   listadoProductos,
   listadoServicios,
   descripcion,
-  idAgenda,
-  idHorario
+  idAgenda, //Si me llega -1 no tengo que borrar nada
+  idHorario // Si me llega -1 no tengo que borrar nada
 ) => {
   try {
     //Hago primero el insert en la tabla entrada
@@ -1599,7 +1599,7 @@ const insertarEntradaProducto = async (idEntrada, listadoProductos, monto) => {
     tabla.columns.add("Cantidad", sql.Int, { nullable: false });
     //Por cada producto que me llegue agrego una fila (row)
     listadoProductos.forEach((producto) => {
-      tabla.rows.add(idEntrada, producto.id, producto.cantidad);
+      tabla.rows.add(idEntrada, producto.id, producto.stock);
     });
     //Creo el request que voy a hacer
     const request = pool.request();
@@ -2397,7 +2397,7 @@ const verificarStockListadoProductos = async (listadoProductos) => {
     let listadoPromesas = [];
     listadoProductos.forEach((producto) => {
       listadoPromesas.push(
-        existeStockSuficiente(producto.id, producto.cantidad)
+        existeStockSuficiente(producto.id, producto.stock)
       );
     });
     return Promise.allSettled(listadoPromesas).then((resultados) => {
