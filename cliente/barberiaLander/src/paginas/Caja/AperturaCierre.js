@@ -142,7 +142,7 @@ const AperturaCierre = () => {
       productosVendidos,
       servicios,
       descripcion: null,
-      idAgenda:cajaState.comboAgenda.value,
+      idAgenda:agenda!==null?agenda.id:-1,
       idHorario:agenda!==null?agenda.idHorario:-1
     };
     return datosEnviar;
@@ -282,11 +282,16 @@ const AperturaCierre = () => {
             console.log(cajaState);
             const comboAgenda = cajaState.comboAgenda.value;
             const productos = cajaState.productosAgregados;
-            /* const data = {
+            const codcup = cajaState.codCuponera.value;
+            let monto = cajaState.cantidadMedios>1?cajaState.montoCuponera.value:cajaState.montoTotal.value;
+            monto = monto.length>0?parseInt(monto,10):0;
+            const data = {
               idAgenda: comboAgenda!==null?comboAgenda:-1,
               listadoProductos:productos.length>0?productos:-1,
-            } */
-            /* validarDatos(
+              ciCliente:codcup.length>0?codcup:-1,
+              monto:monto
+            }
+            validarDatos(
               {
                 url: "/verificarEntrada",
                 method: "POST",
@@ -294,7 +299,7 @@ const AperturaCierre = () => {
                 body: data,
               },
               getRespuestaSalida
-            ); */
+            );
             if (cajaState.cuponera.value) {
               const datosCuponera = {
                 cedula: cajaState.codCuponera.value,
@@ -316,7 +321,7 @@ const AperturaCierre = () => {
               );
             } else {
               console.log(EntradaDeDinero());
-              cobrarCaja(
+              /* cobrarCaja(
                 {
                   url: "/entradaCaja",
                   method: "POST",
@@ -324,7 +329,7 @@ const AperturaCierre = () => {
                   body: EntradaDeDinero(),
                 },
                 getRespuesta
-              );
+              ); */
             }
           }}
           rechazar={() => {
