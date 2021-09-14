@@ -777,7 +777,10 @@ const verificarManejoAgenda = async (agenda) => {
           fecha: agenda.fecha,
         });
         if (horarioDisponible) {
-          return crearSolicitudAgenda(agenda).then((resultado) => resultado);
+          let nuevaAgenda = { ...agenda, aceptada: manejoAgenda };
+          return crearSolicitudAgenda(nuevaAgenda).then(
+            (resultado) => resultado
+          );
         } else {
           return mensajeCrearAgenda({
             codigo: 400,
@@ -785,12 +788,14 @@ const verificarManejoAgenda = async (agenda) => {
           }).then((respuestaFinal) => respuestaFinal);
         }
       } else if (manejoAgenda === 0) {
-        const resultado_1 = await crearSolicitudAgenda(agenda);
+        let nuevaAgenda = { ...agenda, aceptada: manejoAgenda };
+        const resultado_1 = await crearSolicitudAgenda(nuevaAgenda);
         return resultado_1;
       } else {
         const res = await mensajeCrearAgenda({
           codigo: 400,
-          mensaje: "No se estan aceptado mas agendas. Por favor comunicarse con el local",
+          mensaje:
+            "No se estan aceptado mas agendas. Por favor comunicarse con el local",
         });
         return res;
       }
@@ -2269,11 +2274,48 @@ const updateStockProducto = async (idProducto, nuevaCantidad) => {
 const verificacionEntradaCaja = async (
   idAgenda,
   listadoProductos,
-  ciCliente
+  ciCliente,
+  monto
 ) => {
   try {
+    //Armo un listado de promesas
+    let listadoPromesas = [];
     //Aca llamo a los metodos en particular para verificar que exista cada cosa
-    //Ya hay un metodo que se llama existe cuponera
+    //Voy a llamar a todas las promesas y despues las voy a agregar a un listado al cual le hago Promise.all
+    if (idAgenda !== -1) {
+      const promesaAgenda = existeAgenda(idAgenda);
+      listadoPromesas.push(promesaAgenda);
+    }
+    if (listadoProductos !== -1) {
+      const promesaStock = verificarStockListadoProductos(listadoProductos);
+      listadoPromesas.push(promesaStock);
+    }
+    if (ciCliente !== -1) {
+      const promesaCuponera = existeSaldoClienteCuponera(ciCliente, monto);
+      listadoPromesas.push(promesaCuponera);
+    }
+    //Manejo todas las promesas
+    return Promise.allSettled(listadoPromesas).then((resultados) => {
+      let retorno = {};
+      resultados.forEach((promesa) => {
+        switch (promesa.promesa) {
+          case "Producto":
+            retorno = { ...retorno, producto: promesa.value };
+            break;
+
+          case "Cuponera":
+            retorno = { ...retorno, cuponera: promesa.value };
+            break;
+
+          case "Agenda":
+            retorno = { ...retorno, agenda: promesa.value };
+            break;
+          default:
+            break;
+        }
+      });
+      return retorno;
+    });
   } catch (error) {
     console.log(error);
   }
@@ -2290,9 +2332,40 @@ const existeAgenda = async (idAgenda) => {
       .input("idAgenda", sql.Int, idAgenda)
       .query("select * from Agenda where IdAgenda = @idAgenda");
     if (resultado.rowsAffected[0] < 1) {
-      return false;
+      return {
+        codigo: 400,
+        mensaje: "La agenda ya fue eliminada",
+        promesa: "Agenda",
+      };
     }
-    return true;
+    return { codigo: 200, mensaje: "", promesa: "Agenda" };
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo para verificar saldo y cliente de una cuponera
+const existeSaldoClienteCuponera = async (cedula, monto) => {
+  try {
+    return getCuponera(cedula).then((cuponera) => {
+      if (cuponera.rowsAffected[0] < 1) {
+        return {
+          codigo: 400,
+          mensaje: "No existe cuponera para ese cliente",
+          promesa: "Cuponera",
+        };
+      } else {
+        if (cuponera.recordsets[0].monto < monto) {
+          return {
+            codigo: 400,
+            mensaje: "Saldo insuficiente",
+            promesa: "Cuponera",
+          };
+        } else {
+          return { codigo: 200, mensaje: "" };
+        }
+      }
+    });
   } catch (error) {
     console.log(error);
   }
@@ -2309,23 +2382,41 @@ const existeStockSuficiente = async (idProducto, cantidad) => {
       .input("idProducto", sql.Int, idProducto)
       .query("select * from Producto where IdProducto = @idProducto");
     if (resultado.recordset[0].Stock < cantidad) {
-      return false;
+      return { codigo: 400, mensaje: "Stock insuficiente" };
     }
-    return true;
+    return { codigo: 200, mensaje: "" };
   } catch (error) {
     console.log(error);
   }
 };
 
-//Metodo para verificar saldo y cliente de una cuponera
-const existeSaldoClienteCuponera = async (cedula, monto) => {
+//Metodo para verificar si hay stock suficiente de todos los productos de un listado
+//Con que haya uno que al menos no tenga stock suficiente devuelve error
+//El listado de productos tiene objetos producto con idProducto y cantidad requerida
+const verificarStockListadoProductos = async (listadoProductos) => {
   try {
-    return getCuponera(cedula).then((cuponera) => {
-      if (cuponera.rowsAffected[0] < 1) {
-        return { codigo: 400, mensaje: "No existe cuponera para ese cliente" };
-      } else {
-        if (cuponera.recordsets[0].monto < monto) {
+    let listadoPromesas = [];
+    listadoProductos.forEach((producto) => {
+      listadoPromesas.push(
+        existeStockSuficiente(producto.id, producto.cantidad)
+      );
+    });
+    return Promise.allSettled(listadoPromesas).then((resultados) => {
+      let hayStock = true;
+      for (let i = 0; i < resultados.length; i++) {
+        if (resultados[i].value.codigo === 400) {
+          hayStock = false;
+          break;
         }
+      }
+      if (hayStock) {
+        return { codigo: 200, mensaje: "", promesa: "Producto" };
+      } else {
+        return {
+          codigo: 400,
+          mensaje: "Stock insuficiente",
+          promesa: "Producto",
+        };
       }
     });
   } catch (error) {
@@ -2359,6 +2450,7 @@ const interfaz = {
   getDatosFormularioModificarAgenda,
   updateManejarAgenda,
   verificarHorario,
+  verificacionEntradaCaja,
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar

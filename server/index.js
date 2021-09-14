@@ -104,8 +104,21 @@ app.delete("/eliminarAgenda", (req, res) => {
   });
 });
 
+app.post("/verificarEntrada", (req, res) => {
+  const ret = interfaz.verificacionEntradaCaja(
+    req.body.idAgenda,
+    req.body.listadoProductos,
+    req.body.ciCliente,
+    req.body.monto
+  );
+  ret.then((resultado) => {
+    res.json({
+      mensaje: resultado,
+    });
+  });
+});
+
 app.post("/entradaCaja", (req, res) => {
-  console.log(req.body);
   const ret = interfaz.nuevaEntradaDinero(
     req.body.idCaja,
     req.body.montoTotal,
