@@ -768,36 +768,35 @@ const insertarAgendaCliente = async (datosAgendaCliente) => {
 //Metodo que se va a usar para ver si insertamos la agenda con 0 o con 1 en aceptada
 const verificarManejoAgenda = async (agenda) => {
   try {
-    return getManejoAgendas().then(async (manejoAgenda) => {
+    return getManejoAgendas().then((manejoAgenda) => {
       if (manejoAgenda === 1) {
-        const horarioDisponible = await verificarHorario({
+        return verificarHorario({
           ciEmpleado: agenda.ciEmpleado,
           i: agenda.horario.i,
           f: agenda.horario.f,
           fecha: agenda.fecha,
+        }).then((horarioDisponible) => {
+          if (horarioDisponible) {
+            let nuevaAgenda = { ...agenda, aceptada: manejoAgenda };
+            return crearSolicitudAgenda(nuevaAgenda).then(
+              (resultado) => resultado
+            );
+          } else {
+            return mensajeCrearAgenda({
+              codigo: 400,
+              mensaje: "El horario ya fue ocupado",
+            }).then((respuestaFinal) => respuestaFinal);
+          }
         });
-        if (horarioDisponible) {
-          let nuevaAgenda = { ...agenda, aceptada: manejoAgenda };
-          return crearSolicitudAgenda(nuevaAgenda).then(
-            (resultado) => resultado
-          );
-        } else {
-          return mensajeCrearAgenda({
-            codigo: 400,
-            mensaje: "El horario ya fue ocupado",
-          }).then((respuestaFinal) => respuestaFinal);
-        }
       } else if (manejoAgenda === 0) {
         let nuevaAgenda = { ...agenda, aceptada: manejoAgenda };
-        const resultado_1 = await crearSolicitudAgenda(nuevaAgenda);
-        return resultado_1;
+        return crearSolicitudAgenda(nuevaAgenda).then((resultado) => resultado);
       } else {
-        const res = await mensajeCrearAgenda({
+        return mensajeCrearAgenda({
           codigo: 400,
           mensaje:
             "No se estan aceptado mas agendas. Por favor comunicarse con el local",
-        });
-        return res;
+        }).then((resultado) => resultado);
       }
     });
   } catch (error) {
