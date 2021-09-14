@@ -768,13 +768,14 @@ const insertarAgendaCliente = async (datosAgendaCliente) => {
 //Metodo que se va a usar para ver si insertamos la agenda con 0 o con 1 en aceptada
 const verificarManejoAgenda = async (agenda) => {
   try {
-    if (agenda.aceptada === 1) {
-      return verificarHorario({
-        ciEmpleado: agenda.ciEmpleado,
-        i: agenda.horario.i,
-        f: agenda.horario.f,
-        fecha: agenda.fecha,
-      }).then((horarioDisponible) => {
+    return getManejoAgendas().then(async (manejoAgenda) => {
+      if (manejoAgenda === 1) {
+        const horarioDisponible = await verificarHorario({
+          ciEmpleado: agenda.ciEmpleado,
+          i: agenda.horario.i,
+          f: agenda.horario.f,
+          fecha: agenda.fecha,
+        });
         if (horarioDisponible) {
           return crearSolicitudAgenda(agenda).then((resultado) => resultado);
         } else {
@@ -783,16 +784,17 @@ const verificarManejoAgenda = async (agenda) => {
             mensaje: "El horario ya fue ocupado",
           }).then((respuestaFinal) => respuestaFinal);
         }
-      });
-    } else if (agenda.aceptada === 0) {
-      return crearSolicitudAgenda(agenda).then((resultado) => resultado);
-    } else {
-      return mensajeCrearAgenda({
-        codigo: 400,
-        mensaje:
-          "No se estan aceptado mas agendas. Por favor comunicarse con el local",
-      }).then((res) => res);
-    }
+      } else if (manejoAgenda === 0) {
+        const resultado_1 = await crearSolicitudAgenda(agenda);
+        return resultado_1;
+      } else {
+        const res = await mensajeCrearAgenda({
+          codigo: 400,
+          mensaje: "No se estan aceptado mas agendas. Por favor comunicarse con el local",
+        });
+        return res;
+      }
+    });
   } catch (error) {
     console.log(error);
   }
