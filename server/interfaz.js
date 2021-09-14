@@ -777,7 +777,10 @@ const verificarManejoAgenda = async (agenda) => {
           fecha: agenda.fecha,
         }).then((horarioDisponible) => {
           if (horarioDisponible) {
-            let nuevaAgenda = { ...agenda, aceptada: manejoAgenda.AceptarRechazar };
+            let nuevaAgenda = {
+              ...agenda,
+              aceptada: manejoAgenda.AceptarRechazar,
+            };
             return crearSolicitudAgenda(nuevaAgenda).then(
               (resultado) => resultado
             );
@@ -1596,10 +1599,10 @@ const insertarEntradaProducto = async (idEntrada, listadoProductos, monto) => {
       nullable: false,
       primary: true,
     });
-    tabla.columns.add("Cantidad", sql.Int, { nullable: false });
+    tabla.columns.add("Cantidad", sql.Int, { nullable: true });
     //Por cada producto que me llegue agrego una fila (row)
     listadoProductos.forEach((producto) => {
-      tabla.rows.add(idEntrada, producto.id, producto.stock);
+      tabla.rows.add(idEntrada, producto.idProducto, producto.cantidad);
     });
     //Creo el request que voy a hacer
     const request = pool.request();
@@ -2086,6 +2089,23 @@ const insertarCajaSalida = async (idCaja, idSalida) => {
 //Metodo para cerrar la caja
 const cierreCaja = async () => {
   //Llamo al metodo que me devuelve el total de los efectivo
+  /**
+   *
+   *
+   *
+   *
+   * 
+   * 
+   * 
+   * 
+   * 
+   * 
+   * 
+   *
+   *
+   *
+   */
+  //Esto hay que hacerlo que todavia no lo hice
 };
 
 //Conseguir datos para formularios
@@ -2225,6 +2245,23 @@ const agregarHorariosEmpleadoModificar = async (listadoEmpleados, idAgenda) => {
 //Metodo para modificar stock de producto
 const modificarStockProducto = async (idProducto, cantidad) => {
   try {
+
+    /**
+     * 
+     * 
+     * 
+     * 
+     * 
+     * 
+     * 
+     * 
+     * 
+     * 
+     * 
+     * 
+     * 
+     * 
+     */
   } catch (error) {
     console.log(error);
   }
@@ -2294,27 +2331,30 @@ const verificacionEntradaCaja = async (
       listadoPromesas.push(promesaCuponera);
     }
     //Manejo todas las promesas
-    return Promise.allSettled(listadoPromesas).then((resultados) => {
-      let retorno = {};
-      resultados.forEach((promesa) => {
-        switch (promesa.promesa) {
-          case "Producto":
-            retorno = { ...retorno, producto: promesa.value };
-            break;
+    return Promise.allSettled(listadoPromesas)
+      .then((resultados) => {
+        let retorno = {};
+        resultados.forEach((promesa) => {
+          switch (promesa.value.promesa) {
+            case "Producto":
+              retorno = { ...retorno, producto: promesa.value };
+              break;
 
-          case "Cuponera":
-            retorno = { ...retorno, cuponera: promesa.value };
-            break;
+            case "Cuponera":
+              retorno = { ...retorno, cuponera: promesa.value };
+              break;
 
-          case "Agenda":
-            retorno = { ...retorno, agenda: promesa.value };
-            break;
-          default:
-            break;
-        }
-      });
-      return retorno;
-    });
+            case "Agenda":
+              retorno = { ...retorno, agenda: promesa.value };
+              break;
+            default:
+              break;
+          }
+        });
+        console.log(retorno);
+        return retorno;
+      })
+      .then((retorno) => retorno);
   } catch (error) {
     console.log(error);
   }
@@ -2361,7 +2401,7 @@ const existeSaldoClienteCuponera = async (cedula, monto) => {
             promesa: "Cuponera",
           };
         } else {
-          return { codigo: 200, mensaje: "" };
+          return { codigo: 200, mensaje: "", promesa: "Cuponera" };
         }
       }
     });
@@ -2396,9 +2436,7 @@ const verificarStockListadoProductos = async (listadoProductos) => {
   try {
     let listadoPromesas = [];
     listadoProductos.forEach((producto) => {
-      listadoPromesas.push(
-        existeStockSuficiente(producto.id, producto.stock)
-      );
+      listadoPromesas.push(existeStockSuficiente(producto.id, producto.stock));
     });
     return Promise.allSettled(listadoPromesas).then((resultados) => {
       let hayStock = true;
