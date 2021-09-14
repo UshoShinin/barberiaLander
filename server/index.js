@@ -113,7 +113,9 @@ app.post("/entradaCaja", (req, res) => {
     req.body.ciEmpleado,
     req.body.productosVendidos,
     req.body.servicios,
-    req.body.descripcion
+    req.body.descripcion,
+    req.body.idAgenda,
+    req.body.idHorario
   );
   ret.then((resultado) => {
     res.json({

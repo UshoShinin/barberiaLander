@@ -420,7 +420,7 @@ const getManejoAgendas = async () => {
 };
 //Conseguir datos para formularios
 const getDatosFormulario = async () => {
-  let retorno = getEmpleadosFormulario()
+  return getEmpleadosFormulario()
     .then((listadoEmpleados) => {
       return agregarDuracionEmpleados(listadoEmpleados);
     })
@@ -437,7 +437,6 @@ const getDatosFormulario = async () => {
       return agregarManejoAgendas(listadoConServicios);
     })
     .then((listadoCompleto) => listadoCompleto);
-  return retorno;
 };
 
 //Conseguir datos de todas las pre agendas
@@ -782,8 +781,14 @@ const verificarManejoAgenda = async (agenda) => {
           return { codigo: 400, mensaje: "El horario ya fue ocupado" };
         }
       });
-    } else {
+    } else if (agenda.aceptada === 0) {
       return crearSolicitudAgenda(agenda).then((resultado) => resultado);
+    } else {
+      return {
+        codigo: 400,
+        mensaje:
+          "No se estan aceptado mas agendas. Por favor comunicarse con el local",
+      };
     }
   } catch (error) {
     console.log(error);
@@ -833,9 +838,24 @@ const crearSolicitudAgenda = async (agenda) => {
         return { codigo: 400, mensaje: "Error al insertar agenda" };
       }
     })
+    .then((respuestaEntera) => {
+      return mensajeCrearAgenda(respuestaEntera);
+    })
+    .then((resultado) => resultado)
     .catch((error) => {
       return error;
     });
+};
+
+//Metodo auxiliar para devolver un mensaje al crear la agenda y mandar los datos de nuevo
+const mensajeCrearAgenda = async (mensajeCrear) => {
+  try {
+    return getDatosFormulario().then((datosFormulario) => {
+      return { ...mensajeCrear, datos: datosFormulario };
+    });
+  } catch (error) {
+    console.log();
+  }
 };
 
 //Metodo auxiliar para conseguir todas las agendas aceptadas
@@ -1383,7 +1403,9 @@ const nuevaEntradaDinero = async (
   cedula,
   listadoProductos,
   listadoServicios,
-  descripcion
+  descripcion,
+  idAgenda,
+  idHorario
 ) => {
   try {
     //Hago primero el insert en la tabla entrada
@@ -1770,7 +1792,9 @@ const modificarSaldoCuponera = async (cedula, monto) => {
         if (nuevoSaldo < 0) {
           return {
             codigo: 400,
-            mensaje: "La cuponera no posee montos suficientes",
+            mensaje:
+              "La cuponera no posee montos suficientes. Saldo actual: $" +
+              resultado.recordset[0].monto,
           };
         } else {
           //Hago la modificacion del saldo
@@ -1790,7 +1814,11 @@ const modificarSaldoCuponera = async (cedula, monto) => {
               mensaje: "Error al modificar saldo de cuponera",
             };
           } else {
-            return { codigo: 200, mensaje: "Saldo modificado correctamente" };
+            return {
+              codigo: 200,
+              mensaje: "Saldo modificado correctamente",
+              saldoAnterior: resultado.recordset[0].monto,
+            };
           }
         }
       }
@@ -2225,6 +2253,78 @@ const updateStockProducto = async (idProducto, nuevaCantidad) => {
     return resultado.rowsAffected[0];
   } catch (error) {
     console.log();
+  }
+};
+
+//Metodo para controlar cosas antes de la entrada de dinero
+//Se va a verificar que la agenda a eliminar exista, que haya saldo suficiente en la cuponera y haya stock suficiente de los articulos
+//El listado de productos tiene id del producto y cantidad
+//Los parametros pueden o no venir todos. Si no vienen, me mandan -1
+//Yo devuelvo null en caso de que alguno no corresponda
+const verificacionEntradaCaja = async (
+  idAgenda,
+  listadoProductos,
+  ciCliente
+) => {
+  try {
+    //Aca llamo a los metodos en particular para verificar que exista cada cosa
+    //Ya hay un metodo que se llama existe cuponera
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo para ver si existe la agenda
+const existeAgenda = async (idAgenda) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el select
+    const resultado = await pool
+      .request()
+      .input("idAgenda", sql.Int, idAgenda)
+      .query("select * from Agenda where IdAgenda = @idAgenda");
+    if (resultado.rowsAffected[0] < 1) {
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo para ver si hay stock suficiente para ese producto
+const existeStockSuficiente = async (idProducto, cantidad) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el select
+    const resultado = await pool
+      .request()
+      .input("idProducto", sql.Int, idProducto)
+      .query("select * from Producto where IdProducto = @idProducto");
+    if (resultado.recordset[0].Stock < cantidad) {
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo para verificar saldo y cliente de una cuponera
+const existeSaldoClienteCuponera = async (cedula, monto) => {
+  try {
+    return getCuponera(cedula).then((cuponera) => {
+      if (cuponera.rowsAffected[0] < 1) {
+        return { codigo: 400, mensaje: "No existe cuponera para ese cliente" };
+      } else {
+        if (cuponera.recordsets[0].monto < monto) {
+        }
+      }
+    });
+  } catch (error) {
+    console.log(error);
   }
 };
 
