@@ -17,7 +17,7 @@ import CheckBoxAgenda from "./CheckBoxAgenda";
 import useDayGenerator from "../../../hooks/useDayGenerator";
 import { getElementById } from "../../../FuncionesAuxiliares/FuncionesAuxiliares";
 
-import { inputReducer } from "./ReduerFormularioAgenda";
+
 import ComboBox from "../../../components/ComboBox/ComboBox";
 
 import {
@@ -28,10 +28,8 @@ import {
 } from "../../../components/Calendario/FuncionesAuxiliares";
 import AuthContext from "../../../store/AuthContext";
 const FormularioAgenda = (props) => {
-  const [inputState, dispatchInput] = useReducer(
-    inputReducer,
-    props.initialState
-  );
+  const inputState = props.inputState;
+  const dispatchInput = props.dispatchInput;
   const nombreRef = useRef();
   const telefonoRef = useRef();
   const descripcionRef = useRef();
@@ -117,7 +115,6 @@ const FormularioAgenda = (props) => {
         inputState.ComboBox.title.length < 5
           ? "0" + inputState.ComboBox.title
           : inputState.ComboBox.title;
-      console.log(tiempoNecesario);
       const fin = transformNumberString(
         minutosAHorarios(
           horarioEnMinutos(transformStringNumber(inicio)) + timeNeed
@@ -129,6 +126,7 @@ const FormularioAgenda = (props) => {
         const user = authCtx.user;
         //Crear
         datosAgenda = {
+          aceptada: inputState.manejoAgenda,
           ciCliente: user === null ? "-1" : user.ci,
           nombreCliente: inputState.Nombre.value,
           telefono: inputState.Telefono.value,
@@ -141,7 +139,7 @@ const FormularioAgenda = (props) => {
           }`,
           horario: { i: inicio, f: fin },
         };
-        console.log(datosAgenda);
+
         props.onSaveDatosAgenda(datosAgenda);
       } else {
         //Modificar
@@ -406,10 +404,10 @@ const FormularioAgenda = (props) => {
                 <label htmlFor="3">Descripción:</label>
               </div>
               <TextArea ref={descripcionRef} isValid={null} input={INPUTS[2]} />
-              {inputState.problema !== -1 && (
-                <p>{inputState.problemas[inputState.problema].pro}</p>
-              )}
             </div>
+            {inputState.problema !== -1 && (
+              <p>{inputState.problemas[inputState.problema].pro}</p>
+            )}
             {/* <InputFile
               input={INPUTS[3]}
               label="Seleccione una foto de referencia"

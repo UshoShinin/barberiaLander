@@ -9,6 +9,7 @@ import Visualizador from "./Visualizador/Visualizador";
 import CrearAgenda from "../CrearAgenda";
 import AuthContext from "../../../store/AuthContext";
 import { useHistory } from "react-router-dom";
+import SimpleNote from '../../../components/UI/Note/SimpleNote';
 const initialState = { aceptar: false, rechazar: false };
 
 const reducerChecks = (state, action) => {
@@ -30,11 +31,17 @@ const PreAgendas = () => {
   const [checks, dispatchChecks] = useReducer(reducerChecks, initialState);
   const authCtx = useContext(AuthContext);
   const obtenerAgendas = (agendas) => {
+    let manejo = agendas.mensaje.manejoAgenda.AceptarRechazar;
     let misAgendas = [];
     agendas.mensaje.preAgendas.forEach((agenda) => {
       misAgendas.push({ ...agenda, fecha: agenda.fecha.slice(0, 10) });
     });
     setAgendasState(misAgendas);
+    if(manejo===1){
+      dispatchChecks({type:'ACEPTAR'});
+    }else if(manejo===-1){
+      dispatchChecks({type:'RECHAZAR'});
+    }
   };
 
   const getRespuesta = (res) => {

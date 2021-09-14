@@ -769,7 +769,7 @@ const insertarAgendaCliente = async (datosAgendaCliente) => {
 const verificarManejoAgenda = async (agenda) => {
   try {
     return getManejoAgendas().then((manejoAgenda) => {
-      if (manejoAgenda === 1) {
+      if (manejoAgenda.AceptarRechazar === 1) {
         return verificarHorario({
           ciEmpleado: agenda.ciEmpleado,
           i: agenda.horario.i,
@@ -777,7 +777,7 @@ const verificarManejoAgenda = async (agenda) => {
           fecha: agenda.fecha,
         }).then((horarioDisponible) => {
           if (horarioDisponible) {
-            let nuevaAgenda = { ...agenda, aceptada: manejoAgenda };
+            let nuevaAgenda = { ...agenda, aceptada: manejoAgenda.AceptarRechazar };
             return crearSolicitudAgenda(nuevaAgenda).then(
               (resultado) => resultado
             );
@@ -788,8 +788,8 @@ const verificarManejoAgenda = async (agenda) => {
             }).then((respuestaFinal) => respuestaFinal);
           }
         });
-      } else if (manejoAgenda === 0) {
-        let nuevaAgenda = { ...agenda, aceptada: manejoAgenda };
+      } else if (manejoAgenda.AceptarRechazar === 0) {
+        let nuevaAgenda = { ...agenda, aceptada: manejoAgenda.AceptarRechazar };
         return crearSolicitudAgenda(nuevaAgenda).then((resultado) => resultado);
       } else {
         return mensajeCrearAgenda({

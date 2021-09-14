@@ -12,6 +12,9 @@
   bottom: 35px;
   right: 35px;
   z-index: 800;
+  text-align: center;
+  justify-content: center;
+  display: flex;
   transition: all 160ms linear;
 }
 
@@ -25,7 +28,7 @@
   top:10px;
 }
 .Note>.text>p{
-  font-size: 1.2em;
+  font-size: 1.5em;
 }
 .NoteOpen {
   animation: openNote 0.16s linear forwards;
@@ -112,6 +115,6 @@
     text-align: right;
   }
   .Note>.text>p{
-    font-size: 1em;
+    font-size: 1.2em;
   }
 }

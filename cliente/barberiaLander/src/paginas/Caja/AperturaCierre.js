@@ -84,7 +84,6 @@ const AperturaCierre = () => {
   const getRespuesta = (res) => {
     console.log(res);
   };
-
   const EntradaDeDinero = () => {
     let montoE = 0;
     let montoD = 0;
@@ -142,6 +141,8 @@ const AperturaCierre = () => {
       productosVendidos,
       servicios,
       descripcion: null,
+      idAgenda:cajaState.comboAgenda.value,
+      idHorario:agenda.idHorario
     };
     return datosEnviar;
   };
@@ -287,7 +288,6 @@ const AperturaCierre = () => {
                   10
                 ),
               };
-              console.log(datosCuponera);
               modificarCuponera(
                 {
                   url: "/modificarSaldoCuponera",
@@ -299,7 +299,7 @@ const AperturaCierre = () => {
               );
             } else {
               console.log(EntradaDeDinero());
-              cobrarCaja(
+              /* cobrarCaja(
                 {
                   url: "/entradaCaja",
                   method: "POST",
@@ -307,7 +307,7 @@ const AperturaCierre = () => {
                   body: EntradaDeDinero(),
                 },
                 getRespuesta
-              );
+              ); */
             }
           }}
           rechazar={() => {

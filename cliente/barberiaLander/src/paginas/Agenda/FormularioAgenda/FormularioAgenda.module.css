@@ -5,6 +5,10 @@
   width: 100%;
   align-items: center;
 }
+.Inputs>p{
+  color: var(--clr-neon-white);
+  margin-top: 10px;
+}
 .inputsGrid {
   width: 100%;
   display: grid;

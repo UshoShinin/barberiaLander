@@ -48,7 +48,7 @@
   align-items: center;
 }
 
-/* @media (max-width: 990px) {
+@media (max-width: 990px) {
   .NavBar .navMobile {
     display: flex;
     align-items: center;
@@ -57,7 +57,7 @@
   .NavBar .navPc {
     display: none;
   }
-} */
+}
 .hamburger,
 .hamburgerActive {
   color: var(--clr-neon-blue);

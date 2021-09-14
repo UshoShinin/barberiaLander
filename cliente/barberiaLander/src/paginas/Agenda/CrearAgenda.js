@@ -1,10 +1,14 @@
 import FormularioAgenda from "./FormularioAgenda/FormularioAgenda";
+import { useHistory } from "react-router-dom";
 import NormalCard from "../../components/UI/Card/NormalCard";
 import useHttp from "../../hooks/useHttp";
-import { useState, useEffect, useContext, useCallback } from "react";
+import classes from './CrearAgenda.module.css';
+import { useState, useEffect, useContext, useReducer } from "react";
 import LoaddingSpinner from "../../components/LoaddingSpinner/LoaddingSpinner";
 import AuthContext from "../../store/AuthContext";
 import { getElementById } from "../../FuncionesAuxiliares/FuncionesAuxiliares";
+import Modal from "../../components/UI/Modal/Modal";
+import Note from "../../components/UI/Note/Note";
 import {
   horariosAgendarDisponibles,
   obtenerHorariosDeDia,
@@ -13,13 +17,14 @@ import {
   calcularTiempo,
   transformNumberString,
 } from "../../components/Calendario/FuncionesAuxiliares";
-const getRespuesta = (res) => {
-  console.log(res);
-};
+import { inputReducer } from "./FormularioAgenda/ReduerFormularioAgenda";
+
 const CrearAgenda = (props) => {
+  const history = useHistory();
   const authCtx = useContext(AuthContext);
-  console.log("Running Crear Agenda");
   let initialState = {
+    Mensaje: { show: false, text: "" },
+    manejoAgenda: 0,
     Nombre: { value: "", isValid: null },
     Horarios: null,
     HorariosFiltrados: null,
@@ -47,44 +52,16 @@ const CrearAgenda = (props) => {
       { id: 2, pro: "" },
     ],
   };
-  const [stateAgenda, setStateAgenda] = useState(initialState);
-  const mandarAgenda = useHttp();
-  const mandarAgendaModificar = useHttp();
-
-  const guardarDatosAgendaHandler = (enteredDatosAgenda) => {
-    mandarAgenda(
-      {
-        url: "/crearAgenda",
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: enteredDatosAgenda,
-      },
-      getRespuesta
-    );
-  };
-  const modificarDatosAgendaHandler = (enteredDatosAgenda) => {
-    mandarAgendaModificar(
-      {
-        url: "/modificarAgenda",
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: enteredDatosAgenda,
-      },
-      getRespuesta
-    );
-  };
-
-  /* Carga inicial de datos */
-  const misServicios = initialState.servicios;
-  const agenda = props.agenda;
-  const obtenerHorarios = (horarios) => {
+  const [inputState, dispatchInput] = useReducer(inputReducer, initialState);
+  const armadoDeDatos = (horarios, empleados, manejoAgenda) => {
+    let miManejoAgenda =
+      manejoAgenda !== undefined ? manejoAgenda.AceptarRechazar : 0;
     let nombre;
     let telefono;
     let ciCliente;
     let servicios = { ...misServicios };
     let Calendario = { value: null, dia: null };
     let descripcion = { value: "", isValid: null };
-    let empleados = horarios.mensaje.empleados;
     let comboBox = { value: null, active: false, title: "" };
     let id = 1;
     if (agenda !== null) {
@@ -137,26 +114,95 @@ const CrearAgenda = (props) => {
         ciCliente = authCtx.user.ciUsuario;
       }
     }
-    setStateAgenda((prev) => {
-      return {
-        ...prev,
-        Nombre: { ...nombre },
-        Telefono: { ...telefono },
-        Descripcion: { ...descripcion },
+    return {
+      manejoAgenda: miManejoAgenda,
+      Nombre: { ...nombre },
+      Telefono: { ...telefono },
+      Descripcion: { ...descripcion },
+      Horarios: [...empleados],
+      HorariosFiltrados: [...empleados],
+      Employee: {
+        value:
+          initialState.Employee.value === null
+            ? horarios.mensaje.empleados[0].id
+            : initialState.Employee.value,
+      },
+      servicios: { ...servicios },
+      Calendario: { ...Calendario },
+      ComboBox: { ...comboBox },
+      ciCliente: ciCliente,
+    };
+  };
+
+  const getRespuesta = (res) => {
+    console.log(res);
+    const datos = res.mensaje.datos;
+    const empleados = datos.empleados;
+    let misDatos;
+    if (res.mensaje.codigo === 400) {
+      misDatos = {
         Horarios: [...empleados],
         HorariosFiltrados: [...empleados],
-        Employee: {
-          value:
-            prev.Employee.value === null
-              ? horarios.mensaje.empleados[0].id
-              : prev.Employee.value,
-        },
-        servicios: { ...servicios },
-        Calendario: { ...Calendario },
-        ComboBox: { ...comboBox },
-        ciCliente: ciCliente,
       };
+    } else {
+      misDatos = { ...armadoDeDatos(datos, empleados) };
+    }
+    dispatchInput({
+      type: "RESET",
+      payload:misDatos,
+      value: res.mensaje.mensaje,
     });
+    /* dispatchMensaje({
+      type: "SHOW_MENSAJE",
+      value: res.mensaje.mensaje,
+      payload: datos,
+    }); */
+  };
+
+  const mandarAgenda = useHttp();
+  const mandarAgendaModificar = useHttp();
+
+  const guardarDatosAgendaHandler = (enteredDatosAgenda) => {
+    console.log(enteredDatosAgenda);
+    mandarAgenda(
+      {
+        url: "/crearAgenda",
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: enteredDatosAgenda,
+      },
+      getRespuesta
+    );
+  };
+  const modificarDatosAgendaHandler = (enteredDatosAgenda) => {
+    mandarAgendaModificar(
+      {
+        url: "/modificarAgenda",
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: enteredDatosAgenda,
+      },
+      getRespuesta
+    );
+  };
+
+  /* Carga inicial de datos */
+  const misServicios = initialState.servicios;
+  const agenda = props.agenda;
+  const obtenerHorarios = (horarios) => {
+    let manejoAgenda = horarios.mensaje.manejoAgenda;
+    if (
+      agenda === null &&
+      manejoAgenda !== undefined &&
+      manejoAgenda.AceptarRechazar === -1
+    ) {
+      dispatchInput({ type: "MANEJO_AGENDAS", value: -1 });
+    } else {
+      dispatchInput({
+        type: "CARGAR_DATOS",
+        payload: armadoDeDatos(horarios, horarios.mensaje.empleados,manejoAgenda),
+      });
+    }
   };
   const fetchHorarios = useHttp();
 
@@ -174,25 +220,44 @@ const CrearAgenda = (props) => {
     }
   }, []);
   return (
-    <div className="nuevaAgenda">
-      <NormalCard>
-        {stateAgenda.Horarios === null && <LoaddingSpinner />}
-        {stateAgenda.Horarios !== null && (
-          <FormularioAgenda
-            onSaveDatosAgenda={guardarDatosAgendaHandler}
-            onUpdateDatosAgenda={modificarDatosAgendaHandler}
-            agenda={
-              props.agenda !== null
-                ? {
-                    idagenda: props.agenda.idagenda,
-                    idHorario: props.agenda.idHorario,
-                  }
-                : null
-            }
-            initialState={stateAgenda}
-          />
-        )}
-      </NormalCard>
+    <div className={classes.nuevaAgenda}>
+      <Note
+        show={inputState.Mensaje.show}
+        onClose={() => {
+          dispatchInput({ type: "HIDE_MENSAJE" });
+        }}
+      >
+        {inputState.Mensaje.text}
+      </Note>
+      <Modal
+        closed={() => {
+          history.replace("/");
+        }}
+        show={inputState === -1}
+      >
+        <h1>No se aceptan reservas por el momento</h1>
+      </Modal>
+      {inputState !== -1 && (
+        <NormalCard>
+          {inputState.Horarios === null && <LoaddingSpinner />}
+          {inputState.Horarios !== null && (
+            <FormularioAgenda
+              onSaveDatosAgenda={guardarDatosAgendaHandler}
+              onUpdateDatosAgenda={modificarDatosAgendaHandler}
+              agenda={
+                props.agenda !== null
+                  ? {
+                      idagenda: props.agenda.idagenda,
+                      idHorario: props.agenda.idHorario,
+                    }
+                  : null
+              }
+              inputState={inputState}
+              dispatchInput={dispatchInput}
+            />
+          )}
+        </NormalCard>
+      )}
     </div>
   );
 };
