@@ -128,9 +128,9 @@ const AperturaCierre = () => {
     const datosEnviar = {
       idCaja: cajaState.idCaja,
       fecha: cajaState.fecha,
-      ciEmpleado: agenda!==null?cajaState.sinAgendar.value
+      ciEmpleado: cajaState.sinAgendar.value
         ? cajaState.comboAgenda.value
-        : agenda.empleado:-1,
+        : agenda.empleado,
       montoTotal: cajaState.montoTotal.value,
       pago: {
         numeroTicket: cajaState.ticketDebito.value,
