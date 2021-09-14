@@ -38,7 +38,6 @@ export const inputReducer = (state, action) => {
     case "CARGAR_DATOS":
       return { ...state, ...action.payload };
     case "RESET":
-      console.log(action.value);
       return { ...state, ...action.payload,Mensaje: { show: true, text: action.value }};
     case "MANEJO_AGENDAS":
       return { ...state, manejoAgenda: action.value };

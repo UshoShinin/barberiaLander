@@ -3,11 +3,12 @@ import { useHistory } from "react-router-dom";
 import NormalCard from "../../components/UI/Card/NormalCard";
 import useHttp from "../../hooks/useHttp";
 import classes from './CrearAgenda.module.css';
-import { useState, useEffect, useContext, useReducer } from "react";
+import { useEffect, useContext, useReducer } from "react";
 import LoaddingSpinner from "../../components/LoaddingSpinner/LoaddingSpinner";
 import AuthContext from "../../store/AuthContext";
 import { getElementById } from "../../FuncionesAuxiliares/FuncionesAuxiliares";
 import Modal from "../../components/UI/Modal/Modal";
+import Marco from '../../components/UI/Marco/Marco';
 import Note from "../../components/UI/Note/Note";
 import {
   horariosAgendarDisponibles,
@@ -158,11 +159,6 @@ const CrearAgenda = (props) => {
       payload:misDatos,
       value: res.mensaje.mensaje,
     });
-    /* dispatchMensaje({
-      type: "SHOW_MENSAJE",
-      value: res.mensaje.mensaje,
-      payload: datos,
-    }); */
   };
 
   const mandarAgenda = useHttp();
@@ -225,7 +221,7 @@ const CrearAgenda = (props) => {
     }
   }, []);
   return (
-    <div className={classes.nuevaAgenda}>
+    <Marco className={classes.nuevaAgenda}>
       <Note
         show={inputState.Mensaje.show}
         onClose={() => {
@@ -263,7 +259,7 @@ const CrearAgenda = (props) => {
           )}
         </NormalCard>
       )}
-    </div>
+    </Marco>
   );
 };
 

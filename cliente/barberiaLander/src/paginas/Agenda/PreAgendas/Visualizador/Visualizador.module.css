@@ -59,9 +59,9 @@
   max-height: 80%;
   border-radius: 20px;
 }
-
+/* 
 @media (max-width:900px) {
   .container{
     display: none;
   }
-}
+} */

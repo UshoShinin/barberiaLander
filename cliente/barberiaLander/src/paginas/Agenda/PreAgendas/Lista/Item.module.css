@@ -62,3 +62,19 @@
 .item + .item {
   margin-top: 0.5em;
 }
+
+@media (max-width:900px){
+  .contentBotones {
+    grid-template-areas:
+      "accept deny";
+  }
+  .accept{
+    grid-area: accept;
+  }
+  .deny{
+    grid-area: deny;
+  }
+  .info{
+    display: none;
+  }
+}
