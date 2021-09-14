@@ -778,17 +778,20 @@ const verificarManejoAgenda = async (agenda) => {
         if (horarioDisponible) {
           return crearSolicitudAgenda(agenda).then((resultado) => resultado);
         } else {
-          return { codigo: 400, mensaje: "El horario ya fue ocupado" };
+          return mensajeCrearAgenda({
+            codigo: 400,
+            mensaje: "El horario ya fue ocupado",
+          }).then((respuestaFinal) => respuestaFinal);
         }
       });
     } else if (agenda.aceptada === 0) {
       return crearSolicitudAgenda(agenda).then((resultado) => resultado);
     } else {
-      return {
+      return mensajeCrearAgenda({
         codigo: 400,
         mensaje:
           "No se estan aceptado mas agendas. Por favor comunicarse con el local",
-      };
+      }).then((res) => res);
     }
   } catch (error) {
     console.log(error);
