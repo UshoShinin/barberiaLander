@@ -114,24 +114,30 @@ const CrearAgenda = (props) => {
         ciCliente = authCtx.user.ciUsuario;
       }
     }
-    return {
+    console.log(initialState);
+    console.log(horarios);
+    const empoooo = {
+      value:
+        initialState.Employee.value === null
+          ? empleados[0].id
+          : initialState.Employee.value,
+    }
+    
+    const datitos = {
       manejoAgenda: miManejoAgenda,
       Nombre: { ...nombre },
       Telefono: { ...telefono },
       Descripcion: { ...descripcion },
       Horarios: [...empleados],
       HorariosFiltrados: [...empleados],
-      Employee: {
-        value:
-          initialState.Employee.value === null
-            ? horarios.mensaje.empleados[0].id
-            : initialState.Employee.value,
-      },
+      Employee:{...empoooo},
       servicios: { ...servicios },
       Calendario: { ...Calendario },
       ComboBox: { ...comboBox },
       ciCliente: ciCliente,
     };
+    console.log(datitos);
+    return datitos;
   };
 
   const getRespuesta = (res) => {
@@ -145,7 +151,7 @@ const CrearAgenda = (props) => {
         HorariosFiltrados: [...empleados],
       };
     } else {
-      misDatos = { ...armadoDeDatos(datos, empleados) };
+      misDatos = { ...armadoDeDatos(datos, empleados)};
     }
     dispatchInput({
       type: "RESET",
@@ -163,7 +169,6 @@ const CrearAgenda = (props) => {
   const mandarAgendaModificar = useHttp();
 
   const guardarDatosAgendaHandler = (enteredDatosAgenda) => {
-    console.log(enteredDatosAgenda);
     mandarAgenda(
       {
         url: "/crearAgenda",

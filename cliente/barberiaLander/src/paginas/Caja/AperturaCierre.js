@@ -44,6 +44,7 @@ const AperturaCierre = () => {
   const abrirCaja = useHttp();
   const fetchAgendas = useHttp();
   const salidaDinero = useHttp();
+  const validarDatos = useHttp();
   const getRespuestaSalida = (res) => {
     console.log(res);
   };
@@ -127,9 +128,9 @@ const AperturaCierre = () => {
     const datosEnviar = {
       idCaja: cajaState.idCaja,
       fecha: cajaState.fecha,
-      ciEmpleado: cajaState.sinAgendar.value
+      ciEmpleado: agenda!==null?cajaState.sinAgendar.value
         ? cajaState.comboAgenda.value
-        : agenda.empleado,
+        : agenda.empleado:-1,
       montoTotal: cajaState.montoTotal.value,
       pago: {
         numeroTicket: cajaState.ticketDebito.value,
@@ -142,7 +143,7 @@ const AperturaCierre = () => {
       servicios,
       descripcion: null,
       idAgenda:cajaState.comboAgenda.value,
-      idHorario:agenda.idHorario
+      idHorario:agenda!==null?agenda.idHorario:-1
     };
     return datosEnviar;
   };
@@ -278,6 +279,22 @@ const AperturaCierre = () => {
           show={cajaState.jornal.show}
           aceptar={() => {
             dispatchCaja({ type: "HIDE_JORNAL" });
+            console.log(cajaState);
+            const comboAgenda = cajaState.comboAgenda.value;
+            const productos = cajaState.productosAgregados;
+            /* const data = {
+              idAgenda: comboAgenda!==null?comboAgenda:-1,
+              listadoProductos:productos.length>0?productos:-1,
+            } */
+            /* validarDatos(
+              {
+                url: "/verificarEntrada",
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: data,
+              },
+              getRespuestaSalida
+            ); */
             if (cajaState.cuponera.value) {
               const datosCuponera = {
                 cedula: cajaState.codCuponera.value,
@@ -299,7 +316,7 @@ const AperturaCierre = () => {
               );
             } else {
               console.log(EntradaDeDinero());
-              /* cobrarCaja(
+              cobrarCaja(
                 {
                   url: "/entradaCaja",
                   method: "POST",
@@ -307,7 +324,7 @@ const AperturaCierre = () => {
                   body: EntradaDeDinero(),
                 },
                 getRespuesta
-              ); */
+              );
             }
           }}
           rechazar={() => {
