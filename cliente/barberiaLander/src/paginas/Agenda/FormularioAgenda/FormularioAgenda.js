@@ -11,7 +11,7 @@ import Input from "../../../components/UI/Input/Input";
 import TextArea from "../../../components/UI/TextArea/TextArea";
 import Calendario from "../../../components/Calendario/Calendario";
 import { calcularTiempo } from "../../../components/Calendario/FuncionesAuxiliares";
-
+import { cargarHorariosEnMinutos } from "../../../components/Calendario/FuncionesAuxiliares";
 import CheckBoxAgenda from "./CheckBoxAgenda";
 import useDayGenerator from "../../../hooks/useDayGenerator";
 import { getElementById } from "../../../FuncionesAuxiliares/FuncionesAuxiliares";
@@ -47,35 +47,11 @@ const FormularioAgenda = (props) => {
         i++;
       });
     } else {
-      const d = horarios.dia.d;
-      const m = horarios.dia.m;
-      const date = new Date();
-      const realMonth = date.getMonth() + 1;
-      const realYear = date.getFullYear();
-      const y = m < realMonth ? realYear + 1 : realYear;
       const Employee = getElementById(
         inputState.HorariosFiltrados,
         inputState.Employee.value
       );
-      const diaSemana = getDayIndex2(d, m, y);
-      const jornada = getElementById(Employee.jornada,diaSemana);
-
-      const entrada = transformStringNumber(jornada.entrada);
-      const salida = transformStringNumber(jornada.salida);
-      let H = entrada.h;
-      let M = entrada.m;
-      while (H < salida.h || M < salida.m) {
-        misHorarios.push({
-          id: i,
-          title: `${H}:${M < 10 ? "0" + M : M}`,
-        });
-        M += 15;
-        if (M === 60) {
-          M = 0;
-          H++;
-        }
-        i++;
-      }
+      misHorarios = [...cargarHorariosEnMinutos(horarios.dia, Employee)];
     }
     dispatchInput({
       type: "CALENDARIO",
@@ -211,7 +187,6 @@ const FormularioAgenda = (props) => {
           }
         }
       }
-      console.log(dias);
       return dias;
     },
     [JSONDia]

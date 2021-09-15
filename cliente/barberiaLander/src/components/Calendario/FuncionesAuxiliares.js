@@ -1,5 +1,5 @@
 import { getElementById } from "../../FuncionesAuxiliares/FuncionesAuxiliares";
-
+import { getDayIndex2 } from "../Calendario/Dias/FunctionsDias";
 /* Extrae todas las fotos id y nombres de una lista de empleados */
 export const extraerFotos = (empleados) => {
   let resultado = [];
@@ -45,7 +45,7 @@ export const horariosDisponibilidad = (
   salida
 ) => {
   const horarios = obtenerHorariosDeDia(dia, mes, fechas);
-  if (diasTotales < 1 || entrada===null)
+  if (diasTotales < 1 || entrada === null)
     return { valido: false, horariosDisponibles: [] };
   if (horarios === null) return { valido: true, horariosDisponibles: [] };
   else {
@@ -150,19 +150,34 @@ export const cargarHorarios = (inicio, fin) => {
   }
   return lista;
 };
-export const cargarHorariosEnMinutos = (inicio, fin) => {
-  let lista = [];
-  let id = 1;
-  while (inicio <= fin) {
-    lista.push({
-      id: id,
-      title: transformNumberString(minutosAHorarios(inicio)),
+export const cargarHorariosEnMinutos = (dia, Employee) => {
+  let misHorarios = [];
+  const d = dia.d;
+  const m = dia.m;
+  const date = new Date();
+  const realMonth = date.getMonth() + 1;
+  const realYear = date.getFullYear();
+  const y = m < realMonth ? realYear + 1 : realYear;
+  const diaSemana = getDayIndex2(d, m, y);
+  const jornada = getElementById(Employee.jornada, diaSemana);
+  const entrada = transformStringNumber(jornada.entrada);
+  const salida = transformStringNumber(jornada.salida);
+  let H = entrada.h;
+  let M = entrada.m;
+  let i = 1;
+  while (H < salida.h || M < salida.m) {
+    misHorarios.push({
+      id: i,
+      title: `${H}:${M < 10 ? "0" + M : M}`,
     });
-    inicio += 15;
-    id++;
+    M += 15;
+    if (M === 60) {
+      M = 0;
+      H++;
+    }
+    i++;
   }
-
-  return lista;
+  return misHorarios;
 };
 
 /* Te da el día con su propiedad mostrar del array que gestiona la iluminación de los días */

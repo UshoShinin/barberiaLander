@@ -18,6 +18,7 @@ import {
   calcularTiempo,
   transformNumberString,
 } from "../../components/Calendario/FuncionesAuxiliares";
+import { getDayIndex2 } from "../../components/Calendario/Dias/FunctionsDias";
 import { inputReducer } from "./FormularioAgenda/ReduerFormularioAgenda";
 
 const CrearAgenda = (props) => {
@@ -72,6 +73,14 @@ const CrearAgenda = (props) => {
         horarios.mensaje.empleados,
         agenda.ciPeluquero
       );
+      const d = agenda.fecha.d;
+      const m = agenda.fecha.m;
+      const date = new Date();
+      const realMonth = date.getMonth() + 1;
+      const realYear = date.getFullYear();
+      const y = m < realMonth ? realYear + 1 : realYear;
+      const diaSemana = getDayIndex2(d, m, y);
+      const jornada = getElementById(empleado.jornada, diaSemana);
       let tiempo;
       nombre = { value: agenda.nombreCliente, isValid: true };
       telefono = { value: agenda.tel, isValid: true };
@@ -95,13 +104,13 @@ const CrearAgenda = (props) => {
           ? horariosAgendarDisponibles(
               horarios,
               tiempo,
-              empleado.entrada,
-              empleado.salida
+              jornada.entrada,
+              jornada.salida
             ).map((h) => {
               id++;
               return { id: id, title: transformNumberString(h) };
             })
-          : cargarHorariosEnMinutos(8 * 60, 22 * 60);
+          : cargarHorariosEnMinutos(agenda.fecha, empleado);
       const position = getIdByTitle(resultado, agenda.horario.i);
       Calendario = {
         value: resultado,
@@ -143,7 +152,7 @@ const CrearAgenda = (props) => {
   const getRespuestaReservar = (res) => {
     console.log(res);
     let datos = res.mensaje.datos;
-    datos = datos!==undefined?datos:null;
+    datos = datos !== undefined ? datos : null;
     const empleados = datos !== null ? datos.empleados : null;
     let misDatos = {};
     let Calendario = { value: null, dia: null };
@@ -153,8 +162,8 @@ const CrearAgenda = (props) => {
         misDatos = {
           Horarios: [...empleados],
           HorariosFiltrados: [...empleados],
-          Calendario:{...Calendario},
-          comboBox:{...comboBox}
+          Calendario: { ...Calendario },
+          comboBox: { ...comboBox },
         };
       } else {
         misDatos = { ...armadoDeDatos(datos, empleados) };
@@ -167,7 +176,7 @@ const CrearAgenda = (props) => {
     });
   };
 
-  const getRespuestaModificar = (res) =>{
+  const getRespuestaModificar = (res) => {
     if (res.mensaje.codigo === 400) {
       const misDatos = {};
       dispatchInput({
@@ -175,10 +184,10 @@ const CrearAgenda = (props) => {
         payload: misDatos,
         value: res.mensaje.mensaje,
       });
-    }else{
+    } else {
       props.exitModificar();
     }
-  }
+  };
 
   const mandarAgenda = useHttp();
   const mandarAgendaModificar = useHttp();

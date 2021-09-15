@@ -25,7 +25,7 @@ const VisualAgendas = () => {
   const [agendas, setAgendas] = useState(null);
   const [agenda, setAgenda] = useState(null);
   const fetchAgendas = useHttp();
-  const  getAgenda = useHttp();
+  const getAgenda = useHttp();
 
   const moveFHandler = () => {
     setInicio((prev) => {
@@ -87,9 +87,9 @@ const VisualAgendas = () => {
   };
   const user = authCtx.user;
   useEffect(() => {
-    if(user===null||user.rol==='Cliente')history.replace('/');
+    if (user === null || user.rol === "Cliente") history.replace("/");
     else fetchAgendas({ url: "/listadoAgendas" }, obtenerAgendas);
-  }, [user,history,fetchAgendas]);
+  }, [user, history, fetchAgendas]);
 
   let Mostrar = [];
   let tope = null;
@@ -137,7 +137,14 @@ const VisualAgendas = () => {
 
   return (
     <>
-      {agenda !== null && <CrearAgenda exitModificar={()=>{setAgenda(null)}} agenda={agenda} />}
+      {agenda !== null && (
+        <CrearAgenda
+          exitModificar={() => {
+            setAgenda(null);
+          }}
+          agenda={agenda}
+        />
+      )}
       {agenda === null && (
         <>
           {agendas === null && <LoaddingSpinner />}

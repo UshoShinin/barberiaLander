@@ -283,14 +283,16 @@ const AperturaCierre = () => {
             const comboAgenda = cajaState.comboAgenda.value;
             const productos = cajaState.productosAgregados;
             const codcup = cajaState.codCuponera.value;
+            console.log();
             let monto = cajaState.cantidadMedios>1?cajaState.montoCuponera.value:cajaState.montoTotal.value;
             monto = monto.length>0?parseInt(monto,10):0;
             const data = {
-              idAgenda: comboAgenda!==null?comboAgenda:-1,
+              idAgenda: cajaState.sinAgendar.value?-1:comboAgenda,
               listadoProductos:productos.length>0?productos:-1,
               ciCliente:codcup.length>0?codcup:-1,
               monto:monto
             }
+            console.log(data);
             validarDatos(
               {
                 url: "/verificarEntrada",

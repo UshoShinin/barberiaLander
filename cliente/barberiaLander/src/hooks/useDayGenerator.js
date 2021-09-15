@@ -40,7 +40,6 @@ const useDayGenerator = () => {
         diaAuxiliar = diaActual;
         diaSemana = (dayIndex + diaActual - 1) % 7;
         diaSemana = (diaSemana === 0)?7:diaSemana;
-        console.log(miJornada);
         let maxDays = getMonthValue(myMonth,myYear);
         for (let i = diaActual; i <= maxDays; i++) {
           diaSemana = diaSemana > 7 ? 1 : diaSemana;

@@ -87,7 +87,7 @@ const Cuponeras = () => {
         },
         productosVendidos: null,
         servicios: null,
-        descripcion: "X", //No sabemos que letra deberíamos utilizar
+        descripcion: "X",
       };
       entradaDinero(
         {
