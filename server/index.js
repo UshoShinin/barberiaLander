@@ -8,7 +8,6 @@ app.use(express.json()); // To parse the incoming requests with JSON payloads
 
 //Importo la interfaz. Esto va a tener los metodos para llamar a la base
 const interfaz = require("./interfaz");
-const { runInNewContext } = require("vm");
 
 // Have Node serve the files for our built React app
 /* app.use(express.static(path.resolve(__dirname, '../cliente/barberiaLander/build'))); */
@@ -265,7 +264,7 @@ app.post("/modStockListado", (req, res) => {
 });
 
 app.post("/modificarStockProducto", (req, res) => {
-  const ret = interfaz.modificarStockProducto(
+  const ret = interfaz.updateStockProducto(
     req.body.idProducto,
     req.body.cantidad
   );

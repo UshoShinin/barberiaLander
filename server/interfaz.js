@@ -241,7 +241,7 @@ const getEmpleadosFormulario = async () => {
     const empleados = await pool
       .request()
       .query(
-        "select Cedula, Nombre, Img, HorarioEntrada, HorarioSalida from Empleado"
+        "select Cedula, Nombre, Img from Empleado"
       );
     //Creo el array de retorno
     let arrayRetorno = [];
@@ -252,10 +252,41 @@ const getEmpleadosFormulario = async () => {
         id: empleados.recordset[i].Cedula,
         title: empleados.recordset[i].Nombre,
         foto: empleados.recordset[i].Img,
-        entrada: empleados.recordset[i].HorarioEntrada,
-        salida: empleados.recordset[i].HorarioSalida,
+        jornada: [],
       };
       arrayRetorno.push(empleadoAux);
+    }
+    return agregarJornadaListadoEmpleados(arrayRetorno).then(
+      (arrayEntero) => arrayEntero
+    );
+  } catch (error) {
+    console.log(error);
+  }
+};
+//Metodo auxiliar para agregarle la jornada a los empleados
+const agregarJornadaListadoEmpleados = async (listadoEmpleados) => {
+  try {
+    //variable que tiene la conexion
+    const pool = await sql.connect(conexion);
+    //Consigo las jornadas de todos los empleados
+    const jornadas = await pool
+      .request()
+      .query("select * from JornadaEmpleado");
+    //Armo el array completo que voy a devolver
+    let arrayRetorno = listadoEmpleados;
+    //Recorro todos los empleados para ir agregando sus jornadas
+    for (let i = 0; i < arrayRetorno.length; i++) {
+      for (let k = 0; k < jornadas.recordset.length; k++) {
+        if (arrayRetorno[i].id === jornadas.recordset[k].Cedula) {
+          //Cuando coincide la cedula entonces armo un obj axuiliar para agregar a las jornadas del empleado
+          let aux = {
+            dia: jornadas.recordset[k].Dia,
+            entrada: jornadas.recordset[k].HorarioEntrada,
+            salida: jornadas.recordset[k].HorarioSalida,
+          };
+          arrayRetorno[i].jornada.push(aux);
+        }
+      }
     }
     return arrayRetorno;
   } catch (error) {
@@ -2309,14 +2340,9 @@ const modificarStockProducto = async (idProducto, cantidad) => {
         };
       } else {
         //Si entro aca significa de que tengo stock suficiente para vender entonces los descuento
-        return updateStockProducto(idProducto, nuevoStock).then((resultado) => {
-          //Devuelvo el resultado, que son la cantidad de filas afectadas. Siempre deberia ser 1
-          return {
-            codigo: 200,
-            filasAfectadas: resultado,
-            mensaje: "Stock modificado correctamente",
-          };
-        });
+        return updateStockProducto(idProducto, nuevoStock).then(
+          (resultado) => resultado
+        );
       }
     });
   } catch (error) {
@@ -2353,7 +2379,11 @@ const updateStockProducto = async (idProducto, nuevaCantidad) => {
       .query(
         "update Producto set Stock = @nuevaCantidad where IdProducto = @idProducto"
       );
-    return resultado.rowsAffected[0];
+    return {
+      codigo: 200,
+      mensaje: "Stock modificado correctamente",
+      filasAfectadas: resultado.rowsAffected[0],
+    };
   } catch (error) {
     console.log();
   }
@@ -2545,7 +2575,7 @@ const interfaz = {
   verificarHorario,
   verificacionEntradaCaja,
   modificarStockListadoProducto,
-  modificarStockProducto,
+  updateStockProducto,
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar
