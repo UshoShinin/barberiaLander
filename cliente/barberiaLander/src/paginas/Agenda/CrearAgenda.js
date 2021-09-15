@@ -144,15 +144,17 @@ const CrearAgenda = (props) => {
   const getRespuesta = (res) => {
     console.log(res);
     const datos = res.mensaje.datos;
-    const empleados = datos.empleados;
-    let misDatos;
-    if (res.mensaje.codigo === 400) {
-      misDatos = {
-        Horarios: [...empleados],
-        HorariosFiltrados: [...empleados],
-      };
-    } else {
-      misDatos = { ...armadoDeDatos(datos, empleados)};
+    const empleados = datos!==null?datos.empleados:null;
+    let misDatos={};
+    if(datos!==null){
+      if (res.mensaje.codigo === 400) {
+        misDatos = {
+          Horarios: [...empleados],
+          HorariosFiltrados: [...empleados],
+        };
+      } else {
+        misDatos = { ...armadoDeDatos(datos, empleados)};
+      }
     }
     dispatchInput({
       type: "RESET",
@@ -234,11 +236,11 @@ const CrearAgenda = (props) => {
         closed={() => {
           history.replace("/");
         }}
-        show={inputState === -1}
+        show={inputState.manejoAgenda === -1}
       >
-        <h1>No se aceptan reservas por el momento</h1>
+        <h1 className={classes.mensajeTitulo}>No se aceptan reservas por el momento</h1>
       </Modal>
-      {inputState !== -1 && (
+      {inputState.manejoAgenda !== -1 && (
         <NormalCard>
           {inputState.Horarios === null && <LoaddingSpinner />}
           {inputState.Horarios !== null && (
