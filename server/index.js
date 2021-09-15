@@ -136,6 +136,25 @@ app.post("/entradaCaja", (req, res) => {
   });
 });
 
+app.post("/cobrarCaja", (req, res) => {
+  const ret = interfaz.realizarEntradaDinero(
+    req.body.idCaja,
+    req.body.montoTotal,
+    req.body.pago,
+    req.body.ciEmpleado,
+    req.body.productosVendidos,
+    req.body.servicios,
+    req.body.descripcion,
+    req.body.idAgenda,
+    req.body.idHorario
+  );
+  ret.then((resultado) => {
+    res.json({
+      mensaje: resultado,
+    });
+  });
+});
+
 app.post("/salidaCaja", (req, res) => {
   console.log(req.body);
   const ret = interfaz.nuevaSalidaDinero(
@@ -268,6 +287,16 @@ app.post("/modificarStockProducto", (req, res) => {
     req.body.idProducto,
     req.body.cantidad
   );
+  ret.then((resultado) => {
+    res.json({
+      mensaje: resultado,
+    });
+  });
+});
+
+app.use("/cierreCaja", (req, res) => {
+  let valor = req.query.idCaja;
+  let ret = interfaz.cierreCaja(valor);
   ret.then((resultado) => {
     res.json({
       mensaje: resultado,

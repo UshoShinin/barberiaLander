@@ -240,9 +240,7 @@ const getEmpleadosFormulario = async () => {
     //Consigo los datos de los empleados
     const empleados = await pool
       .request()
-      .query(
-        "select Cedula, Nombre, Img from Empleado"
-      );
+      .query("select Cedula, Nombre, Img from Empleado");
     //Creo el array de retorno
     let arrayRetorno = [];
     //Recorro el listado de empleados para armar el objeto como necesito
@@ -1446,9 +1444,7 @@ const nuevaEntradaDinero = async (
   cedula,
   listadoProductos,
   listadoServicios,
-  descripcion,
-  idAgenda, //Si me llega -1 no tengo que borrar nada
-  idHorario // Si me llega -1 no tengo que borrar nada
+  descripcion
 ) => {
   try {
     //Hago primero el insert en la tabla entrada
@@ -1539,6 +1535,55 @@ const nuevaEntradaDinero = async (
   } catch (error) {
     console.log(error);
   }
+};
+
+//Metodo que se va a llamar cuando se haga una entrada de dinero
+//Esto lo que va a hacer es hacer la entrada de dinero y despues va a eliminar la agenda en caso de que corresponda
+const realizarEntradaDinero = async (
+  idCaja,
+  monto,
+  pago,
+  cedula,
+  listadoProductos,
+  listadoServicios,
+  descripcion,
+  idAgenda,
+  idHorario
+) => {
+  //Aca lo primero que tengo que hacer es hacer la entrada de dinero
+  return nuevaEntradaDinero(
+    idCaja,
+    monto,
+    pago,
+    cedula,
+    listadoProductos,
+    listadoServicios,
+    descripcion
+  ).then((resultadoEntrada) => {
+    //Primero tengo que verificar si la entrada se hizo o no
+    if (resultadoEntrada.codigo !== 200) {
+      //Si dio algun codigo que no sea el de exito entonces devuelvo ese mensaje
+      return resultadoEntrada;
+    } else {
+      //Aca verifico de si hay agenda o no
+      //Si hay agenda la borro, si no, solamente aviso de que se cobro todo
+      if (idAgenda !== -1 && idHorario !== -1) {
+        return cancelarAgenda(idAgenda, idHorario).then((resultado) => {
+          if (resultado.codigo === 200) {
+            return {
+              codigo: 200,
+              mensaje: "Entrada realizada correctamente, la agenda fue borrada",
+            };
+          } else {
+            //Si quedo en error entonces devuelvo el error
+            return resultado;
+          }
+        });
+      } else {
+        return resultadoEntrada;
+      }
+    }
+  });
 };
 
 //Metodo auxiliar para hacer el insert en la tabla EntradaDinero
@@ -1758,7 +1803,7 @@ const crearCuponera = async (cedula, monto, caja) => {
             return nuevaEntradaDinero(
               caja.idCaja,
               caja.montoTotal,
-              caja.pago.Efectivo,
+              caja.pago,
               caja.ciEmpleado,
               caja.productosVendidos,
               caja.servicios,
@@ -2134,25 +2179,216 @@ const insertarCajaSalida = async (idCaja, idSalida) => {
 };
 
 //Metodo para cerrar la caja
-const cierreCaja = async () => {
-  //Llamo al metodo que me devuelve el total de los efectivo
-  /**
-   *
-   *
-   *
-   *
-   *
-   *
-   *
-   *
-   *
-   *
-   *
-   *
-   *
-   *
-   */
-  //Esto hay que hacerlo que todavia no lo hice
+const cierreCaja = async (idCaja) => {
+  //Me llega el idCaja en base a eso llamo a los totales de cada medio de pago
+  //Armo un array para guardar todas las promesas asi las resuelvo todas juntas
+  let listadoPromesas = [];
+  //Llamo a todos los metodos que me traen los datos de los pagos
+  const promesaEfectivo = getTotalEfectivos(idCaja);
+  const promesaDebito = getTotalDebitos(idCaja);
+  const promesaCuponera = getTotalCuponera(idCaja);
+  //Agrego todas las promesas al listado de promesas
+  listadoPromesas.push(promesaEfectivo, promesaDebito, promesaCuponera);
+  //Las resuelvo todas
+  return Promise.allSettled(listadoPromesas).then((resultados) => {
+    //Armo el objeto que voy a devolver
+    let retorno = {};
+    resultados.forEach((promesa) => {
+      switch (promesa.value.promesa) {
+        case "Efectivo":
+          retorno = { ...retorno, efectivo: promesa.value.efectivo };
+          break;
+
+        case "Cuponera":
+          retorno = { ...retorno, cuponera: promesa.value.cuponera };
+          break;
+
+        case "Debito":
+          retorno = { ...retorno, debito: promesa.value.debito };
+          break;
+        default:
+          break;
+      }
+    });
+    /**
+     *
+     * AHORA ACA FALTA LA PARTE DEL MANTENIMIENTO DE DATOS
+     *
+     *
+     *
+     *
+     */
+    return retorno;
+  });
+};
+
+//Metodo auxiliar para conseguir el total de efectivos de una caja en particular
+const getTotalEfectivos = async (idCaja) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Cantidad de pagos con efectivo de atenciones y productos
+    const normales = await pool
+      .request()
+      .input("idCaja", sql.Int, idCaja)
+      .query(
+        "select SUM(EE.Monto) as total, COUNT(E.IdEntrada) as cantidad from EntradaDinero E, Entrada_Efectivo EE, Caja_Entrada C where E.IdEntrada = EE.IdEntrada and E.IdEntrada = C.IdEntrada and EE.IdMedioPago = 1 and E.Descripcion is null and C.IdCaja = @idCaja"
+      );
+    //Cantidad de entrada de caja
+    const aperturaCaja = await pool
+      .request()
+      .input("idCaja", sql.Int, idCaja)
+      .query(
+        "select SUM(EE.Monto) as total, COUNT(E.IdEntrada) as cantidad from EntradaDinero E, Entrada_Efectivo EE, Caja_Entrada C where E.IdEntrada = EE.IdEntrada and E.IdEntrada = C.IdEntrada and EE.IdMedioPago = 1 and E.Descripcion = 'A' and C.IdCaja = @idCaja"
+      );
+    //Cantidad de pagos con efectivo para crear cuponeras
+    const cuponerasCreadas = await pool
+      .request()
+      .input("idCaja", sql.Int, idCaja)
+      .query(
+        "select SUM(EE.Monto) as total, COUNT(E.IdEntrada) as cantidad from EntradaDinero E, Entrada_Efectivo EE, Caja_Entrada C where E.IdEntrada = EE.IdEntrada and E.IdEntrada = C.IdEntrada and EE.IdMedioPago = 1 and E.Descripcion = 'C' and C.IdCaja = @idCaja"
+      );
+    //Cantidad de pagos con efectivo para cargar cuponeras
+    const agregadoSaldoCuponera = await pool
+      .request()
+      .input("idCaja", sql.Int, idCaja)
+      .query(
+        "select SUM(EE.Monto) as total, COUNT(E.IdEntrada) as cantidad from EntradaDinero E, Entrada_Efectivo EE, Caja_Entrada C where E.IdEntrada = EE.IdEntrada and E.IdEntrada = C.IdEntrada and EE.IdMedioPago = 1 and E.Descripcion = 'X' and C.IdCaja = @idCaja"
+      );
+    //Armo un objeto con todos los datos
+    let cobrosEfectivo = {
+      //A este array le voy a agregar los objetos anteriores
+      efectivo: [],
+      promesa: "Efectivo",
+    };
+    //Agrego al array que voy a devolver
+    cobrosEfectivo.efectivo.push(
+      {
+        total:
+          normales.recordset[0].total === null
+            ? 0
+            : normales.recordset[0].total,
+        cantidad: normales.recordset[0].cantidad,
+        mensaje: "Cobros de atenciones o productos",
+      },
+      {
+        total:
+          aperturaCaja.recordset[0].total === null
+            ? 0
+            : aperturaCaja.recordset[0].total,
+        cantidad: aperturaCaja.recordset[0].cantidad,
+        mensaje: "Monto de apertura de caja",
+      },
+      {
+        total:
+          cuponerasCreadas.recordset[0].total === null
+            ? 0
+            : cuponerasCreadas.recordset[0].total,
+        cantidad: cuponerasCreadas.recordset[0].cantidad,
+        mensaje: "Creaciones de cuponera",
+      },
+      {
+        total:
+          agregadoSaldoCuponera.recordset[0].total === null
+            ? 0
+            : agregadoSaldoCuponera.recordset[0].total,
+        cantidad: agregadoSaldoCuponera.recordset[0].cantidad,
+        mensaje: "Carga de saldo a cuponeras",
+      }
+    );
+    //Armo un objeto con el total de los efectivos, ya que es el que esta separado
+    let totalEfectivo = {
+      total: 0,
+    };
+    //Recorro todos los pagos para sumarlos y tener el total
+    cobrosEfectivo.efectivo.forEach((pagos) => {
+      totalEfectivo.total += pagos.total;
+    });
+    cobrosEfectivo.efectivo.push(totalEfectivo);
+    return cobrosEfectivo;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo auxiliar para conseguir el total de debitos de una caja en particular
+const getTotalDebitos = async (idCaja) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Cantidad de pagos con debito
+    const debitos = await pool
+      .request()
+      .input("idCaja", sql.Int, idCaja)
+      .query(
+        "select SUM(EE.Monto) as total, COUNT(E.IdEntrada) as cantidad from EntradaDinero E, Entrada_Debito EE, Caja_Entrada C where E.IdEntrada = EE.IdEntrada and E.IdEntrada = C.IdEntrada and EE.IdMedioPago = 2 and E.Descripcion is null and C.IdCaja = @idCaja"
+      );
+    //Armo un objeto con todos los datos
+    let cobrosDebito = {
+      //Para este caso no seria necesario dejarlo como array, pero sirve para que esto sea escalable
+      debito: [],
+      promesa: "Debito",
+    };
+    cobrosDebito.debito.push({
+      total:
+        debitos.recordset[0].total === null ? 0 : debitos.recordset[0].total,
+      cantidad: debitos.recordset[0].cantidad,
+      mensaje: "Cobros de atenciones o productos",
+    });
+    //Armo un objeto con el total de los efectivos, ya que es el que esta separado
+    let totalDebito = {
+      total: 0,
+    };
+    //Recorro todos los pagos para sumarlos y tener el total
+    cobrosDebito.debito.forEach((pagos) => {
+      totalDebito.total += pagos.total;
+    });
+    cobrosDebito.debito.push(totalDebito);
+    return cobrosDebito;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo auxiliar para conseguir el total de pagos con cuponera de una caja en particular
+const getTotalCuponera = async (idCaja) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Cantidad de pagos con cuponera
+    const cuponeras = await pool
+      .request()
+      .input("idCaja", sql.Int, idCaja)
+      .query(
+        "select SUM(EE.Monto) as total, COUNT(E.IdEntrada) as cantidad from EntradaDinero E, Entrada_Efectivo EE, Caja_Entrada C where E.IdEntrada = EE.IdEntrada and E.IdEntrada = C.IdEntrada and EE.IdMedioPago = 3 and E.Descripcion is null and C.IdCaja = @idCaja"
+      );
+    //Armo un objeto con todos los datos
+    let cobrosCuponera = {
+      //Para este caso no seria necesario dejarlo como array, pero sirve para que esto sea escalable
+      cuponera: [],
+      promesa: "Cuponera",
+    };
+    cobrosCuponera.cuponera.push({
+      total:
+        cuponeras.recordset[0].total === null
+          ? 0
+          : cuponeras.recordset[0].total,
+      cantidad: cuponeras.recordset[0].cantidad,
+      mensaje: "Cobros de atenciones o productos",
+    });
+    //Armo un objeto con el total de los efectivos, ya que es el que esta separado
+    let totalCuponera = {
+      total: 0,
+    };
+    //Recorro todos los pagos para sumarlos y tener el total
+    cobrosCuponera.cuponera.forEach((pagos) => {
+      totalCuponera.total += pagos.total;
+    });
+    cobrosCuponera.cuponera.push(totalCuponera);
+    return cobrosCuponera;
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 //Conseguir datos para formularios
@@ -2480,7 +2716,7 @@ const existeSaldoClienteCuponera = async (cedula, monto) => {
           promesa: "Cuponera",
         };
       } else {
-        if (cuponera.recordsets[0].monto < monto) {
+        if (cuponera.recordset[0].monto < monto) {
           return {
             codigo: 400,
             mensaje: "Saldo insuficiente",
@@ -2576,6 +2812,8 @@ const interfaz = {
   verificacionEntradaCaja,
   modificarStockListadoProducto,
   updateStockProducto,
+  cierreCaja,
+  realizarEntradaDinero
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar
