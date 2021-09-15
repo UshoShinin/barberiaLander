@@ -1,7 +1,6 @@
 import classes from "./FormularioAgenda.module.css";
 import React, {
   useRef,
-  useReducer,
   useContext,
   useCallback,
   useEffect,
@@ -124,10 +123,11 @@ const FormularioAgenda = (props) => {
 
       if (props.agenda === null || props.agenda === undefined) {
         const user = authCtx.user;
+        console.log(user);
         //Crear
         datosAgenda = {
           aceptada: inputState.manejoAgenda,
-          ciCliente: user === null ? "-1" : user.ci,
+          ciCliente: user === null ? undefined : user.ci,
           nombreCliente: inputState.Nombre.value,
           telefono: inputState.Telefono.value,
           descripcion: inputState.Descripcion.value,
@@ -139,7 +139,6 @@ const FormularioAgenda = (props) => {
           }`,
           horario: { i: inicio, f: fin },
         };
-
         props.onSaveDatosAgenda(datosAgenda);
       } else {
         //Modificar
@@ -228,14 +227,14 @@ const FormularioAgenda = (props) => {
       );
       const Empo = getElementById(misHorarios, ciEmplo);
       const fechas = JSON.stringify(Empo.fechas);
+      const jornada = JSON.stringify(Empo.jornada);
       misDias = DaysGenerator(
         date.getDate(),
         date.getMonth() + 1,
         date.getFullYear(),
         fechas,
         tiempoNecesario,
-        Empo.entrada,
-        Empo.salida
+        jornada
       );
       return activarDias(misDias);
     }

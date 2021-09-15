@@ -2,13 +2,13 @@ import FormularioAgenda from "./FormularioAgenda/FormularioAgenda";
 import { useHistory } from "react-router-dom";
 import NormalCard from "../../components/UI/Card/NormalCard";
 import useHttp from "../../hooks/useHttp";
-import classes from './CrearAgenda.module.css';
+import classes from "./CrearAgenda.module.css";
 import { useEffect, useContext, useReducer } from "react";
 import LoaddingSpinner from "../../components/LoaddingSpinner/LoaddingSpinner";
 import AuthContext from "../../store/AuthContext";
 import { getElementById } from "../../FuncionesAuxiliares/FuncionesAuxiliares";
 import Modal from "../../components/UI/Modal/Modal";
-import Marco from '../../components/UI/Marco/Marco';
+import Marco from "../../components/UI/Marco/Marco";
 import Note from "../../components/UI/Note/Note";
 import {
   horariosAgendarDisponibles,
@@ -23,6 +23,7 @@ import { inputReducer } from "./FormularioAgenda/ReduerFormularioAgenda";
 const CrearAgenda = (props) => {
   const history = useHistory();
   const authCtx = useContext(AuthContext);
+  const width = document.getElementById("root").clientWidth;
   let initialState = {
     Mensaje: { show: false, text: "" },
     manejoAgenda: 0,
@@ -54,6 +55,7 @@ const CrearAgenda = (props) => {
     ],
   };
   const [inputState, dispatchInput] = useReducer(inputReducer, initialState);
+
   const armadoDeDatos = (horarios, empleados, manejoAgenda) => {
     let miManejoAgenda =
       manejoAgenda !== undefined ? manejoAgenda.AceptarRechazar : 0;
@@ -115,15 +117,13 @@ const CrearAgenda = (props) => {
         ciCliente = authCtx.user.ciUsuario;
       }
     }
-    console.log(initialState);
-    console.log(horarios);
     const empoooo = {
       value:
         initialState.Employee.value === null
           ? empleados[0].id
           : initialState.Employee.value,
-    }
-    
+    };
+
     const datitos = {
       manejoAgenda: miManejoAgenda,
       Nombre: { ...nombre },
@@ -131,37 +131,54 @@ const CrearAgenda = (props) => {
       Descripcion: { ...descripcion },
       Horarios: [...empleados],
       HorariosFiltrados: [...empleados],
-      Employee:{...empoooo},
+      Employee: { ...empoooo },
       servicios: { ...servicios },
       Calendario: { ...Calendario },
       ComboBox: { ...comboBox },
       ciCliente: ciCliente,
     };
-    console.log(datitos);
     return datitos;
   };
 
-  const getRespuesta = (res) => {
+  const getRespuestaReservar = (res) => {
     console.log(res);
-    const datos = res.mensaje.datos;
-    const empleados = datos!==null?datos.empleados:null;
-    let misDatos={};
-    if(datos!==null){
+    let datos = res.mensaje.datos;
+    datos = datos!==undefined?datos:null;
+    const empleados = datos !== null ? datos.empleados : null;
+    let misDatos = {};
+    let Calendario = { value: null, dia: null };
+    let comboBox = { value: null, active: false, title: "" };
+    if (datos !== null) {
       if (res.mensaje.codigo === 400) {
         misDatos = {
           Horarios: [...empleados],
           HorariosFiltrados: [...empleados],
+          Calendario:{...Calendario},
+          comboBox:{...comboBox}
         };
       } else {
-        misDatos = { ...armadoDeDatos(datos, empleados)};
+        misDatos = { ...armadoDeDatos(datos, empleados) };
       }
     }
     dispatchInput({
       type: "RESET",
-      payload:misDatos,
+      payload: misDatos,
       value: res.mensaje.mensaje,
     });
   };
+
+  const getRespuestaModificar = (res) =>{
+    if (res.mensaje.codigo === 400) {
+      const misDatos = {};
+      dispatchInput({
+        type: "RESET",
+        payload: misDatos,
+        value: res.mensaje.mensaje,
+      });
+    }else{
+      props.exitModificar();
+    }
+  }
 
   const mandarAgenda = useHttp();
   const mandarAgendaModificar = useHttp();
@@ -174,7 +191,7 @@ const CrearAgenda = (props) => {
         headers: { "Content-Type": "application/json" },
         body: enteredDatosAgenda,
       },
-      getRespuesta
+      getRespuestaReservar
     );
   };
   const modificarDatosAgendaHandler = (enteredDatosAgenda) => {
@@ -185,7 +202,7 @@ const CrearAgenda = (props) => {
         headers: { "Content-Type": "application/json" },
         body: enteredDatosAgenda,
       },
-      getRespuesta
+      getRespuestaModificar
     );
   };
 
@@ -203,7 +220,11 @@ const CrearAgenda = (props) => {
     } else {
       dispatchInput({
         type: "CARGAR_DATOS",
-        payload: armadoDeDatos(horarios, horarios.mensaje.empleados,manejoAgenda),
+        payload: armadoDeDatos(
+          horarios,
+          horarios.mensaje.empleados,
+          manejoAgenda
+        ),
       });
     }
   };
@@ -223,7 +244,7 @@ const CrearAgenda = (props) => {
     }
   }, []);
   return (
-    <Marco className={classes.nuevaAgenda}>
+    <Marco use={width > 900} className={classes.nuevaAgenda}>
       <Note
         show={inputState.Mensaje.show}
         onClose={() => {
@@ -238,7 +259,9 @@ const CrearAgenda = (props) => {
         }}
         show={inputState.manejoAgenda === -1}
       >
-        <h1 className={classes.mensajeTitulo}>No se aceptan reservas por el momento</h1>
+        <h1 className={classes.mensajeTitulo}>
+          No se aceptan reservas por el momento
+        </h1>
       </Modal>
       {inputState.manejoAgenda !== -1 && (
         <NormalCard>

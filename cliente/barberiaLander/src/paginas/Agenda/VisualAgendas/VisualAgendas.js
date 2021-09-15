@@ -137,7 +137,7 @@ const VisualAgendas = () => {
 
   return (
     <>
-      {agenda !== null && <CrearAgenda agenda={agenda} />}
+      {agenda !== null && <CrearAgenda exitModificar={()=>{setAgenda(null)}} agenda={agenda} />}
       {agenda === null && (
         <>
           {agendas === null && <LoaddingSpinner />}

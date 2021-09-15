@@ -280,7 +280,7 @@ const agregarJornadaListadoEmpleados = async (listadoEmpleados) => {
         if (arrayRetorno[i].id === jornadas.recordset[k].Cedula) {
           //Cuando coincide la cedula entonces armo un obj axuiliar para agregar a las jornadas del empleado
           let aux = {
-            dia: jornadas.recordset[k].Dia,
+            id: jornadas.recordset[k].Dia,
             entrada: jornadas.recordset[k].HorarioEntrada,
             salida: jornadas.recordset[k].HorarioSalida,
           };

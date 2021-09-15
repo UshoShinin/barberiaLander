@@ -47,7 +47,7 @@ const Login = (props) => {
     }
   };
   return (
-    <Marco className={classes.alinear}>
+    <Marco use={true} className={classes.alinear}>
       <form onSubmit={submitHandler}>
         <NormalCard className={classes.container}>
           <Border>

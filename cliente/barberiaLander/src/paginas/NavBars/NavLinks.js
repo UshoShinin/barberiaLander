@@ -23,7 +23,7 @@ const NavLinks = (props) => {
           active: state.active === action.value ? -1 : action.value,
         };
       default:
-        return{...state}
+        return { ...state };
     }
   };
 
@@ -52,9 +52,9 @@ const NavLinks = (props) => {
     <ul className={classes.navbarUl}>
       {/* <li><Link to="/" className="navbar-brand">Lander</Link></li>  */}
       <li className={classes.Logo}>
-        <img className={classes.base} src={LogoAzulH}/>
-        <img className={classes.blur} src={LogoAzulH}/>
-        <img className={classes.brillo} src={LogoAzulH}/>
+        <img className={classes.base} src={LogoAzulH} />
+        <img className={classes.blur} src={LogoAzulH} />
+        <img className={classes.brillo} src={LogoAzulH} />
       </li>
       <li>
         <NavLink
@@ -77,20 +77,20 @@ const NavLinks = (props) => {
           <span data="Historial de Cajas">Historial de Cajas</span>
         </NavLink>{" "}
       </li> */}
-       {authCtx.user !== null &&
+      {authCtx.user !== null &&
         (authCtx.user.rol === "Administrador" ||
           authCtx.user.rol === "Encargado") && (
-      <li>
-        <NavLink
-          onClick={NavOnClick}
-          exact
-          activeClassName={classes.active}
-          to="/caja/aperturacierre"
-        >
-          <span data="Abrir/Cerra Caja">Abrir/Cerra Caja</span>
-        </NavLink>
-      </li>
-      )}
+          <li>
+            <NavLink
+              onClick={NavOnClick}
+              exact
+              activeClassName={classes.active}
+              to="/caja/aperturacierre"
+            >
+              <span data="Abrir/Cerra Caja">Abrir/Cerra Caja</span>
+            </NavLink>
+          </li>
+        )}
       {authCtx.user !== null &&
         (authCtx.user.rol === "Administrador" ||
           authCtx.user.rol === "Encargado") && (
@@ -127,6 +127,19 @@ const NavLinks = (props) => {
           <span data="Reserva">Reserva</span>
         </NavLink>
       </li>
+      {(authCtx.user === null ||
+        authCtx.user.rol === "Cliente") && (
+          <li>
+            <NavLink
+              onClick={NavOnClick}
+              exact
+              activeClassName={classes.active}
+              to="/cuponeras"
+            >
+              <span data="Cuponera">Cuponera</span>
+            </NavLink>
+          </li>
+        )}
       {!isLoggedIn && (
         <li>
           <NavLink

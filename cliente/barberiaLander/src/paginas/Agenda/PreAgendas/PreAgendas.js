@@ -98,7 +98,7 @@ const PreAgendas = () => {
 
   return (
     <>
-      {agendaAModificar !== null && <CrearAgenda agenda={agendaAModificar} />}
+      {agendaAModificar !== null && <CrearAgenda exitModificar={()=>{setAgendaAModificar(null)}} agenda={agendaAModificar} />}
       {agendaAModificar === null && (
         <NormalCard className={classes.ajuste}>
           {agendasState === null && <LoaddingSpinner />}

@@ -5,9 +5,10 @@ export const getYearChart = () => {
   return 6;
 }
 const useDayGenerator = () => {
-    const DaysGenerator = useCallback((diaActual , month, year,fechas,timeNeed,entrada,salida) => {
+    const DaysGenerator = useCallback((diaActual , month, year,fechas,timeNeed,jornada) => {
         console.log('Running DaysGenerator');
         const misFechas = JSON.parse(fechas);
+        const miJornada = JSON.parse(jornada);
         const dayIndex = getDayIndex(
           1,
           getMonthChart(month),
@@ -22,6 +23,7 @@ const useDayGenerator = () => {
         let idMonth = 0;
         let myMonth = month;
         let myYear = year;
+        let jornal;
         //Generar los días para el calendario
         //Carga los días desde el 1 hasta al actual de este mes, todos son invalidos
         for (let i = 1; i < diaActual; i++) {
@@ -37,6 +39,7 @@ const useDayGenerator = () => {
         diaAuxiliar = diaActual;
         diaSemana = (dayIndex + diaActual - 1) % 7;
         diaSemana = (diaSemana === 0)?7:diaSemana;
+        console.log(miJornada);
         let maxDays = getMonthValue(myMonth,myYear);
         for (let i = diaActual; i <= maxDays; i++) {
           diaSemana = diaSemana > 7 ? 1 : diaSemana;

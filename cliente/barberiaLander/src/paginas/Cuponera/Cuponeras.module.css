@@ -24,8 +24,8 @@
   font-size: 2.6em;
   transition: color 180ms linear;
 }
-.container > .borderDisabled > .text{
-  color:red;
+.container > .borderDisabled > .text {
+  color: red;
 }
 .container > div:hover > .text {
   color: var(--clr-neon-white);
@@ -38,7 +38,7 @@
 .container > div:hover .textP {
   color: var(--clr-neon-white);
 }
-.container > div > button{
+.container > div > button {
   position: absolute;
   bottom: 20px;
 }
@@ -74,9 +74,19 @@
     font-size: 1em;
   }
   .container > div .textP {
-      font-size: 1em;
+    font-size: 1em;
   }
-  .container > div > button{
+  .container > div > button {
     bottom: 10px;
+  }
+}
+.ajuste{
+  align-items: center;
+}
+@media (max-width: 900px) {
+  .container {
+    grid-template-columns: auto;
+    grid-template-rows: repeat(4,270px);
+    padding-bottom: 90px;
   }
 }

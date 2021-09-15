@@ -1,9 +1,15 @@
 import classes from "./Marco.module.css";
 const Marco = (props) => {
+  
   return (
-    <div className={`${props.className!==undefined?props.className:''} ${classes.ajuste}`}>
+    <>
+    {props.use&&<div className={`${props.className!==undefined?props.className:''} ${classes.ajuste}`}>
       {props.children}
-    </div>
+    </div>}
+    {!props.use&&<div className={`${props.className!==undefined?props.className:''}`}>
+      {props.children}
+    </div>}
+    </>
   );
 };
 export default Marco;

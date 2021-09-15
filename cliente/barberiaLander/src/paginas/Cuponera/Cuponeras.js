@@ -11,6 +11,7 @@ import AuthContext from "../../store/AuthContext";
 import { useHistory } from "react-router-dom";
 import Note from "../../components/UI/Note/Note";
 const Cuponeras = () => {
+  const width = document.getElementById("root").clientWidth;
   const authCtx = useContext(AuthContext);
   const history = useHistory();
   const [cuponeraState, dispatchCuponera] = useReducer(reducer, initialState);
@@ -46,8 +47,8 @@ const Cuponeras = () => {
     } else {
       dispatchCuponera({
         type: "SHOW_MENSAJE",
-        value: 'Cuponera creada correctamente',
-        reset:'CREAR'
+        value: "Cuponera creada correctamente",
+        reset: "CREAR",
       });
     }
   };
@@ -60,8 +61,8 @@ const Cuponeras = () => {
     } else {
       dispatchCuponera({
         type: "SHOW_MENSAJE",
-        value: 'Saldo agregado satisfactoriamente',
-        reset:'AGREGAR'
+        value: "Saldo agregado satisfactoriamente",
+        reset: "AGREGAR",
       });
     }
   };
@@ -86,7 +87,7 @@ const Cuponeras = () => {
         },
         productosVendidos: null,
         servicios: null,
-        descripcion: "X",//No sabemos que letra deberíamos utilizar
+        descripcion: "X", //No sabemos que letra deberíamos utilizar
       };
       entradaDinero(
         {
@@ -109,7 +110,7 @@ const Cuponeras = () => {
       dispatchCuponera({
         type: "SHOW_MENSAJE",
         value: res.mensaje.mensaje,
-        reset:'MODIFICAR'
+        reset: "MODIFICAR",
       });
     }
   };
@@ -124,7 +125,7 @@ const Cuponeras = () => {
       dispatchCuponera({
         type: "SHOW_MENSAJE",
         value: "Saldo: $" + res.mensaje.mensaje,
-        reset:'CONSULTAR'
+        reset: "CONSULTAR",
       });
     }
   };
@@ -133,15 +134,11 @@ const Cuponeras = () => {
     if (res.mensaje !== -1)
       dispatchCuponera({ type: "CARGAR_DATOS", value: res.mensaje });
   };
-  const user = authCtx.user;
+
+  const VC = authCtx.user === null || authCtx.user.rol === "Cliente";
   useEffect(() => {
-    dispatchCuponera({
-      type: "SHOW_MENSAJE",
-      value: 'Cuponera modificada correctamente muy correctamente',
-    });
-    if (user === null || user.rol === "Cliente") history.replace("/");
-    else sendFormulario({ url: "/getIdCajaHoy" }, obtenerDatos);
-  }, [user, history, sendFormulario]);
+    sendFormulario({ url: "/getIdCajaHoy" }, obtenerDatos);
+  }, [sendFormulario]);
   const crearHandler = () => {
     const Crear = cuponeraState.Crear;
     if (!Crear.cedula.isValid) refCrearCi.current.focus();
@@ -264,7 +261,7 @@ const Cuponeras = () => {
   };
 
   return (
-    <Marco className={classes.container}>
+    <Marco use={width > 900 || VC} className={`${classes.container} ${VC?classes.ajuste:''}`}>
       <Note
         show={cuponeraState.Mensaje.show}
         onClose={() => {
@@ -273,134 +270,142 @@ const Cuponeras = () => {
       >
         {cuponeraState.Mensaje.text}
       </Note>
-      <Border disabled={!cuponeraState.active}>
-        <h1
-          className={`${
-            cuponeraState.active ? classes.text : classes.textDisabled
-          }`}
-        >
-          Crear Cuponera
-        </h1>
-        <div>
-          <label
+      {!VC && (
+        <Border disabled={!cuponeraState.active}>
+          <h1
             className={`${
-              cuponeraState.active ? classes.textL : classes.textLDisabled
+              cuponeraState.active ? classes.text : classes.textDisabled
             }`}
           >
-            Cédula Cliente
-          </label>
-          <Input
-            ref={refCrearCi}
-            isValid={cuponeraState.Crear.cedula.isValid}
-            input={INPUTS[0]}
-          />
-          <label
+            Crear Cuponera
+          </h1>
+          <div>
+            <label
+              className={`${
+                cuponeraState.active ? classes.textL : classes.textLDisabled
+              }`}
+            >
+              Cédula Cliente
+            </label>
+            <Input
+              ref={refCrearCi}
+              isValid={cuponeraState.Crear.cedula.isValid}
+              input={INPUTS[0]}
+            />
+            <label
+              className={`${
+                cuponeraState.active ? classes.textL : classes.textLDisabled
+              }`}
+            >
+              Monto inicial
+            </label>
+            <Input
+              ref={refCrearMonto}
+              isValid={cuponeraState.Crear.monto.isValid}
+              input={INPUTS[1]}
+            />
+          </div>
+          <p className={classes.textP}>
+            {CrearP !== -1 ? cuponeraState.Crear.problemas[CrearP].pro : ""}
+          </p>
+          <Button disabled={!cuponeraState.active} action={crearHandler}>
+            Crear
+          </Button>
+        </Border>
+      )}
+      {!VC && (
+        <Border disabled={!cuponeraState.active}>
+          <h1
             className={`${
-              cuponeraState.active ? classes.textL : classes.textLDisabled
+              cuponeraState.active ? classes.text : classes.textDisabled
             }`}
           >
-            Monto inicial
-          </label>
-          <Input
-            ref={refCrearMonto}
-            isValid={cuponeraState.Crear.monto.isValid}
-            input={INPUTS[1]}
-          />
-        </div>
-        <p className={classes.textP}>
-          {CrearP !== -1 ? cuponeraState.Crear.problemas[CrearP].pro : ""}
-        </p>
-        <Button disabled={!cuponeraState.active} action={crearHandler}>
-          Crear
-        </Button>
-      </Border>
-      <Border disabled={!cuponeraState.active}>
-        <h1
-          className={`${
-            cuponeraState.active ? classes.text : classes.textDisabled
-          }`}
-        >
-          Agregar Saldo
-        </h1>
-        <div>
-          <label
-            className={`${
-              cuponeraState.active ? classes.textL : classes.textLDisabled
-            }`}
-          >
-            Cédula Cliente
-          </label>
-          <Input
-            ref={refAgregarCi}
-            isValid={cuponeraState.Agregar.cedula.isValid}
-            input={INPUTS[2]}
-          />
-          <label
-            className={`${
-              cuponeraState.active ? classes.textL : classes.textLDisabled
-            }`}
-          >
-            Dinero ingresado
-          </label>
-          <Input
-            ref={refAgregarMonto}
-            isValid={cuponeraState.Agregar.monto.isValid}
-            input={INPUTS[3]}
-          />
-        </div>
-        <p className={classes.textP}>
-          {AgregarP !== -1 ? cuponeraState.Agregar.problemas[AgregarP].pro : ""}
-        </p>
-        <Button disabled={!cuponeraState.active} action={agregarHandler}>
-          Agregar
-        </Button>
-      </Border>
-      <Border disabled={!cuponeraState.active}>
-        <h1 className={classes.text}>Modificar Cuponera</h1>
-        <div>
-          <label className={classes.textL}>Cédula Cliente Actual</label>
-          <Input
-            ref={refModificarCiA}
-            isValid={cuponeraState.Modificar.cedulaAnterior.isValid}
-            input={INPUTS[4]}
-          />
-          <label className={classes.textL}>Cédula Nuevo Cliente</label>
-          <Input
-            ref={refModificarCiN}
-            isValid={cuponeraState.Modificar.cedulaNueva.isValid}
-            input={INPUTS[5]}
-          />
-          <label className={classes.textL}>Nuevo Monto</label>
-          <Input
-            ref={refModificarMonto}
-            isValid={cuponeraState.Modificar.monto.isValid}
-            input={INPUTS[6]}
-          />
-        </div>
-        <p className={classes.textP}>
-          {ModificarP !== -1
-            ? cuponeraState.Modificar.problemas[ModificarP].pro
-            : ""}
-        </p>
-        <Button action={modificarHandler}>Modificar</Button>
-      </Border>
-      <Border disabled={!cuponeraState.active}>
-        <h1 className={classes.text}>Consultar Cuponera</h1>
-        <div>
-          <label className={classes.textL}>Cédula Cliente</label>
-          <Input
-            ref={refConsultar}
-            isValid={cuponeraState.Consultar.cedula.isValid}
-            input={INPUTS[7]}
-          />
-        </div>
-        <p className={classes.textP}>
-          {ConsultarP !== -1
-            ? cuponeraState.Consultar.problemas[ConsultarP].pro
-            : ""}
-        </p>
-        <Button action={consultarHandler}>Consultar</Button>
-      </Border>
+            Agregar Saldo
+          </h1>
+          <div>
+            <label
+              className={`${
+                cuponeraState.active ? classes.textL : classes.textLDisabled
+              }`}
+            >
+              Cédula Cliente
+            </label>
+            <Input
+              ref={refAgregarCi}
+              isValid={cuponeraState.Agregar.cedula.isValid}
+              input={INPUTS[2]}
+            />
+            <label
+              className={`${
+                cuponeraState.active ? classes.textL : classes.textLDisabled
+              }`}
+            >
+              Dinero ingresado
+            </label>
+            <Input
+              ref={refAgregarMonto}
+              isValid={cuponeraState.Agregar.monto.isValid}
+              input={INPUTS[3]}
+            />
+          </div>
+          <p className={classes.textP}>
+            {AgregarP !== -1
+              ? cuponeraState.Agregar.problemas[AgregarP].pro
+              : ""}
+          </p>
+          <Button disabled={!cuponeraState.active} action={agregarHandler}>
+            Agregar
+          </Button>
+        </Border>
+      )}
+      {!VC && (
+        <Border disabled={!cuponeraState.active}>
+          <h1 className={classes.text}>Modificar Cuponera</h1>
+          <div>
+            <label className={classes.textL}>Cédula Cliente Actual</label>
+            <Input
+              ref={refModificarCiA}
+              isValid={cuponeraState.Modificar.cedulaAnterior.isValid}
+              input={INPUTS[4]}
+            />
+            <label className={classes.textL}>Cédula Nuevo Cliente</label>
+            <Input
+              ref={refModificarCiN}
+              isValid={cuponeraState.Modificar.cedulaNueva.isValid}
+              input={INPUTS[5]}
+            />
+            <label className={classes.textL}>Nuevo Monto</label>
+            <Input
+              ref={refModificarMonto}
+              isValid={cuponeraState.Modificar.monto.isValid}
+              input={INPUTS[6]}
+            />
+          </div>
+          <p className={classes.textP}>
+            {ModificarP !== -1
+              ? cuponeraState.Modificar.problemas[ModificarP].pro
+              : ""}
+          </p>
+          <Button action={modificarHandler}>Modificar</Button>
+        </Border>
+      )}
+        <Border disabled={!cuponeraState.active}>
+          <h1 className={classes.text}>Consultar Cuponera</h1>
+          <div>
+            <label className={classes.textL}>Cédula Cliente</label>
+            <Input
+              ref={refConsultar}
+              isValid={cuponeraState.Consultar.cedula.isValid}
+              input={INPUTS[7]}
+            />
+          </div>
+          <p className={classes.textP}>
+            {ConsultarP !== -1
+              ? cuponeraState.Consultar.problemas[ConsultarP].pro
+              : ""}
+          </p>
+          <Button action={consultarHandler}>Consultar</Button>
+        </Border>
     </Marco>
   );
 };

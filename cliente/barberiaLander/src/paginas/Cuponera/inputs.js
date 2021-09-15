@@ -132,7 +132,6 @@ const inputs = (state, dispatch) => {
       },
       {
         id: 8,
-        disabled:!state.active,
         type: "number",
         value: state.Consultar.cedula.value,
         placeholder: "Cédula",
