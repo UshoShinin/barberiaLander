@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { getMonthValue,getDayIndex,getMonthChart  } from '../components/Calendario/Dias/FunctionsDias';
 import { horariosDisponibilidad } from '../components/Calendario/FuncionesAuxiliares';
+import { getElementById } from "../FuncionesAuxiliares/FuncionesAuxiliares";
 export const getYearChart = () => {
   return 6;
 }
@@ -43,10 +44,11 @@ const useDayGenerator = () => {
         let maxDays = getMonthValue(myMonth,myYear);
         for (let i = diaActual; i <= maxDays; i++) {
           diaSemana = diaSemana > 7 ? 1 : diaSemana;
+          jornal = getElementById(miJornada,diaSemana);
           diasAuxiliares.push({
             num: diaAuxiliar,
             mes:month,
-            disponibilidad: horariosDisponibilidad(diaSemana, diasTotales,i, myMonth+idMonth,misFechas,timeNeed,entrada,salida),
+            disponibilidad: horariosDisponibilidad(diasTotales,i, myMonth+idMonth,misFechas,timeNeed,jornal.entrada,jornal.salida),
             activo:diaSemana ===0 ? null:false,
           });
           diaAuxiliar++;
@@ -68,7 +70,7 @@ const useDayGenerator = () => {
             diasAuxiliares.push({
               num: i,
               mes:myMonth,
-              disponibilidad: horariosDisponibilidad(diaSemana, diasTotales,i, myMonth,misFechas,timeNeed,entrada,salida),
+              disponibilidad: horariosDisponibilidad(diasTotales,i, myMonth,misFechas,timeNeed,jornal.entrada,jornal.salida),
               activo:diaSemana ===0 ? null:false,
             });
             diaSemana++;

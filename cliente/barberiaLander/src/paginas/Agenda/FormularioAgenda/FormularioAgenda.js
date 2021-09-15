@@ -15,8 +15,7 @@ import { calcularTiempo } from "../../../components/Calendario/FuncionesAuxiliar
 import CheckBoxAgenda from "./CheckBoxAgenda";
 import useDayGenerator from "../../../hooks/useDayGenerator";
 import { getElementById } from "../../../FuncionesAuxiliares/FuncionesAuxiliares";
-
-
+import { getDayIndex2 } from "../../../components/Calendario/Dias/FunctionsDias";
 import ComboBox from "../../../components/ComboBox/ComboBox";
 
 import {
@@ -36,7 +35,6 @@ const FormularioAgenda = (props) => {
   const DaysGenerator = useDayGenerator();
   const authCtx = useContext(AuthContext);
   const [diasMostrar, setDiasMostrar] = useState(null);
-
   const calendarioHandler = (horarios) => {
     let misHorarios = [];
     let i = 1;
@@ -49,14 +47,22 @@ const FormularioAgenda = (props) => {
         i++;
       });
     } else {
+      console.log(horarios);
+      const d = horarios.dia.d;
+      const m = horarios.dia.m;
+      const date = new Date();
+      const realMonth = date.getMonth() + 1;
+      const realYear = date.getFullYear();
+      const y = m < realMonth ? realYear + 1 : realYear;
       const Employee = getElementById(
         inputState.HorariosFiltrados,
         inputState.Employee.value
       );
-      const entrada = transformStringNumber(Employee.entrada);
-      const salida = transformStringNumber(Employee.salida);
-      console.log(entrada);
-      console.log(salida);
+      const diaSemana = getDayIndex2(d, m, y);
+      const jornada = getElementById(Employee.jornada,diaSemana);
+
+      const entrada = transformStringNumber(jornada.entrada);
+      const salida = transformStringNumber(jornada.salida);
       let H = entrada.h;
       let M = entrada.m;
       while (H < salida.h || M < salida.m) {

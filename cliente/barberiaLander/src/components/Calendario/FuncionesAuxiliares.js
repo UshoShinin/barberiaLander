@@ -36,20 +36,25 @@ export const getIdByTitle = (list, title) => {
 /* Esta funciona genera los días del calendario, si ese día no tiene horarios y no es domingo automaticamente está disponible
 en caso de que tenga horarios se evalúan si hay horarios disponibles y se devuelven */
 export const horariosDisponibilidad = (
-  diaSemana,
   diasTotales,
   dia,
   mes,
   fechas,
-  servicios,entrada,salida
+  servicios,
+  entrada,
+  salida
 ) => {
   const horarios = obtenerHorariosDeDia(dia, mes, fechas);
-  if (diasTotales < 1 || diaSemana === 7)
+  if (diasTotales < 1 || entrada===null)
     return { valido: false, horariosDisponibles: [] };
   if (horarios === null) return { valido: true, horariosDisponibles: [] };
   else {
-    
-    const resultado = horariosAgendarDisponibles(horarios, servicios,entrada,salida);
+    const resultado = horariosAgendarDisponibles(
+      horarios,
+      servicios,
+      entrada,
+      salida
+    );
     if (resultado.length > 0) {
       return {
         valido: true,
@@ -83,7 +88,12 @@ export const minutosAHorarios = (minutos) => {
   return { h: (minutos - (minutos % 60)) / 60, m: minutos % 60 };
 };
 /* Carga todos los horarios disponibles dentro de una lista de ghrarios y una cantidad de tiempo que es necesario ocupar */
-export const horariosAgendarDisponibles = (horarios, timeNeed,entrada,salida) => {
+export const horariosAgendarDisponibles = (
+  horarios,
+  timeNeed,
+  entrada,
+  salida
+) => {
   let hora = entrada;
   const horaCierre = salida;
   let horariosDisponibles = [];
@@ -144,7 +154,10 @@ export const cargarHorariosEnMinutos = (inicio, fin) => {
   let lista = [];
   let id = 1;
   while (inicio <= fin) {
-    lista.push({id:id,title:transformNumberString(minutosAHorarios(inicio))});
+    lista.push({
+      id: id,
+      title: transformNumberString(minutosAHorarios(inicio)),
+    });
     inicio += 15;
     id++;
   }

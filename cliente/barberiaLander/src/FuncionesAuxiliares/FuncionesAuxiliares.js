@@ -4,9 +4,6 @@ export const formatDate = (date) => {
   const mes = normalDate.slice(5, 7);
   const dia = normalDate.slice(8, 10);
   const nuevaFecha = new Date(`${mes}-${dia}-${year}`);
-  /* console.log(year);
-    console.log(mes);
-    console.log(dia); */
   return nuevaFecha;
 };
 export const deFormatDate = (date) => {};

@@ -54,3 +54,14 @@ export let getMonthValue = (index, year) => {
       return 31;
   }
 };
+
+export const getDayIndex2 = (diaActual, mes, year) => {
+  let monthChart = getMonthChart(mes);
+  let yearChart = 6;
+  let shortYear = parseInt(year.toString().substr(-2), 10)
+  let dayIndex =
+    diaActual + monthChart + yearChart + shortYear + Math.trunc(shortYear / 4);
+  dayIndex = dayIndex % 7;
+  dayIndex = dayIndex === 0 ? 7 : dayIndex;
+  return dayIndex;
+};
