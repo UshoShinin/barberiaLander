@@ -321,7 +321,7 @@ const AperturaCierre = () => {
               );
             } else {
               console.log(EntradaDeDinero());
-              /* cobrarCaja(
+              cobrarCaja(
                 {
                   url: "/entradaCaja",
                   method: "POST",
@@ -329,7 +329,7 @@ const AperturaCierre = () => {
                   body: EntradaDeDinero(),
                 },
                 getRespuesta
-              ); */
+              );
             }
           }}
           rechazar={() => {

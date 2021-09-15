@@ -47,7 +47,6 @@ const FormularioAgenda = (props) => {
         i++;
       });
     } else {
-      console.log(horarios);
       const d = horarios.dia.d;
       const m = horarios.dia.m;
       const date = new Date();
