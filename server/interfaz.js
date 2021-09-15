@@ -1461,7 +1461,7 @@ const nuevaEntradaDinero = async (
         }
         //Ahora tengo que verificar si se vendieron productos
         if (listadoProductos !== null) {
-          const agregoProductos = insertarEntradaProducto(
+          const agregoProductos = cobrarEntradaProducto(
             idEntrada,
             listadoProductos
           );
@@ -1613,6 +1613,22 @@ const insertarEntradaProducto = async (idEntrada, listadoProductos, monto) => {
       filasAfectadas: resultado.rowsAffected[0],
       tablaInsertada: "Entrada_Producto",
     };
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo para cobrar los productos
+//Hago el insert en la tabla de producto y hago el descuento del stock
+const cobrarEntradaProducto = async (idEntrada, listadoProductos) => {
+  try {
+    //Primero cobro los articulos, despues inserto en la tabla de EntradaProducto
+    return modificarStockListadoProducto(listadoProductos)
+      .then((resultado) => {
+        //Aca hago el insert en la tabla Entrada_Producto
+        return insertarEntradaProducto(idEntrada, listadoProductos);
+      })
+      .then((res) => res);
   } catch (error) {
     console.log(error);
   }
@@ -2295,7 +2311,11 @@ const modificarStockProducto = async (idProducto, cantidad) => {
         //Si entro aca significa de que tengo stock suficiente para vender entonces los descuento
         return updateStockProducto(idProducto, nuevoStock).then((resultado) => {
           //Devuelvo el resultado, que son la cantidad de filas afectadas. Siempre deberia ser 1
-          return { codigo: 200, filasAfectadas: resultado };
+          return {
+            codigo: 200,
+            filasAfectadas: resultado,
+            mensaje: "Stock modificado correctamente",
+          };
         });
       }
     });
@@ -2525,6 +2545,7 @@ const interfaz = {
   verificarHorario,
   verificacionEntradaCaja,
   modificarStockListadoProducto,
+  modificarStockProducto,
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar

@@ -254,8 +254,21 @@ app.use("/manejoDeAgendas", (req, res) => {
   });
 });
 
+//Esto es de prueba
 app.post("/modStockListado", (req, res) => {
   const ret = interfaz.modificarStockListadoProducto(req.body.listadoProductos);
+  ret.then((resultado) => {
+    res.json({
+      mensaje: resultado,
+    });
+  });
+});
+
+app.post("/modificarStockProducto", (req, res) => {
+  const ret = interfaz.modificarStockProducto(
+    req.body.idProducto,
+    req.body.cantidad
+  );
   ret.then((resultado) => {
     res.json({
       mensaje: resultado,
