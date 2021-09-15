@@ -2094,13 +2094,13 @@ const cierreCaja = async () => {
    *
    *
    *
-   * 
-   * 
-   * 
-   * 
-   * 
-   * 
-   * 
+   *
+   *
+   *
+   *
+   *
+   *
+   *
    *
    *
    *
@@ -2242,26 +2242,63 @@ const agregarHorariosEmpleadoModificar = async (listadoEmpleados, idAgenda) => {
   }
 };
 
+//Metodo para modificar stock de un listado de productos
+//El listado de productos tiene objeto producto con id y cantidad a sacar
+const modificarStockListadoProducto = async (listadoProducto) => {
+  try {
+    let listadoPromesa = [];
+    listadoProducto.forEach((producto) => {
+      listadoPromesa.push(
+        modificarStockProducto(producto.id, producto.cantidad)
+      );
+    });
+    return Promise.allSettled(listadoPromesa)
+      .then((resultados) => {
+        let salioBien = true;
+        resultados.forEach((promesa) => {
+          if (promesa.value.codigo !== 200) {
+            salioBien = false;
+          }
+        });
+        return salioBien;
+      })
+      .then((resultado) => {
+        if (resultado) {
+          return { codigo: 200, mensaje: "Stock modificado correctamente" };
+        } else {
+          return {
+            codigo: 400,
+            mensaje: "Error al modificar el stock de los productos",
+          };
+        }
+      });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 //Metodo para modificar stock de producto
 const modificarStockProducto = async (idProducto, cantidad) => {
   try {
-
-    /**
-     * 
-     * 
-     * 
-     * 
-     * 
-     * 
-     * 
-     * 
-     * 
-     * 
-     * 
-     * 
-     * 
-     * 
-     */
+    //Voy a buscar el producto que quiero modificarle el stock
+    return getProductoPorId(idProducto).then((producto) => {
+      //Ahora que tengo el producto quiero saber cual va a ser el nuevo stock
+      //En caso de que el stock sea < 0 devuelvo error
+      let nuevoStock = producto.Stock - cantidad;
+      if (nuevoStock < 0) {
+        return {
+          codigo: 400,
+          mensaje: "Stock insuficiente",
+          producto: producto.IdProducto,
+        };
+      } else {
+        //Si entro aca significa de que tengo stock suficiente para vender entonces los descuento
+        return updateStockProducto(idProducto, nuevoStock).then((resultado) => {
+          //Devuelvo el resultado, que son la cantidad de filas afectadas. Siempre deberia ser 1
+          return { codigo: 200, filasAfectadas: resultado };
+        });
+      }
+    });
   } catch (error) {
     console.log(error);
   }
@@ -2277,7 +2314,7 @@ const getProductoPorId = async (idProducto) => {
       .request()
       .input("idProducto", sql.Int, idProducto)
       .query("select * from Producto where IdProducto = @idProducto");
-    return producto.rowsAffected[0];
+    return producto.recordset[0];
   } catch (error) {
     console.log();
   }
@@ -2292,9 +2329,9 @@ const updateStockProducto = async (idProducto, nuevaCantidad) => {
     const resultado = await pool
       .request()
       .input("idProducto", sql.Int, idProducto)
-      .input("cantidad", sql.Int, cantidad)
+      .input("nuevaCantidad", sql.Int, nuevaCantidad)
       .query(
-        "update Producto set Stock = @cantidad where IdProducto = @idProducto"
+        "update Producto set Stock = @nuevaCantidad where IdProducto = @idProducto"
       );
     return resultado.rowsAffected[0];
   } catch (error) {
@@ -2351,7 +2388,6 @@ const verificacionEntradaCaja = async (
               break;
           }
         });
-        console.log(retorno);
         return retorno;
       })
       .then((retorno) => retorno);
@@ -2488,6 +2524,7 @@ const interfaz = {
   updateManejarAgenda,
   verificarHorario,
   verificacionEntradaCaja,
+  modificarStockListadoProducto,
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar
