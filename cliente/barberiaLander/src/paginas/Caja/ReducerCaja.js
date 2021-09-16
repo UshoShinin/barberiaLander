@@ -79,6 +79,7 @@ export const initialState = {
     { id: 2, title: "Pablito" },
     { id: 3, title: "Juan carlos" },
   ],
+  Mensaje: { show: false, value: "" },
 };
 
 const orden = (a, b) => {
@@ -126,6 +127,10 @@ export const cajaReducer = (state, action) => {
   let mDebito = null;
   let mCuponera = null;
   switch (action.type) {
+    case "SHOW_MENSAJE":
+      return { ...state, Mensaje: { show: true, value: action.value } };
+    case "HIDE_MENSAJE":
+      return { ...state, Mensaje: { show: false, value: "" } };
     case "ABRIR_CAJA":
       return { ...state, cajaAbierta: true, idCaja: action.id };
     case "CERRAR_CAJA":
@@ -1023,7 +1028,7 @@ export const cajaReducer = (state, action) => {
       };
       break;
     default:
-      return {...state};
+      return { ...state };
   }
   if (myState !== null) {
     mAgenda = calcularPrecio(myState.servicios);

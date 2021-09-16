@@ -45,9 +45,46 @@ const AperturaCierre = () => {
   const fetchAgendas = useHttp();
   const salidaDinero = useHttp();
   const validarDatos = useHttp();
+  const cierreCaja = useHttp();
   const getRespuestaSalida = (res) => {
     console.log(res);
+    /* if(res.) */
+    /* if (cajaState.cuponera.value) {
+      const datosCuponera = {
+        cedula: cajaState.codCuponera.value,
+        monto: -parseInt(
+          cajaState.cantidadMedios.value > 1
+            ? cajaState.montoCuponera.value
+            : cajaState.montoTotal.value,
+          10
+        ),
+      };
+      modificarCuponera(
+        {
+          url: "/modificarSaldoCuponera",
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: datosCuponera,
+        },
+        getRespuestaModificar
+      );
+    } else {
+      console.log(EntradaDeDinero());
+      cobrarCaja(
+        {
+          url: "/cobrarCaja",
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: EntradaDeDinero(),
+        },
+        getRespuesta
+      );
+    } */
   };
+
+  const cerrarCaja = (res) =>{
+    console.log(res);
+  }
   const salidaSubmitHandler = (e) => {
     e.preventDefault();
     if (!cajaState.montoSalida.isValid) {
@@ -83,7 +120,13 @@ const AperturaCierre = () => {
   };
 
   const getRespuesta = (res) => {
-    console.log(res);
+    if(res.mensaje.cuponera!==undefined&&res.mensaje.cuponera.codigo===400){
+      dispatchCaja({ type: "SHOW_MENSAJE", value: res.mensaje.cuponera.mensaje});
+    }else if(res.mensaje.producto!==undefined&&res.mensaje.producto.codigo===400){
+      dispatchCaja({ type: "SHOW_MENSAJE", value: res.mensaje.producto.mensaje});
+    }else if(res.mensaje.agenda!==undefined&&res.mensaje.agenda.codigo===400){
+      dispatchCaja({ type: "SHOW_MENSAJE", value: res.mensaje.agenda.mensaje});
+    }
   };
   const EntradaDeDinero = () => {
     let montoE = 0;
@@ -279,7 +322,6 @@ const AperturaCierre = () => {
           show={cajaState.jornal.show}
           aceptar={() => {
             dispatchCaja({ type: "HIDE_JORNAL" });
-            console.log(cajaState);
             const comboAgenda = cajaState.comboAgenda.value;
             const productos = cajaState.productosAgregados;
             const codcup = cajaState.codCuponera.value;
@@ -292,7 +334,6 @@ const AperturaCierre = () => {
               ciCliente:codcup.length>0?codcup:-1,
               monto:monto
             }
-            console.log(data);
             validarDatos(
               {
                 url: "/verificarEntrada",
@@ -302,37 +343,6 @@ const AperturaCierre = () => {
               },
               getRespuestaSalida
             );
-            if (cajaState.cuponera.value) {
-              const datosCuponera = {
-                cedula: cajaState.codCuponera.value,
-                monto: -parseInt(
-                  cajaState.cantidadMedios.value > 1
-                    ? cajaState.montoCuponera.value
-                    : cajaState.montoTotal.value,
-                  10
-                ),
-              };
-              modificarCuponera(
-                {
-                  url: "/modificarSaldoCuponera",
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: datosCuponera,
-                },
-                getRespuestaModificar
-              );
-            } else {
-              console.log(EntradaDeDinero());
-              cobrarCaja(
-                {
-                  url: "/entradaCaja",
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: EntradaDeDinero(),
-                },
-                getRespuesta
-              );
-            }
           }}
           rechazar={() => {
             dispatchCaja({ type: "HIDE_JORNAL" });
@@ -401,7 +411,9 @@ const AperturaCierre = () => {
             <SimpleButton
               disabled={!cajaState.cajaAbierta}
               action={() => {
-                dispatchCaja({ type: "CERRAR_CAJA" });
+                /* dispatchCaja({ type: "CERRAR_CAJA" }); */
+                cierreCaja({url:'/cierreCaja?idCaja='+cajaState.idCaja},cerrarCaja)
+                /* getAgenda({ url: "/agendaPorId?idAgenda=" + id }, obtenerAgenda); */
               }}
               className={classes.Cerrar}
             >

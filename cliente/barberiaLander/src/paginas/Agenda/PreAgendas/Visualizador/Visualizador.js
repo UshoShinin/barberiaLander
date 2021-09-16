@@ -232,7 +232,7 @@ const Visualizador = React.memo((props) => {
             />
           </div>
         </div>
-        <SimpleButton active={false} action={sendAgendas}>
+        <SimpleButton disabled={agenda.IdAgenda === -1} active={false} action={sendAgendas}>
           Comenzar a modificar
         </SimpleButton>
       </Border>

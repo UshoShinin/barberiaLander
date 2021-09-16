@@ -261,7 +261,7 @@ const Cuponeras = () => {
   };
 
   return (
-    <Marco use={width > 900 || VC} className={`${classes.container} ${VC?classes.ajuste:''}`}>
+    <Marco use={width > 900 || VC} className={`${!VC?classes.container:''} ${VC?classes.ajuste:''}`}>
       <Note
         show={cuponeraState.Mensaje.show}
         onClose={() => {

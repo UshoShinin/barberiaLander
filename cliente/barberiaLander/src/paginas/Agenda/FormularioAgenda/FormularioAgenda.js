@@ -101,7 +101,7 @@ const FormularioAgenda = (props) => {
         )
       );
       let datosAgenda;
-
+        /* const reserva = document.getElementById('reserva'); */
       if (props.agenda === null || props.agenda === undefined) {
         const user = authCtx.user;
         console.log(user);
@@ -120,6 +120,7 @@ const FormularioAgenda = (props) => {
           }`,
           horario: { i: inicio, f: fin },
         };
+        /* reserva.blur(); */
         props.onSaveDatosAgenda(datosAgenda);
       } else {
         //Modificar
@@ -142,6 +143,7 @@ const FormularioAgenda = (props) => {
             fecha: fechita,
           },
         };
+        /* reserva.blur(); */
         props.onUpdateDatosAgenda(datosAgenda);
       }
     }
@@ -399,7 +401,7 @@ const FormularioAgenda = (props) => {
             </div>
           )}
         </div>
-        <Button type="submit">{`${
+        <Button id='reserva' type="submit">{`${
           props.agenda === null ? "Reservar" : "Modificar Reserva"
         }`}</Button>
       </form>
