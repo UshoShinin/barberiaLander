@@ -27,7 +27,7 @@ const Visualizador = React.memo((props) => {
       decoloracion: false,
       brushing: false,
     };
-    respuesta.mensaje.servicios.forEach((s) => {
+    respuesta.mensaje.mensaje.servicios.forEach((s) => {
       switch (s) {
         case 1:
           servicios.corte = true;
@@ -53,8 +53,8 @@ const Visualizador = React.memo((props) => {
     });
 
     const agendaObtenida = {
-      ...respuesta.mensaje,
-      fecha: respuesta.mensaje.fecha.slice(0, 10),
+      ...respuesta.mensaje.mensaje,
+      fecha: respuesta.mensaje.mensaje.fecha.slice(0, 10),
       servicios: { ...servicios },
     };
     setAgenda(agendaObtenida);

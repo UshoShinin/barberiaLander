@@ -14,8 +14,6 @@ import { initialState, reducer } from "./FAReducer";
 
 const PreAgendas = () => {
   const history = useHistory();
-  const [idAgenda, setIdAgenda] = useState(null);
-  const [agendaAModificar, setAgendaAModificar] = useState(null);
   const [agendasState, dispatch] = useReducer(reducer, initialState);
   const authCtx = useContext(AuthContext);
   const obtenerAgendas = (agendas) => {
@@ -48,9 +46,7 @@ const PreAgendas = () => {
     else fetchAgendas({ url: "/listadoPreAgendas" }, obtenerAgendas);
   }, [user, history, fetchAgendas]);
   const showAgenda = (agendita) => {
-    //Controlar error
-    /* setAgendaAModificar(); */
-
+    dispatch({type:'GET_AGENDA',agenda:agendita});
   };
   const aceptarAgenda = (agenda) => {
     aceptar(
@@ -81,7 +77,7 @@ const PreAgendas = () => {
       {agendasState.agendaAModificar !== null && (
         <CrearAgenda
           exitModificar={() => {
-            setAgendaAModificar(null);
+            dispatch({type:'GET_AGENDA',agenda:null});
           }}
           agenda={agendasState.agendaAModificar}
         />
@@ -95,7 +91,7 @@ const PreAgendas = () => {
                 {agendasState.agendas !== null && (
                   <Lista
                     items={agendasState.agendas}
-                    select={setIdAgenda}
+                    select={(id)=>{dispatch({type:'SELECT_AGENDA',value:id})}}
                     aceptar={aceptarAgenda}
                     rechazar={rechazarAgenda}
                   />
@@ -126,7 +122,7 @@ const PreAgendas = () => {
                 </div>
               </div>
               <div className={classes.editor}>
-                <Visualizador id={idAgenda} mostrarAgenda={showAgenda} />
+                <Visualizador id={agendasState.agendaId} mostrarAgenda={showAgenda} />
               </div>
             </div>
           )}

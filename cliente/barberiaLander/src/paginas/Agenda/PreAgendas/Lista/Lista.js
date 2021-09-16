@@ -4,7 +4,7 @@ const Lista = (props) => {
   const content = props.items.map((item) => {
     return (
       <Item
-        key={item.nombreCliente}
+        key={item.idAgenda}
         item={item}
         select={props.select}
         aceptar={props.aceptar}

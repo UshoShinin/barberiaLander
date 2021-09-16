@@ -21,7 +21,8 @@ export const reducer = (state, action) => {
         rechazar: manejo === -1,
         agendas: [...misAgendas],
       };
-    case "SELECT_AGENDA":
+    case "GET_AGENDA":
+        console.log(action.agenda);
       const agendita =
         action.agenda != null
           ? {
@@ -33,6 +34,8 @@ export const reducer = (state, action) => {
             }
           : null;
       return { ...state, agendaAModificar: agendita };
+    case 'SELECT_AGENDA':
+        return {...state,agendaId:action.value};
     case "ACEPTAR":
       return { aceptar: !state.aceptar, rechazar: false };
     case "RECHAZAR":

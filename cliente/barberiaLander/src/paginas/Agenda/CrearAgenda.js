@@ -111,6 +111,7 @@ const CrearAgenda = (props) => {
               return { id: id, title: transformNumberString(h) };
             })
           : cargarHorariosEnMinutos(agenda.fecha, empleado);
+      console.log(resultado);
       const position = getIdByTitle(resultado, agenda.horario.i);
       Calendario = {
         value: resultado,

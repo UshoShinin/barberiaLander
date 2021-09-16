@@ -94,6 +94,10 @@ export const horariosAgendarDisponibles = (
   entrada,
   salida
 ) => {
+  console.log(horarios,
+    timeNeed,
+    entrada,
+    salida);
   let hora = entrada;
   const horaCierre = salida;
   let horariosDisponibles = [];
