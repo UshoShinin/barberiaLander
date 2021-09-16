@@ -562,13 +562,13 @@ const getAgendaPorId = async (idAgenda) => {
       serviciosAgenda.forEach((servicio) => {
         ret.servicios.push(servicio.IdServicio);
       });
-      return {codigo: 200, mensaje: ret};
+      return { codigo: 200, mensaje: ret };
     } else {
-      return {codigo: 400, mensaje: "No existe una agenda con ese id"};
+      return { codigo: 400, mensaje: "No existe una agenda con ese id" };
     }
   } catch (error) {
     console.log(error);
-    return {codigo: 400, mensaje: "Error al buscar agenda"};
+    return { codigo: 400, mensaje: "Error al buscar agenda" };
   }
 };
 
@@ -709,19 +709,26 @@ const insertarAgenda = async (agenda) => {
       "insert into Agenda (NombreCliente, Descripcion, Img, Tel, Aceptada, IdHorario) OUTPUT inserted.IdHorario, inserted.IdAgenda values (@NombreCliente, @Descripcion, @Img, @Tel, @Aceptada, @IdHorario)"
     )
     .then((resultado) => {
-      //El objeto resultado devuelve la cantidad de filas afectadas, el idAgenda y el idHorario
-      let ret = {
-        idHorario: resultado.recordset[0].IdHorario,
-        idAgenda: resultado.recordset[0].IdAgenda,
-      };
       if (agenda.ciCliente !== undefined) {
         return insertarAgendaCliente({
-          cedula: agenda.ciCliente,
-          idAgenda: ret.idAgenda,
-          idHorario: ret.idHorario,
+          ciCliente: agenda.ciCliente,
+          idHorario: resultado.recordset[0].IdHorario,
+          idAgenda: resultado.recordset[0].IdAgenda,
+        }).then((resCli) => {
+          let retorno = {
+            idHorario: resCli.recordset[0].IdHorario,
+            idAgenda: resCli.recordset[0].IdAgenda,
+          };
+          return retorno;
         });
+      } else {
+        let ret = {
+          idHorario: resultado.recordset[0].IdHorario,
+          idAgenda: resultado.recordset[0].IdAgenda,
+        };
+        return ret;
       }
-      return ret;
+      //El objeto resultado devuelve la cantidad de filas afectadas, el idAgenda y el idHorario
     })
     .catch((error) => {
       //Armo un objeto con el error y los valores en -1
@@ -734,6 +741,7 @@ const insertarAgenda = async (agenda) => {
   //Cuando tengo el resultado del insert de la agenda, devuelvo el idAgenda y el idHorario
   return insertAgenda;
 };
+
 //Este es un metodo que dado los datos de una agenda y un servicio lo inserta en la base de datos
 //Es un metodo auxiliar que devuelve la cantida de filas afectadas
 //Este metodo espera un objeto de este estilo
@@ -788,7 +796,7 @@ const insertarAgendaCliente = async (datosAgendaCliente) => {
       .input("idHorario", sql.Int, datosAgendaCliente.idHorario)
       .input("idAgenda", sql.Int, datosAgendaCliente.idAgenda)
       .query(
-        "insert into Agenda_Cliente (IdAgenda, IdHorario, Cedula) values (@idAgenda, @idHorario, @ciCliente)"
+        "insert into Agenda_Cliente (IdAgenda, IdHorario, Cedula) OUTPUT inserted.IdHorario, inserted.IdAgenda values (@idAgenda, @idHorario, @ciCliente)"
       );
     const filasAfectadas = insertAgendaCliente.rowsAffected[0];
     return filasAfectadas;
@@ -2900,7 +2908,7 @@ const interfaz = {
   realizarEntradaDinero,
   getListadoProductos,
   crearNuevoProducto,
-  getAgendasCliente
+  getAgendasCliente,
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar
