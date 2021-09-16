@@ -324,7 +324,7 @@ app.post("/crearProducto", (req, res) => {
 
 app.use("/getAgendasCliente", (req, res) => {
   let valor = req.query.cedula;
-  let ret = interfaz.getAgendasCliente(valor);
+  let ret = interfaz.getAllServiciosAgendaClientes(valor);
   ret.then((resultado) => {
     res.json({
       mensaje: resultado,

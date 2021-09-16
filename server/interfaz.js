@@ -243,7 +243,7 @@ const getEmpleadosFormulario = async () => {
     //Consigo los datos de los empleados
     const empleados = await pool
       .request()
-      .query("select Cedula, Nombre, Img from Empleado");
+      .query("select Cedula, Nombre, Img from Empleado where Habilitado = 1");
     //Creo el array de retorno
     let arrayRetorno = [];
     //Recorro el listado de empleados para armar el objeto como necesito
@@ -716,8 +716,8 @@ const insertarAgenda = async (agenda) => {
           idAgenda: resultado.recordset[0].IdAgenda,
         }).then((resCli) => {
           let retorno = {
-            idHorario: resCli.recordset[0].IdHorario,
-            idAgenda: resCli.recordset[0].IdAgenda,
+            idHorario: resCli.IdHorario,
+            idAgenda: resCli.IdAgenda,
           };
           return retorno;
         });
@@ -731,6 +731,7 @@ const insertarAgenda = async (agenda) => {
       //El objeto resultado devuelve la cantidad de filas afectadas, el idAgenda y el idHorario
     })
     .catch((error) => {
+      console.log(error);
       //Armo un objeto con el error y los valores en -1
       return {
         error: error,
@@ -798,8 +799,7 @@ const insertarAgendaCliente = async (datosAgendaCliente) => {
       .query(
         "insert into Agenda_Cliente (IdAgenda, IdHorario, Cedula) OUTPUT inserted.IdHorario, inserted.IdAgenda values (@idAgenda, @idHorario, @ciCliente)"
       );
-    const filasAfectadas = insertAgendaCliente.rowsAffected[0];
-    return filasAfectadas;
+    return insertAgendaCliente.recordset[0];
   } catch (error) {
     console.log(error);
   }
@@ -1011,7 +1011,7 @@ const getCiNombreEmpleados = async () => {
     //Voy a buscar todos los empleados
     const empleados = await pool
       .request()
-      .query("select Cedula as id, Nombre as title from Empleado");
+      .query("select Cedula as id, Nombre as title from Empleado where Habilitado = 1");
     //Separo el listado
     const listadoEmpleados = empleados.recordset;
     return listadoEmpleados;
@@ -2874,6 +2874,22 @@ const getAgendasCliente = async (cedula) => {
     }
   } catch (error) {}
 };
+
+//Metodo auxiliar para conseguir todos los servicios de las agendas de clientes
+const getAllServiciosAgendaClientes = async (cedula) => {
+try {
+  //Creo la conexion
+  let pool = await sql.connect(conexion);
+  //Hago el select
+  const servicios = await pool
+    .request()
+    .input("cedula", sql.VarChar, cedula)
+    .query("select AC.IdAgenda as idAgenda, SA.IdServicio as idServicio from Agenda_Cliente AC, Agenda_Servicio SA where AC.IdAgenda = SA.IdAgenda and AC.Cedula = @cedula");
+  return servicios.recordset;
+} catch (error) {
+ console.log(error); 
+}
+}
 
 //Creo un objeto que voy a exportar para usarlo desde el index.js
 //Adentro voy a tener todos los metodos de llamar a la base
