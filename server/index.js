@@ -304,6 +304,24 @@ app.use("/cierreCaja", (req, res) => {
   });
 });
 
+app.use("/listadoProductos", (req, res) => {
+  let ret = interfaz.getListadoProductos();
+  ret.then((resultado) => {
+    res.json({
+      mensaje: resultado,
+    });
+  });
+});
+
+app.post("/crearProducto", (req, res) => {
+  const ret = interfaz.crearNuevoProducto(req.body.nombre, req.body.precio);
+  ret.then((resultado) => {
+    res.json({
+      mensaje: resultado,
+    });
+  });
+});
+
 // All other GET requests not handled before will return our React app
 /* app.get('*', (req, res) => {
   res.sendFile(path.resolve(__dirname, '../cliente/barberiaLander/build', 'index.html'));

@@ -2783,6 +2783,67 @@ const verificarStockListadoProductos = async (listadoProductos) => {
   }
 };
 
+//Metodo para calcular las propinas hasta el momento de un empleado
+const calcularPropina = async (ciEmpleado, idCaja) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el select
+    const propinas = await pool
+      .request()
+      .input("idCaja", sql.Int, idCaja)
+      .input("ciEmpleado", sql.VarChar, ciEmpleado)
+      .query(
+        "select SUM(E.Propina) as totalPropinas from EntradaDinero E, Empleado EP, Caja_Entrada C where E.Cedula = EP.Cedula and C.IdEntrada = E.IdEntrada and EP.Cedula = @ciEmpleado, and C.IdCaja = @idCaja "
+      );
+    if (propinas.rowsAffected[0] < 1) {
+      return { codigo: 400, mensaje: "Error al ir a buscar las propinas" };
+    } else {
+      return {
+        codigo: 200,
+        mensaje:
+          "Propina hasta el momento: " + propinas.recordset[0].totalPropinas,
+        propina: propinas.recordset[0].totalPropinas,
+      };
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo para calcular las comisiones de un empleado hasta el momento
+const calcularComision = async (ciEmpleado, idCaja) => {
+  try {
+    //El calculo de comisiones es bastante complicado
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo para crear un nuevo producto
+//Los productos nuevos se crean con stock 0 por las dudas
+const crearNuevoProducto = async (nombre, precio) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el insert
+    const producto = await pool
+      .request()
+      .input("precio", sql.Int, precio)
+      .input("nombre", sql.VarChar, nombre)
+      .query(
+        "insert into Producto (Nombre, Stock, Precio) values (@nombre, 0, @precio)"
+      );
+    if (producto.rowsAffected < 1) {
+      return { codigo: 400, mensaje: "Error al crear producto" };
+    } else {
+      return { codigo: 200, mensaje: "Producto creado correctamente" };
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 //Creo un objeto que voy a exportar para usarlo desde el index.js
 //Adentro voy a tener todos los metodos de llamar a la base
 const interfaz = {
@@ -2813,7 +2874,9 @@ const interfaz = {
   modificarStockListadoProducto,
   updateStockProducto,
   cierreCaja,
-  realizarEntradaDinero
+  realizarEntradaDinero,
+  getListadoProductos,
+  crearNuevoProducto
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar
