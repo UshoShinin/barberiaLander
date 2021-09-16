@@ -108,7 +108,7 @@ const FormularioAgenda = (props) => {
         //Crear
         datosAgenda = {
           aceptada: inputState.manejoAgenda,
-          ciCliente: user === null ? undefined : user.ci,
+          ciCliente: user === null ? undefined : user.ciUsuario,
           nombreCliente: inputState.Nombre.value,
           telefono: inputState.Telefono.value,
           descripcion: inputState.Descripcion.value,
