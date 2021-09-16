@@ -14,7 +14,10 @@ const aceptarAgenda = async (id, horario) => {
       fecha: horario.fecha,
     }).then(async (disponible) => {
       if (!disponible) {
-        return "El horario ya esta ocupado";
+        return {
+          codigo: 400,
+          mensaje: "El horario ya esta ocupado",
+        };;
       } else {
         //Creo la conexion
         let pool = await sql.connect(conexion);
@@ -2843,6 +2846,8 @@ const crearNuevoProducto = async (nombre, precio) => {
     console.log(error);
   }
 };
+
+
 
 //Creo un objeto que voy a exportar para usarlo desde el index.js
 //Adentro voy a tener todos los metodos de llamar a la base
