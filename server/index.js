@@ -322,6 +322,16 @@ app.post("/crearProducto", (req, res) => {
   });
 });
 
+app.use("/getAgendasCliente", (req, res) => {
+  let valor = req.query.cedula;
+  let ret = interfaz.getAgendasCliente(valor);
+  ret.then((resultado) => {
+    res.json({
+      mensaje: resultado,
+    });
+  });
+});
+
 // All other GET requests not handled before will return our React app
 /* app.get('*', (req, res) => {
   res.sendFile(path.resolve(__dirname, '../cliente/barberiaLander/build', 'index.html'));

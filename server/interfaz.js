@@ -17,7 +17,7 @@ const aceptarAgenda = async (id, horario) => {
         return {
           codigo: 400,
           mensaje: "El horario ya esta ocupado",
-        };;
+        };
       } else {
         //Creo la conexion
         let pool = await sql.connect(conexion);
@@ -562,13 +562,13 @@ const getAgendaPorId = async (idAgenda) => {
       serviciosAgenda.forEach((servicio) => {
         ret.servicios.push(servicio.IdServicio);
       });
-      return ret;
+      return {codigo: 200, mensaje: ret};
     } else {
-      return "No existe una agenda con ese id";
+      return {codigo: 400, mensaje: "No existe una agenda con ese id"};
     }
   } catch (error) {
     console.log(error);
-    return "Error al buscar agenda";
+    return {codigo: 400, mensaje: "Error al buscar agenda"};
   }
 };
 
@@ -2847,7 +2847,25 @@ const crearNuevoProducto = async (nombre, precio) => {
   }
 };
 
-
+//Metodo para conseguir las agendas de un cliente
+const getAgendasCliente = async (cedula) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el select
+    const agendas = await pool
+      .request()
+      .input("cedula", sql.VarChar, cedula)
+      .query(
+        "select H.Fecha as fecha, H.HoraInicio as horaInicio, H.HoraFin as horaFin, A.IdAgenda as idAgenda, A.IdHorario as idHorario, E.Nombre as nombreEmpleado from Agenda A, Agenda_Cliente AC, Horario H, Empleado E where A.IdHorario = H.IdHorario and AC.IdAgenda = A.IdAgenda and E.Cedula = H.Cedula and AC.Cedula = @cedula"
+      );
+    if (agendas.rowsAffected < 1) {
+      return { codigo: 400, mensaje: "No hay ninguna agenda" };
+    } else {
+      return { codigo: 200, mensaje: agendas.recordset };
+    }
+  } catch (error) {}
+};
 
 //Creo un objeto que voy a exportar para usarlo desde el index.js
 //Adentro voy a tener todos los metodos de llamar a la base
@@ -2881,7 +2899,8 @@ const interfaz = {
   cierreCaja,
   realizarEntradaDinero,
   getListadoProductos,
-  crearNuevoProducto
+  crearNuevoProducto,
+  getAgendasCliente
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar
