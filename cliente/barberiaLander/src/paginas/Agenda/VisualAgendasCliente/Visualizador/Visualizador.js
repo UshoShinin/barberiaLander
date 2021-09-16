@@ -221,16 +221,16 @@ const Visualizador = React.memo((props) => {
               }`}
             </p>
           </div>
-          <div className={classes.foto}>
-            {/* <img
+          {/* <div className={classes.foto}>
+            <img
             alt='Foto cliente'
               id="referencia"
               className={`${classes.hide} ${
                 agenda.IdAgenda !== -1 ? classes.show : ""
               }`}
               src={`${agenda.img !== null ? agenda.img : ""}`}
-            /> */}
-          </div>
+            />
+          </div> */}
         </div>
         <SimpleButton disabled={agenda.IdAgenda === -1} active={false} action={sendAgendas}>
           Comenzar a modificar

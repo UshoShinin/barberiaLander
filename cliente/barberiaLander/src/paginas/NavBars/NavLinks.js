@@ -105,17 +105,17 @@ const NavLinks = (props) => {
             </NavLink>
           </li>
         )}
-      {/* <li>
+      <li>
         <NavLink 
           onClick={NavOnClick}
           exact
           activeClassName={classes.active}
           
-          to="/slider"
+          to="/agenda/VisualizarAgendaCliente"
         >
-          <span data="Slider">Slider</span>
+          <span data="Visualizar Agenda">Visualizar Agenda</span>
         </NavLink>
-      </li> */}
+      </li>
 
       <li>
         <NavLink

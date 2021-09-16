@@ -10,26 +10,42 @@ import CrearAgenda from "../CrearAgenda";
 import AuthContext from "../../../store/AuthContext";
 import { useHistory } from "react-router-dom";
 import SimpleNote from "../../../components/UI/Note/SimpleNote";
-import { initialState, reducer } from "./FAReducer";
+const initialState = { aceptar: false, rechazar: false };
+
+const reducerChecks = (state, action) => {
+  switch (action.type) {
+    case "ACEPTAR":
+      return { aceptar: !state.aceptar, rechazar: false };
+    case "RECHAZAR":
+      return { aceptar: false, rechazar: !state.rechazar };
+    default:
+      return { ...state };
+  }
+};
 
 const PreAgendas = () => {
   const history = useHistory();
+  const [agendasState, setAgendasState] = useState(null);
   const [idAgenda, setIdAgenda] = useState(null);
   const [agendaAModificar, setAgendaAModificar] = useState(null);
-  const [agendasState, dispatch] = useReducer(reducer, initialState);
+  const [checks, dispatchChecks] = useReducer(reducerChecks, initialState);
   const authCtx = useContext(AuthContext);
   const obtenerAgendas = (agendas) => {
-    dispatch({
-      type: "CARGA",
-      payload: agendas.mensaje.preAgendas,
-      manejo: agendas.mensaje.manejoAgenda.AceptarRechazar,
-    });    
+    let manejo = agendas.mensaje.manejoAgenda.AceptarRechazar;
+    let misAgendas = [];
+    agendas.mensaje.preAgendas.forEach((agenda) => {
+      misAgendas.push({ ...agenda, fecha: agenda.fecha.slice(0, 10) });
+    });
+    setAgendasState(misAgendas);
+    if (manejo === 1) {
+      dispatchChecks({ type: "ACEPTAR" });
+    } else if (manejo === -1) {
+      dispatchChecks({ type: "RECHAZAR" });
+    }
   };
 
   const getRespuesta = (res) => {
-    const Data = {};
-    if (res.mensaje.codigo === 400) {
-    }
+    console.log(res);
   };
   const getRespuestaEliminar = (res) => {
     console.log(res);
@@ -39,18 +55,20 @@ const PreAgendas = () => {
   const aceptar = useHttp();
   const rechazar = useHttp();
   const user = authCtx.user;
+  const RC = user.rol==='Cliente'; //Rol Cliente
   useEffect(() => {
-    if (
-      user === null ||
-      (user.rol !== "Administrador" && user.rol !== "Encargado")
-    )
-      history.replace("/");
+    if (user === null || user.rol !== "Empleado") history.replace("/");
+    else if(user.rol === "Cliente") fetchAgendas({ url: "/listadoPreAgendas" }, obtenerAgendas);
     else fetchAgendas({ url: "/listadoPreAgendas" }, obtenerAgendas);
   }, [user, history, fetchAgendas]);
   const showAgenda = (agendita) => {
-    //Controlar error
-    /* setAgendaAModificar(); */
-
+    setAgendaAModificar({
+      ...agendita,
+      fecha: {
+        d: parseInt(agendita.fecha.slice(8, 10), 10),
+        m: parseInt(agendita.fecha.slice(5, 7), 10),
+      },
+    });
   };
   const aceptarAgenda = (agenda) => {
     aceptar(
@@ -78,23 +96,23 @@ const PreAgendas = () => {
 
   return (
     <>
-      {agendasState.agendaAModificar !== null && (
+      {agendaAModificar !== null && (
         <CrearAgenda
           exitModificar={() => {
             setAgendaAModificar(null);
           }}
-          agenda={agendasState.agendaAModificar}
+          agenda={agendaAModificar}
         />
       )}
-      {agendasState.agendaAModificar === null && (
+      {agendaAModificar === null && (
         <NormalCard className={classes.ajuste}>
-          {agendasState.agendas === null && <LoaddingSpinner />}
-          {agendasState.agendas !== null && (
+          {agendasState === null && <LoaddingSpinner />}
+          {agendasState !== null && (
             <div className={classes.container}>
               <div className={classes.listado}>
-                {agendasState.agendas !== null && (
+                {agendasState !== null && (
                   <Lista
-                    items={agendasState.agendas}
+                    items={agendasState}
                     select={setIdAgenda}
                     aceptar={aceptarAgenda}
                     rechazar={rechazarAgenda}
@@ -107,9 +125,9 @@ const PreAgendas = () => {
                   <div className={classes.actions}>
                     <Switch
                       onCheck={() => {
-                        dispatch({ type: "ACEPTAR" });
+                        dispatchChecks({ type: "ACEPTAR" });
                       }}
-                      active={agendasState.aceptar}
+                      active={checks.aceptar}
                     />
                   </div>
                   <div className={classes.label}>
@@ -118,9 +136,9 @@ const PreAgendas = () => {
                   <div className={classes.actions}>
                     <Switch
                       onCheck={() => {
-                        dispatch({ type: "RECHAZAR" });
+                        dispatchChecks({ type: "RECHAZAR" });
                       }}
-                      active={agendasState.rechazar}
+                      active={checks.rechazar}
                     />
                   </div>
                 </div>

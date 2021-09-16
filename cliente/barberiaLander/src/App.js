@@ -15,6 +15,7 @@ import MovimientoCaja from "./paginas/Caja/MovimientoCaja";
 import CrearAgenda from "./paginas/Agenda/CrearAgenda";
 import PreAgendas from "./paginas/Agenda/PreAgendas/PreAgendas";
 import VisualAgendas from "./paginas/Agenda/VisualAgendas/VisualAgendas";
+import VisualAgendasCliente from "./paginas/Agenda/VisualAgendasCliente/VisualizarAgenda";
 import Registro from "./paginas/Registro/Registro";
 import Login from "./paginas/Login/Login";
 import NoEncontrado from "./paginas/NoEncontrado";
@@ -31,10 +32,6 @@ const App = () => {
   //ESTO POR AHORA QUEDA NADA MAS, CUANDO ACOMODEMOS LAS COSAS PARA QUE QUEDEN PROLIJAS HAY QUE PONER EL IMPORT DONDE TIENE QUE IR
   //HAY QUE IMPORTAR useContext y ContextUsuario donde sea que vayamos a ir
   //DEJO UNA LISTA CON COMPONENTES LINKS QUE SON LOS QUE DEBERIAMOS USAR EN EL HEADER, SE VAN A RENDERIZAR SEGUN EL ROL
-  /* const ctxUsuario = useContext(ContextUsuario);
-  const estaLogueado = ctxUsuario.estaLogueado;
-  const rol = ctxUsuario.rol; */
-
   return (
     <div className="App">
       {/*ESTAS SON LAS RUTAS POSIBLES A GRANDES RASGOS*/}
@@ -66,6 +63,9 @@ const App = () => {
             <Route path="/agenda/crearagenda" exact>
               <CrearAgenda agenda={null}/>
             </Route>
+            {/* <Route path="/agenda/VisualizarAgendaCliente" exact>
+              <VisualAgendasCliente/>
+            </Route> */}
             <Route path="/agenda/preagendas" exact>
               <PreAgendas />
             </Route>
