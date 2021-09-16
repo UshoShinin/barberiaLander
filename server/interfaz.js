@@ -2895,6 +2895,37 @@ const getAllServiciosAgendaClientes = async (cedula) => {
   }
 };
 
+//Metodo para juntar todas las agendas de un cliente con los servicios de esa agenda
+//Recibo la cedula de un cliente y con eso llamo a los otros metodos
+const juntarAgendasServicioCliente = async (cedula) => {
+  try {
+    const agendas = await getAgendasCliente(cedula);
+    const servicios = await getAllServiciosAgendaClientes(cedula);
+    //Pregunto sin hay alguna agenda
+    if (agendas.codigo === 400) {
+      return agendas;
+    } else {
+      //Armo un array que voy a devolver
+      let arrayRetorno = [];
+      //Si hay agendas entonces las recorro para despues recorrer los servicios
+      for (let i = 0; i < agendas.mensaje.length; i++) {
+        //Armo el objeto de la agenda que voy a devolver y que le voy a agregar los servicios
+        let agendaAux = { ...agendas.mensaje[i], servicios: [] };
+        for (let k = 0; k < servicios.length; k++) {
+          if (agendas.mensaje[i].idAgenda === servicios[k].idAgenda) {
+            //Agrego el servicio a el listado de servicios
+            agendaAux.servicios.push(servicios[k].idServicio);
+          }
+        }
+        arrayRetorno.push(agendaAux);
+      }
+      return arrayRetorno;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 //Metodo para cambiar la opcion de deshabilitado de un usuario
 const updateHabilitarEmpleado = async (cedula, hab) => {
   try {
@@ -2968,9 +2999,9 @@ const interfaz = {
   realizarEntradaDinero,
   getListadoProductos,
   crearNuevoProducto,
-  getAgendasCliente,
+  juntarAgendasServicioCliente,
   updateHabilitarEmpleado,
-  listadoEmpleadosHabilitacion
+  listadoEmpleadosHabilitacion,
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar
