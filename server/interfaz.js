@@ -1011,7 +1011,9 @@ const getCiNombreEmpleados = async () => {
     //Voy a buscar todos los empleados
     const empleados = await pool
       .request()
-      .query("select Cedula as id, Nombre as title from Empleado where Habilitado = 1");
+      .query(
+        "select Cedula as id, Nombre as title from Empleado where Habilitado = 1"
+      );
     //Separo el listado
     const listadoEmpleados = empleados.recordset;
     return listadoEmpleados;
@@ -2877,19 +2879,61 @@ const getAgendasCliente = async (cedula) => {
 
 //Metodo auxiliar para conseguir todos los servicios de las agendas de clientes
 const getAllServiciosAgendaClientes = async (cedula) => {
-try {
-  //Creo la conexion
-  let pool = await sql.connect(conexion);
-  //Hago el select
-  const servicios = await pool
-    .request()
-    .input("cedula", sql.VarChar, cedula)
-    .query("select AC.IdAgenda as idAgenda, SA.IdServicio as idServicio from Agenda_Cliente AC, Agenda_Servicio SA where AC.IdAgenda = SA.IdAgenda and AC.Cedula = @cedula");
-  return servicios.recordset;
-} catch (error) {
- console.log(error); 
-}
-}
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el select
+    const servicios = await pool
+      .request()
+      .input("cedula", sql.VarChar, cedula)
+      .query(
+        "select AC.IdAgenda as idAgenda, SA.IdServicio as idServicio from Agenda_Cliente AC, Agenda_Servicio SA where AC.IdAgenda = SA.IdAgenda and AC.Cedula = @cedula"
+      );
+    return servicios.recordset;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo para cambiar la opcion de deshabilitado de un usuario
+const updateHabilitarEmpleado = async (cedula, hab) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el update
+    const ret = await pool
+      .request()
+      .input("cedula", sql.VarChar, cedula)
+      .input("hab", sql.Bit, hab)
+      .query("update Empleado set Habilitado = @hab where Cedula = @cedula");
+    if (hab === 1) {
+      return { codigo: 200, mensaje: "Empleado habilitado correctamente" };
+    } else {
+      return { codigo: 200, mensaje: "Empleado deshabilitado correctamente" };
+    }
+  } catch (error) {
+    console.log(error);
+    return { codigo: 400, mensaje: "Error al habilitar/deshabilitar empleado" };
+  }
+};
+
+//Metodo devolver todos empleados con la opcion de habilitados
+const listadoEmpleadosHabilitacion = async () => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el update
+    const ret = await pool
+      .request()
+      .query(
+        "select Cedula as id, Nombre as title, Habilitado as habilitado from Empleado"
+      );
+    return { codigo: 200, mensaje: ret.recordset };
+  } catch (error) {
+    console.log(error);
+    return { codigo: 400, mensaje: "Error al ir a buscar los empleados" };
+  }
+};
 
 //Creo un objeto que voy a exportar para usarlo desde el index.js
 //Adentro voy a tener todos los metodos de llamar a la base
@@ -2925,6 +2969,8 @@ const interfaz = {
   getListadoProductos,
   crearNuevoProducto,
   getAgendasCliente,
+  updateHabilitarEmpleado,
+  listadoEmpleadosHabilitacion
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar

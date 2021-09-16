@@ -332,6 +332,27 @@ app.use("/getAgendasCliente", (req, res) => {
   });
 });
 
+app.use("/listadoHabilitarEmpleados", (req, res) => {
+  let ret = interfaz.listadoEmpleadosHabilitacion();
+  ret.then((resultado) => {
+    res.json({
+      mensaje: resultado,
+    });
+  });
+});
+
+app.post("/habilitarEmpleado", (req, res) => {
+  const ret = interfaz.updateHabilitarEmpleado(
+    req.body.ciEmpleado,
+    req.body.habilitado
+  );
+  ret.then((resultado) => {
+    res.json({
+      mensaje: resultado,
+    });
+  });
+});
+
 // All other GET requests not handled before will return our React app
 /* app.get('*', (req, res) => {
   res.sendFile(path.resolve(__dirname, '../cliente/barberiaLander/build', 'index.html'));
