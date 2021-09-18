@@ -1641,7 +1641,7 @@ const insertarEntradaDinero = async (monto, cedula, descripcion, propina) => {
       .input("descripcion", sql.Char, descripcion)
       .input("propina", sql.Int, propina)
       .query(
-        "insert into EntradaDinero(Cedula, Monto, Fecha, Descripcion, Propina) output inserted.IdEntrada values(@cedula, @monto, CAST(GETDATE() AS DATE), @descripcion, @propina)"
+        "insert into EntradaDinero(Cedula, Monto, Fecha, Descripcion, Propina) output inserted.IdEntrada values(@cedula, @monto, GETDATE(), @descripcion, @propina)"
       );
     return insertEntradaDinero.recordset[0].IdEntrada;
   } catch (error) {
@@ -3087,6 +3087,26 @@ const calcularComision = async (ciEmpleado, idCaja) => {
   }
 };
 
+//Metodo para discontinuar un producto
+const discontinuarProducto = async (idProducto, discontinuar) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el select
+    const producto = await pool
+      .request()
+      .input("idProducto", sql.Int, idProducto)
+      .input("discontinuar", sql.Bit, discontinuar)
+      .query(
+        "update Producto set Discontinuado = @discontinuar where IdProducto = @idProducto"
+      );
+    return { codigo: 200, mensaje: "Producto modificado correctamente" };
+  } catch (error) {
+    console.log(error);
+    return { codigo: 400, mensaje: "Error al discontunuar producto" };
+  }
+};
+
 //Creo un objeto que voy a exportar para usarlo desde el index.js
 //Adentro voy a tener todos los metodos de llamar a la base
 const interfaz = {
@@ -3124,6 +3144,7 @@ const interfaz = {
   updateHabilitarEmpleado,
   listadoEmpleadosHabilitacion,
   reestablecerContra,
+  discontinuarProducto
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar
