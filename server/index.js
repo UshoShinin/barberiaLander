@@ -378,6 +378,15 @@ app.put("/discontinuarProducto", (req, res) => {
   });
 });
 
+app.use("/comisiones", (req, res) => {
+  let ret = interfaz.calcularComisionSinLimite(req.body.ciEmpleado, req.body.idCaja);
+  ret.then((resultado) => {
+    res.json({
+      mensaje: resultado,
+    });
+  });
+});
+
 // All other GET requests not handled before will return our React app
 /* app.get('*', (req, res) => {
   res.sendFile(path.resolve(__dirname, '../cliente/barberiaLander/build', 'index.html'));

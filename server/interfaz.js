@@ -306,7 +306,7 @@ const agregarDuracionEmpleados = async (listadoEmpleados) => {
     const duracionServiciosEmpleado = await pool
       .request()
       .query(
-        "select E.Cedula, SE.IdServicio, SE.Duracion from Empleado E, Servicio_Empleado SE where E.Cedula = SE.Cedula order by E.Cedula"
+        "select E.Cedula, SE.IdServicio, SE.Duracion from Empleado E, Servicio_Empleado SE where E.Cedula = SE.Cedula order by E.Cedula, SE.IdServicio"
       );
     let arrayRetorno = [];
     for (let i = 0; i < listadoEmpleados.length; i++) {
@@ -3044,6 +3044,26 @@ const debeCambiarContra = async (cedula) => {
   }
 };
 
+//Metodo para discontinuar un producto
+const discontinuarProducto = async (idProducto, discontinuar) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el update
+    const ret = await pool
+      .request()
+      .input("idProducto", sql.Int, idProducto)
+      .input("discontinuar", sql.Bit, discontinuar)
+      .query(
+        "update Producto set Discontinuado = @discontinuar where IdProducto = @idProducto"
+      );
+    return { codigo: 200, mensaje: "Producto modificado correctamente" };
+  } catch (error) {
+    console.log(error);
+    return { codigo: 400, mensaje: "Error al discontinuar producto" };
+  }
+};
+
 //Metodo para calcular las propinas hasta el momento de un empleado
 const calcularPropina = async (ciEmpleado, idCaja) => {
   try {
@@ -3091,23 +3111,29 @@ const calcularComision = async (ciEmpleado, idCaja) => {
   }
 };
 
-//Metodo para discontinuar un producto
-const discontinuarProducto = async (idProducto, discontinuar) => {
+//Metodo para calcular la comision de los que corresponden siempre el 35%
+const calcularComisionSinLimite = async (ciEmpleado, idCaja) => {
   try {
     //Creo la conexion
     let pool = await sql.connect(conexion);
-    //Hago el update
-    const ret = await pool
+    //Hago el select
+    const comisionesSinLimite = await pool
       .request()
-      .input("idProducto", sql.Int, idProducto)
-      .input("discontinuar", sql.Bit, discontinuar)
+      .input("idCaja", sql.Int, idCaja)
+      .input("ciEmpleado", sql.VarChar, ciEmpleado)
       .query(
-        "update Producto set Discontinuado = @discontinuar where IdProducto = @idProducto"
+        "select COUNT(ES.IdEntrada) as cantidad, ES.IdServicio as idServicio from EntradaDinero E, Entrada_Servicio ES, Caja_Entrada CE where E.IdEntrada = ES.IdEntrada and ES.IdServicio in (6, 7, 8) and CE.IdEntrada = E.IdEntrada and E.Cedula = @ciEmpleado and CE.IdCaja = @idCaja group by ES.IdServicio"
       );
-      return { codigo: 200, mensaje: "Producto modificado correctamente" };   
+      return {
+        codigo: 200,
+        mensaje: comisionesSinLimite.recordset
+      }; 
   } catch (error) {
     console.log(error);
-    return { codigo: 400, mensaje: "Error al discontinuar producto" };
+    return {
+      codigo: 400,
+      mensaje: "Error al calcular la comision sin limites",
+    };
   }
 };
 
@@ -3149,6 +3175,7 @@ const interfaz = {
   listadoEmpleadosHabilitacion,
   reestablecerContra,
   discontinuarProducto,
+  calcularComisionSinLimite
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar
