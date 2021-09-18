@@ -1029,14 +1029,17 @@ const getCiNombreEmpleados = async () => {
 //Metodo auxiliar para agregar los empleados a un listado
 const agregarEmpleadosALIstado = async (listado) => {
   try {
-    const resultado = getCiNombreEmpleados().then((listadoEmpleados) => {
-      let retornoAux = {
-        ...listado,
-        empleados: listadoEmpleados,
-      };
-      return retornoAux;
+    return getCiNombreEmpleados().then((listadoEmpleados) => {
+      return agregarDuracionEmpleados(listadoEmpleados).then(
+        (listadoConDuraciones) => {
+          let retornoAux = {
+            ...listado,
+            empleados: listadoConDuraciones,
+          };
+          return retornoAux;
+        }
+      );
     });
-    return resultado;
   } catch (error) {
     console.log(error);
   }
