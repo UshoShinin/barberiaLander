@@ -1354,20 +1354,41 @@ const existeCliente = async (ciCliente) => {
 //Metodo para el login
 const login = async (usuario) => {
   try {
-    const resultado = getEmpleadoParaLogin(usuario).then((resultado) => {
+    return getEmpleadoParaLogin(usuario).then((resultado) => {
       if (resultado.rowsAffected[0] === 1) {
-        return resultado.recordset[0];
+        return debeCambiarContra(resultado.recordset[0].ciUsuario).then(
+          (debeCambiar) => {
+            if (debeCambiar) {
+              return {
+                codigo: 402,
+                mensaje: "El usuario debe cambiar la contraseña",
+              };
+            } else {
+              return resultado.recordset[0];
+            }
+          }
+        );
       } else {
         return getClienteParaLogin(usuario).then((cliente) => {
           if (cliente.rowsAffected[0] === 1) {
-            return { ...cliente.recordset[0], rol: "Cliente" };
+            return debeCambiarContra(cliente.recordset[0].ciUsuario).then(
+              (debeCambiar) => {
+                if (debeCambiar) {
+                  return {
+                    codigo: 402,
+                    mensaje: "El usuario debe cambiar la contraseña",
+                  };
+                } else {
+                  return { ...cliente.recordset[0], rol: "Cliente" };
+                }
+              }
+            );
           } else {
             return { codigo: 400, error: "Credenciales incorrectas" };
           }
         });
       }
     });
-    return resultado;
   } catch (error) {
     console.log(error);
   }
@@ -2966,6 +2987,90 @@ const listadoEmpleadosHabilitacion = async () => {
   }
 };
 
+//Metodo para establecer que un usuario necesita cambiar su pass
+const insertarCambiarContra = async (cedula) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el update
+    const ret = await pool
+      .request()
+      .input("cedula", sql.VarChar, cedula)
+      .query(
+        "insert into Reseteo Clave (Cedula, DebeCambiar) values (@cedula, 1)"
+      );
+    return { codigo: 200, mensaje: "Se reseteo la clave correctamente" };
+  } catch (error) {
+    console.log(error);
+    return { codigo: 400, mensaje: "Algo salio mal" };
+  }
+};
+
+//Metodo para modificar la pass de un empleado
+//El identificadorUsu va a ser 1 para Empleados y 2 para Clientes
+const updateContra = async (cedula, contra, identificadorUsu) => {
+  try {
+    //Verifico si va a ser Empleado o Cliente al que le tengo que cambiar la contra
+    const queryUpdate = "";
+    if (identificadorUsu === 1) {
+      //Armo la query que voy a hacer
+      queryUpdate =
+        "update Empleado set Contra = @contra where Cedula = @cedula";
+    } else if (identificadorUsu === 2) {
+      queryUpdate =
+        "update Cliente set Contra = @contra where Cedula = @cedula";
+    }
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el update
+    const ret = await pool
+      .request()
+      .input("cedula", sql.VarChar, cedula)
+      .input("contra", sql.VarChar, contra)
+      .query(queryUpdate);
+    return { codigo: 200, mensaje: "Clave modificada correctamente" };
+  } catch (error) {
+    console.log(error);
+    return { codigo: 400, mensaje: "Algo salio mal" };
+  }
+};
+
+//Metodo para establecer que un usuario deba cambiar la contra
+const reestablecerContra = async (cedula, contra, identificadorUsu) => {
+  try {
+    return updateContra(cedula, contra, identificadorUsu).then((resultado) => {
+      if (resultado.codigo === 200) {
+        return insertarCambiarContra(cedula).then((resFinal) => resFinal);
+      } else {
+        return { codigo: 400, mensaje: "Error al modificar contra" };
+      }
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo para verificar si el usuario debe cambiar la contra o no
+const debeCambiarContra = async (cedula) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el update
+    const ret = await pool
+      .request()
+      .input("cedula", sql.VarChar, cedula)
+      .query("select * from ReseteoClave where Cedula = @cedula");
+    if (ret.recordset > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (error) {
+    console.log(error);
+    return { codigo: 400, mensaje: "Algo salio mal" };
+  }
+};
+
 //Creo un objeto que voy a exportar para usarlo desde el index.js
 //Adentro voy a tener todos los metodos de llamar a la base
 const interfaz = {
@@ -3002,6 +3107,7 @@ const interfaz = {
   juntarAgendasServicioCliente,
   updateHabilitarEmpleado,
   listadoEmpleadosHabilitacion,
+  reestablecerContra,
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar
