@@ -3124,10 +3124,58 @@ const calcularComisionSinLimite = async (ciEmpleado, idCaja) => {
       .query(
         "select COUNT(ES.IdEntrada) as cantidad, ES.IdServicio as idServicio from EntradaDinero E, Entrada_Servicio ES, Caja_Entrada CE where E.IdEntrada = ES.IdEntrada and ES.IdServicio in (6, 7, 8) and CE.IdEntrada = E.IdEntrada and E.Cedula = @ciEmpleado and CE.IdCaja = @idCaja group by ES.IdServicio"
       );
-      return {
-        codigo: 200,
-        mensaje: comisionesSinLimite.recordset
-      }; 
+    //Separo la cantidad de servicios que hizo
+    let cantServiciosRealizados = comisionesSinLimite.recordset;
+    //Voy a buscar los precios de estos servicios en particular
+    const precioServicios = await pool
+      .request()
+      .input("idCaja", sql.Int, idCaja)
+      .input("ciEmpleado", sql.VarChar, ciEmpleado)
+      .query(
+        "select IdServicio, Precio from Servicio where IdServicio in (6, 7, 8)"
+      );
+    //Separo los precios de esos servicios
+    let claritos = { precio: 0, id: 0 };
+    let brushing = { precio: 0, id: 0 };
+    let deco = { precio: 0, id: 0 };
+    //Recorro los servicios para ponerle precio a las variables
+    precioServicios.recordset.forEach((servicio) => {
+      switch (servicio.IdServicio) {
+        case 6:
+          claritos.precio = servicio.Precio;
+          break;
+        case 7:
+          deco.precio = servicio.Precio;
+          break;
+        case 8:
+          brushing.precio = servicio.Precio;
+          break;
+        default:
+          break;
+      }
+    });
+    //Armo un total que es lo que voy a devolver
+    let totalComision = 0;
+    //Recorro los servicios que haya realizado para calcular
+    cantServiciosRealizados.forEach((serviciosHechos) => {
+      switch (serviciosHechos.idServicio) {
+        case 6:
+          totalComision += serviciosHechos.cantidad * claritos.precio;
+          break;
+        case 7:
+          totalComision += serviciosHechos.cantidad * deco.precio;
+          break;
+        case 8:
+          totalComision += serviciosHechos.cantidad * brushing.precio;
+          break;
+        default:
+          break;
+      }
+    });
+    return {
+      codigo: 400,
+      mensaje: totalComision * 0.35,
+    };
   } catch (error) {
     console.log(error);
     return {
@@ -3175,7 +3223,7 @@ const interfaz = {
   listadoEmpleadosHabilitacion,
   reestablecerContra,
   discontinuarProducto,
-  calcularComisionSinLimite
+  calcularComisionSinLimite,
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar
