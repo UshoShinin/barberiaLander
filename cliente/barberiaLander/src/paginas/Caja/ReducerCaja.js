@@ -141,9 +141,9 @@ export const cajaReducer = (state, action) => {
         agendasHoy: [...state.agendasHoy],
       };
     case "CARGA_DE_DATOS":
+      console.log(action.payload);
       const date = new Date();
       let cajaAbierta = false;
-      formatDate(action.payload.agendas[0].fecha);
       let newList = action.payload.agendas.filter(
         (agenda) =>
           formatDate(agenda.fecha).getDate() === date.getDate() &&

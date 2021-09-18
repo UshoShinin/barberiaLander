@@ -694,6 +694,7 @@ const insertarHorario = async (horario) => {
 //Este es un metodo que dado los datos de una agenda lo inserta en la base de datos
 //Es un metodo auxiliar que devuelve el idAgenda y idHorario si se inserta, si no devuelve en cada uno -1
 const insertarAgenda = async (agenda) => {
+  console.log(agenda);
   //Variable que tiene la conexion
   const pool = await sql.connect(conexion);
   //Armo el insert

@@ -48,7 +48,6 @@ const AperturaCierre = () => {
   const cierreCaja = useHttp();
   const getRespuestaSalida = (res) => {
     console.log(res);
-    /* if(res.) */
     /* if (cajaState.cuponera.value) {
       const datosCuponera = {
         cedula: cajaState.codCuponera.value,
@@ -325,7 +324,6 @@ const AperturaCierre = () => {
             const comboAgenda = cajaState.comboAgenda.value;
             const productos = cajaState.productosAgregados;
             const codcup = cajaState.codCuponera.value;
-            console.log();
             let monto = cajaState.cantidadMedios>1?cajaState.montoCuponera.value:cajaState.montoTotal.value;
             monto = monto.length>0?parseInt(monto,10):0;
             const data = {

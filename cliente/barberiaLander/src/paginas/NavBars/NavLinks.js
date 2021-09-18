@@ -91,9 +91,7 @@ const NavLinks = (props) => {
             </NavLink>
           </li>
         )}
-      {authCtx.user !== null &&
-        (authCtx.user.rol === "Administrador" ||
-          authCtx.user.rol === "Encargado") && (
+      {authCtx.user !== null && authCtx.user.rol !== "Empleado"  && (
           <li>
             <NavLink
               onClick={NavOnClick}
@@ -106,18 +104,6 @@ const NavLinks = (props) => {
           </li>
         )}
       <li>
-        <NavLink 
-          onClick={NavOnClick}
-          exact
-          activeClassName={classes.active}
-          
-          to="/agenda/VisualizarAgendaCliente"
-        >
-          <span data="Visualizar Agenda">Visualizar Agenda</span>
-        </NavLink>
-      </li>
-
-      <li>
         <NavLink
           onClick={NavOnClick}
           exact
@@ -127,19 +113,18 @@ const NavLinks = (props) => {
           <span data="Reserva">Reserva</span>
         </NavLink>
       </li>
-      {(authCtx.user === null ||
-        authCtx.user.rol === "Cliente") && (
-          <li>
-            <NavLink
-              onClick={NavOnClick}
-              exact
-              activeClassName={classes.active}
-              to="/cuponeras"
-            >
-              <span data="Cuponera">Cuponera</span>
-            </NavLink>
-          </li>
-        )}
+      {(authCtx.user === null || authCtx.user.rol === "Cliente") && (
+        <li>
+          <NavLink
+            onClick={NavOnClick}
+            exact
+            activeClassName={classes.active}
+            to="/cuponeras"
+          >
+            <span data="Cuponera">Cuponera</span>
+          </NavLink>
+        </li>
+      )}
       {!isLoggedIn && (
         <li>
           <NavLink

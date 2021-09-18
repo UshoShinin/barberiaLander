@@ -11,80 +11,42 @@ import {
   faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
 import { animateScroll as scroll } from "react-scroll";
-import { useState, useEffect, useContext } from "react";
+import { useEffect, useContext, useReducer } from "react";
 import LoaddingSpinner from "../../../components/LoaddingSpinner/LoaddingSpinner";
 import useHttp from "../../../hooks/useHttp";
 import CrearAgenda from "../CrearAgenda";
 import AuthContext from "../../../store/AuthContext";
 import { useHistory } from "react-router-dom";
+import { initialState, reducer } from "./reducer";
+import Note from "../../../components/UI/Note/Note";
 
 const VisualAgendas = () => {
   const history = useHistory();
   const authCtx = useContext(AuthContext);
-  const [inicio, setInicio] = useState(0);
-  const [agendas, setAgendas] = useState(null);
-  const [agenda, setAgenda] = useState(null);
+  const [state, dispatch] = useReducer(reducer, initialState);
   const fetchAgendas = useHttp();
   const getAgenda = useHttp();
 
-  const moveFHandler = () => {
-    setInicio((prev) => {
-      return prev + 1;
-    });
-  };
-  const moveBHandler = () => {
-    setInicio((prev) => {
-      return prev - 1;
-    });
-  };
-
   const obtenerAgenda = (res) => {
-    const agenda = res.mensaje;
-    let misServicios = {
-      barba: false,
-      brushing: false,
-      corte: false,
-      claritos: false,
-      decoloracion: false,
-      maquina: false,
-    };
-    agenda.servicios.forEach((s) => {
-      switch (s) {
-        case 1:
-          misServicios.corte = true;
-          break;
-        case 4:
-          misServicios.barba = true;
-          break;
-        case 5:
-          misServicios.maquina = true;
-          break;
-        case 6:
-          misServicios.claritos = true;
-          break;
-        case 7:
-          misServicios.decoloracion = true;
-          break;
-        case 8:
-          misServicios.brushing = true;
-          break;
-        default:
-          break;
-      }
-    });
-    setAgenda({
-      ...agenda,
-      servicios: { ...misServicios },
-      fecha: {
-        d: parseInt(agenda.fecha.slice(8, 10), 10),
-        m: parseInt(agenda.fecha.slice(5, 7), 10),
-      },
-    });
+    if (res.mensaje.codigo === 200) {
+      dispatch({ type: "SET_AGENDA", payload: res.mensaje.mensaje });
+    } else {
+      fetchAgendas({ url: "/listadoAgendas" }, obtenerAgendas);
+    }
   };
 
   const obtenerAgendas = (res) => {
-    setAgendas(res.mensaje.agendas);
+    dispatch({ type: "CARGAR", payload: res.mensaje.agendas });
   };
+
+  const obtenerAgendasModificadas = (res) => {
+    dispatch({
+      type: "RESET",
+      payload: res.mensaje.agendas,
+      value: "Agenda modificada correctamente",
+    });
+  };
+
   const user = authCtx.user;
   useEffect(() => {
     if (user === null || user.rol === "Cliente") history.replace("/");
@@ -106,13 +68,13 @@ const VisualAgendas = () => {
   } else {
     cantidadMostrar = 4;
   }
-  if (agendas !== null) {
+  if (state.agendas !== null) {
     const final =
-      agendas.length > (inicio + 1) * cantidadMostrar
-        ? (inicio + 1) * cantidadMostrar
-        : agendas.length;
-    for (let i = inicio * cantidadMostrar; i < final; i++) {
-      Mostrar.push(agendas[i]);
+      state.agendas.length > (state.inicio + 1) * cantidadMostrar
+        ? (state.inicio + 1) * cantidadMostrar
+        : state.agendas.length;
+    for (let i = state.inicio * cantidadMostrar; i < final; i++) {
+      Mostrar.push(state.agendas[i]);
     }
     ocupar = 100 / Mostrar.length;
     empleados = generarCupos(Mostrar, colorFilaI, (id) => {
@@ -129,45 +91,57 @@ const VisualAgendas = () => {
         </div>
       );
     });
-    const mod = agendas.length % cantidadMostrar;
+    const mod = state.agendas.length % cantidadMostrar;
     tope =
-      (agendas.length - mod + (mod > 0 ? cantidadMostrar : 0)) /
+      (state.agendas.length - mod + (mod > 0 ? cantidadMostrar : 0)) /
       cantidadMostrar;
   }
 
   return (
     <>
-      {agenda !== null && (
+      <Note
+        show={state.Mensaje.show}
+        onClose={() => {
+          dispatch({ type: "HIDE_MENSAJE" });
+        }}
+      >
+        {state.Mensaje.value}
+      </Note>
+      {state.agenda !== null && (
         <CrearAgenda
           exitModificar={() => {
-            setAgenda(null);
+            fetchAgendas({ url: "/listadoAgendas" }, obtenerAgendasModificadas);
           }}
-          agenda={agenda}
+          agenda={state.agenda}
         />
       )}
-      {agenda === null && (
+      {state.agenda === null && (
         <>
-          {agendas === null && <LoaddingSpinner />}
-          {agendas !== null && (
+          {state.agendas === null && <LoaddingSpinner />}
+          {state.agendas !== null && (
             <div className={classes.myContainer}>
               <div className={classes.navigation}>
                 <div>
                   <div className={classes.arrow}>
-                    {inicio > 0 && (
+                    {state.inicio > 0 && (
                       <FontAwesomeIcon
                         icon={faChevronLeft}
-                        onClick={moveBHandler}
+                        onClick={() => {
+                          dispatch({ type: "RETROCEDER" });
+                        }}
                       />
                     )}
                   </div>
                   <p>
-                    {inicio + 1} de {tope}
+                    {state.inicio + 1} de {tope}
                   </p>
                   <div className={classes.arrow}>
-                    {inicio < tope - 1 && (
+                    {state.inicio < tope - 1 && (
                       <FontAwesomeIcon
                         icon={faChevronRight}
-                        onClick={moveFHandler}
+                        onClick={() => {
+                          dispatch({ type: "AVANZAR" });
+                        }}
                       />
                     )}
                   </div>

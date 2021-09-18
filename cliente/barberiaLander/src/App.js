@@ -15,7 +15,6 @@ import MovimientoCaja from "./paginas/Caja/MovimientoCaja";
 import CrearAgenda from "./paginas/Agenda/CrearAgenda";
 import PreAgendas from "./paginas/Agenda/PreAgendas/PreAgendas";
 import VisualAgendas from "./paginas/Agenda/VisualAgendas/VisualAgendas";
-import VisualAgendasCliente from "./paginas/Agenda/VisualAgendasCliente/VisualizarAgenda";
 import Registro from "./paginas/Registro/Registro";
 import Login from "./paginas/Login/Login";
 import NoEncontrado from "./paginas/NoEncontrado";
@@ -63,9 +62,6 @@ const App = () => {
             <Route path="/agenda/crearagenda" exact>
               <CrearAgenda agenda={null}/>
             </Route>
-            {/* <Route path="/agenda/VisualizarAgendaCliente" exact>
-              <VisualAgendasCliente/>
-            </Route> */}
             <Route path="/agenda/preagendas" exact>
               <PreAgendas />
             </Route>

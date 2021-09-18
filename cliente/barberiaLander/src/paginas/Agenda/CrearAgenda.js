@@ -48,7 +48,7 @@ const CrearAgenda = (props) => {
       decoloracion: { active: false, id: 7 },
       brushing: { active: false, id: 8 },
     },
-    ciCliente: "-1",
+    ciCliente: -1,
     problema: -1,
     problemas: [
       { id: 1, pro: "" },
@@ -62,7 +62,7 @@ const CrearAgenda = (props) => {
       manejoAgenda !== undefined ? manejoAgenda.AceptarRechazar : 0;
     let nombre;
     let telefono;
-    let ciCliente;
+    let ciCliente = -1;
     let servicios = { ...misServicios };
     let Calendario = { value: null, dia: null };
     let descripcion = { value: "", isValid: null };
@@ -111,7 +111,6 @@ const CrearAgenda = (props) => {
               return { id: id, title: transformNumberString(h) };
             })
           : cargarHorariosEnMinutos(agenda.fecha, empleado);
-      console.log(resultado);
       const position = getIdByTitle(resultado, agenda.horario.i);
       Calendario = {
         value: resultado,

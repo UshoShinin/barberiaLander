@@ -104,11 +104,10 @@ const FormularioAgenda = (props) => {
         /* const reserva = document.getElementById('reserva'); */
       if (props.agenda === null || props.agenda === undefined) {
         const user = authCtx.user;
-        console.log(user);
         //Crear
         datosAgenda = {
           aceptada: inputState.manejoAgenda,
-          ciCliente: user === null ? undefined : user.ciUsuario,
+          ciCliente: (user === null||user.rol!=='Cliente') ? -1 : user.ciUsuario,
           nombreCliente: inputState.Nombre.value,
           telefono: inputState.Telefono.value,
           descripcion: inputState.Descripcion.value,
