@@ -3090,6 +3090,26 @@ const calcularComision = async (ciEmpleado, idCaja) => {
   }
 };
 
+//Metodo para discontinuar un producto
+const discontinuarProducto = async (idProducto, discontinuar) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el update
+    const ret = await pool
+      .request()
+      .input("idProducto", sql.Int, idProducto)
+      .input("discontinuar", sql.Bit, discontinuar)
+      .query(
+        "update Producto set Discontinuado = @discontinuar where IdProducto = @idProducto"
+      );
+      return { codigo: 200, mensaje: "Producto modificado correctamente" };   
+  } catch (error) {
+    console.log(error);
+    return { codigo: 400, mensaje: "Error al discontinuar producto" };
+  }
+};
+
 //Creo un objeto que voy a exportar para usarlo desde el index.js
 //Adentro voy a tener todos los metodos de llamar a la base
 const interfaz = {
@@ -3127,6 +3147,7 @@ const interfaz = {
   updateHabilitarEmpleado,
   listadoEmpleadosHabilitacion,
   reestablecerContra,
+  discontinuarProducto,
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar
