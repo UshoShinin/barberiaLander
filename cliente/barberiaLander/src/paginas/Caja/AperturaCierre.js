@@ -48,42 +48,77 @@ const AperturaCierre = () => {
   const cierreCaja = useHttp();
   const getRespuestaSalida = (res) => {
     console.log(res);
-    /* if (cajaState.cuponera.value) {
-      const datosCuponera = {
-        cedula: cajaState.codCuponera.value,
-        monto: -parseInt(
-          cajaState.cantidadMedios.value > 1
-            ? cajaState.montoCuponera.value
-            : cajaState.montoTotal.value,
-          10
-        ),
-      };
-      modificarCuponera(
-        {
-          url: "/modificarSaldoCuponera",
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: datosCuponera,
-        },
-        getRespuestaModificar
-      );
-    } else {
-      console.log(EntradaDeDinero());
-      cobrarCaja(
-        {
-          url: "/cobrarCaja",
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: EntradaDeDinero(),
-        },
-        getRespuesta
-      );
-    } */
+    if (res.mensaje.codigo === 200) {
+    }
   };
 
-  const cerrarCaja = (res) =>{
+  const getValidacion = (res) => {
     console.log(res);
-  }
+    if (
+      res.mensaje.cuponera === undefined ||
+      res.mensaje.cuponera.codigo === 200
+    ) {
+      if (
+        res.mensaje.producto === undefined ||
+        res.mensaje.producto.codigo === 200
+      ) {
+        if (
+          res.mensaje.agenda === undefined ||
+          res.mensaje.agenda.codigo === 200
+        ) {
+          if (cajaState.cuponera.value) {
+            const datosCuponera = {
+              cedula: cajaState.codCuponera.value,
+              monto: -parseInt(
+                cajaState.cantidadMedios.value > 1
+                  ? cajaState.montoCuponera.value
+                  : cajaState.montoTotal.value,
+                10
+              ),
+            };
+            modificarCuponera(
+              {
+                url: "/modificarSaldoCuponera",
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: datosCuponera,
+              },
+              getRespuestaModificar
+            );
+          } else {
+            cobrarCaja(
+              {
+                url: "/cobrarCaja",
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: EntradaDeDinero(),
+              },
+              getRespuesta
+            );
+          }
+        } else {
+          dispatchCaja({
+            type: "SHOW_MENSAJE",
+            value: res.mensaje.agenda.mensaje,
+          });
+        }
+      } else {
+        dispatchCaja({
+          type: "SHOW_MENSAJE",
+          value: res.mensaje.producto.mensaje,
+        });
+      }
+    } else {
+      dispatchCaja({
+        type: "SHOW_MENSAJE",
+        value: res.mensaje.cuponera.mensaje,
+      });
+    }
+  };
+
+  const cerrarCaja = (res) => {
+    console.log(res);
+  };
   const salidaSubmitHandler = (e) => {
     e.preventDefault();
     if (!cajaState.montoSalida.isValid) {
@@ -119,13 +154,8 @@ const AperturaCierre = () => {
   };
 
   const getRespuesta = (res) => {
-    if(res.mensaje.cuponera!==undefined&&res.mensaje.cuponera.codigo===400){
-      dispatchCaja({ type: "SHOW_MENSAJE", value: res.mensaje.cuponera.mensaje});
-    }else if(res.mensaje.producto!==undefined&&res.mensaje.producto.codigo===400){
-      dispatchCaja({ type: "SHOW_MENSAJE", value: res.mensaje.producto.mensaje});
-    }else if(res.mensaje.agenda!==undefined&&res.mensaje.agenda.codigo===400){
-      dispatchCaja({ type: "SHOW_MENSAJE", value: res.mensaje.agenda.mensaje});
-    }
+    console.log(res);
+    dispatchCaja({ type: "SHOW_MENSAJE", value: res.mensaje.mensaje });
   };
   const EntradaDeDinero = () => {
     let montoE = 0;
@@ -179,21 +209,22 @@ const AperturaCierre = () => {
         Efectivo: parseInt(montoE, 10),
         Debito: parseInt(montoD, 10),
         Cuponera: parseInt(montoC, 10),
-        propina:parseInt(propina, 10),
+        propina: parseInt(propina, 10),
       },
       productosVendidos,
       servicios,
       descripcion: null,
-      idAgenda:agenda!==null?agenda.id:-1,
-      idHorario:agenda!==null?agenda.idHorario:-1
+      idAgenda: agenda !== null ? agenda.id : -1,
+      idHorario: agenda !== null ? agenda.idHorario : -1,
     };
     return datosEnviar;
   };
   const getRespuestaModificar = (res) => {
+    console.log(res);
     if (res.mensaje.codigo !== 400) {
       cobrarCaja(
         {
-          url: "/entradaCaja",
+          url: "/cobrarCaja",
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: EntradaDeDinero(),
@@ -324,14 +355,17 @@ const AperturaCierre = () => {
             const comboAgenda = cajaState.comboAgenda.value;
             const productos = cajaState.productosAgregados;
             const codcup = cajaState.codCuponera.value;
-            let monto = cajaState.cantidadMedios>1?cajaState.montoCuponera.value:cajaState.montoTotal.value;
-            monto = monto.length>0?parseInt(monto,10):0;
+            let monto =
+              cajaState.cantidadMedios > 1
+                ? cajaState.montoCuponera.value
+                : cajaState.montoTotal.value;
+            monto = monto.length > 0 ? parseInt(monto, 10) : 0;
             const data = {
-              idAgenda: cajaState.sinAgendar.value?-1:comboAgenda,
-              listadoProductos:productos.length>0?productos:-1,
-              ciCliente:codcup.length>0?codcup:-1,
-              monto:monto
-            }
+              idAgenda: cajaState.sinAgendar.value ? -1 : comboAgenda,
+              listadoProductos: productos.length > 0 ? productos : -1,
+              ciCliente: codcup.length > 0 ? codcup : -1,
+              monto: monto,
+            };
             validarDatos(
               {
                 url: "/verificarEntrada",
@@ -339,7 +373,7 @@ const AperturaCierre = () => {
                 headers: { "Content-Type": "application/json" },
                 body: data,
               },
-              getRespuestaSalida
+              getValidacion
             );
           }}
           rechazar={() => {
@@ -409,9 +443,10 @@ const AperturaCierre = () => {
             <SimpleButton
               disabled={!cajaState.cajaAbierta}
               action={() => {
-                /* dispatchCaja({ type: "CERRAR_CAJA" }); */
-                cierreCaja({url:'/cierreCaja?idCaja='+cajaState.idCaja},cerrarCaja)
-                /* getAgenda({ url: "/agendaPorId?idAgenda=" + id }, obtenerAgenda); */
+                cierreCaja(
+                  { url: "/cierreCaja?idCaja=" + cajaState.idCaja },
+                  cerrarCaja
+                );
               }}
               className={classes.Cerrar}
             >
@@ -426,27 +461,29 @@ const AperturaCierre = () => {
             >
               <div className={classes.agenda}>
                 <div className={classes.dobleFild}>
-                  <div>
-                    <label
-                      className={`${classes.labelText} ${
-                        cajaState.cajaAbierta
-                          ? classes.text
-                          : classes.textDisabled
-                      }`}
-                    >
-                      Sin agendar
-                    </label>
-                    <Switch
-                      active={cajaState.sinAgendar.value}
-                      onCheck={() => {
-                        const agenda = document.getElementById("Agenda");
-                        if (agenda.classList[2] !== undefined)
-                          agenda.classList.remove(agenda.classList[2]);
-                        dispatchCaja({ type: "CLICK_S_A" });
-                      }}
-                      disabled={!cajaState.cajaAbierta}
-                    />
-                  </div>
+                  {cajaState.agendas.length > 0 && (
+                    <div>
+                      <label
+                        className={`${classes.labelText} ${
+                          cajaState.cajaAbierta
+                            ? classes.text
+                            : classes.textDisabled
+                        }`}
+                      >
+                        Sin agendar
+                      </label>
+                      <Switch
+                        active={cajaState.sinAgendar.value}
+                        onCheck={() => {
+                          const agenda = document.getElementById("Agenda");
+                          if (agenda.classList[2] !== undefined)
+                            agenda.classList.remove(agenda.classList[2]);
+                          dispatchCaja({ type: "CLICK_S_A" });
+                        }}
+                        disabled={!cajaState.cajaAbierta}
+                      />
+                    </div>
+                  )}
                   <div>
                     {!cajaState.sinAgendar.value && (
                       <>

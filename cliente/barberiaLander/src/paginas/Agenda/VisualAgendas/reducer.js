@@ -63,6 +63,8 @@ export const reducer = (state, action) => {
         agendas: action.payload,
         Mensaje: { value: action.value, show: true },
       };
+    case "SHOW_MENSAJE":
+      return { ...state, Mensaje: { value: action.value, show: true } };
     case "HIDE_MENSAJE":
       return { ...state, Mensaje: { value: "", show: false } };
     case "AVANZAR":

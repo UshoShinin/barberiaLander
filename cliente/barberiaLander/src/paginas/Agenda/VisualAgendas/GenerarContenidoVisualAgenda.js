@@ -23,11 +23,11 @@ const diferencia = (i, f) => {
   return dif;
 };
 
-export const generarCupos = (empleados, colorFilaI,click) => {
+export const generarCupos = (empleados, colorFilaI, click, user) => {
   let horariosHTML;
   let auxiliarDiv = [];
   for (let i = 0; i < empleados.length; i++) {
-    horariosHTML=null;
+    horariosHTML = null;
     let horarios = [];
     let cuantos = [];
     let hora;
@@ -62,7 +62,13 @@ export const generarCupos = (empleados, colorFilaI,click) => {
               (cantidad + separacion) * initialMargin + separacion
             }px`,
           }}
-          onClick={()=>{click(empleados[i].agendas[0].idAgenda)}}
+          onClick={() => {
+            if(user.rol === "Administrador"){
+              click(empleados[i].agendas[0].idAgenda);
+            }else if (user.rol === "Empleado" && user.ciUsuario === empleados[i].ci) {
+              click(empleados[i].agendas[0].idAgenda);
+            }
+          }}
         >
           {cuantosHTML}
         </div>
@@ -95,7 +101,13 @@ export const generarCupos = (empleados, colorFilaI,click) => {
                 separacion
               }px`,
             }}
-            onClick={()=>{click(empleados[i].agendas[j].idAgenda)}}
+            onClick={() => {
+              if(user.rol === "Administrador"){
+                click(empleados[i].agendas[j].idAgenda);
+              }else if (user.rol === "Empleado" && user.ciUsuario === empleados[i].ci) {
+                click(empleados[i].agendas[j].idAgenda);
+              }
+            }}
           >
             {cuantosHTML}
           </div>
@@ -134,7 +146,7 @@ export const generarNavegacion = (ini, fin) => {
     <ul className={classes.Nav}>
       {list.map((h) => (
         <Link
-        key={h}
+          key={h}
           className={classes.Link}
           activeClass="active"
           to={String(h)}

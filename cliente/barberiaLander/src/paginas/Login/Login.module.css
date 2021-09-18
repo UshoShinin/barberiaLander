@@ -3,18 +3,24 @@
     align-items: center;
     justify-content: center;
 }
+
+.container{
+    max-width: 100%;
+}
+
 .container>div{
-    padding: 25px;
+    padding: 40px;
     border-radius: 25px;
     overflow: hidden;
 }
 
 .container,.container>div{
-    width: min-content;
+    width: max-content;
     margin:0;
 }
 .container>div > p{
     margin-top: 15px;
+    font-size: 1.5em;
     color: var(--clr-inActive);
     transition: color 180ms linear;
 }
@@ -28,7 +34,7 @@
 }
 .container >div >div{
     display: grid;
-    grid-template-columns: max-content 140px;
+    grid-template-columns: max-content max-content;
     align-items: center;
     grid-column-gap:15px;
     grid-row-gap: 18px;
@@ -36,6 +42,7 @@
 
 .container >div > div > label{
     color:var(--clr-inActive);
+    font-size: 1.5em;
     text-align: right;
     transition: color 180ms linear;
 }
@@ -44,6 +51,12 @@
 }
 @media (max-width:990px) {
     .container>div{
-        padding: 40px;
+        padding: 25px;
+    }
+    .container >div > div > label{
+        font-size: 1em;
+    }
+    .container>div > p{
+        font-size: 1em;
     }
 }

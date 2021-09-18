@@ -79,7 +79,7 @@ const VisualAgendas = () => {
     ocupar = 100 / Mostrar.length;
     empleados = generarCupos(Mostrar, colorFilaI, (id) => {
       getAgenda({ url: "/agendaPorId?idAgenda=" + id }, obtenerAgenda);
-    }).map((divA) => {
+    },user).map((divA) => {
       i++;
       return (
         <div

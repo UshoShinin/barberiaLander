@@ -73,7 +73,7 @@ const Empleados = () => {
     }
   }, [history, user]);
   return (
-    <Modal show={state.empleados !== null}>
+    <Modal closed ={()=>{history.replace("/");}} show={state.empleados !== null}>
       <form className={classes.form}>
         <ComboBox
           current={state.empleado.value}

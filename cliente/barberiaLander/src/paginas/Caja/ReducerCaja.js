@@ -141,7 +141,6 @@ export const cajaReducer = (state, action) => {
         agendasHoy: [...state.agendasHoy],
       };
     case "CARGA_DE_DATOS":
-      console.log(action.payload);
       const date = new Date();
       let cajaAbierta = false;
       let newList = action.payload.agendas.filter(
@@ -160,6 +159,7 @@ export const cajaReducer = (state, action) => {
         Empleados: [...action.payload.empleados],
         productos: [...action.payload.productos],
         cajaAbierta: cajaAbierta,
+        sinAgendar: { value: action.payload.agendas.length===0 },
       };
       return { ...myState };
     case "USER_INPUT_MONTO_I":
@@ -1027,6 +1027,9 @@ export const cajaReducer = (state, action) => {
         },
       };
       break;
+
+
+      
     default:
       return { ...state };
   }
