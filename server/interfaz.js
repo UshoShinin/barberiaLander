@@ -709,7 +709,7 @@ const insertarAgenda = async (agenda) => {
       "insert into Agenda (NombreCliente, Descripcion, Img, Tel, Aceptada, IdHorario) OUTPUT inserted.IdHorario, inserted.IdAgenda values (@NombreCliente, @Descripcion, @Img, @Tel, @Aceptada, @IdHorario)"
     )
     .then((resultado) => {
-      if (agenda.ciCliente !== undefined) {
+      if (agenda.ciCliente !== -1) {
         return insertarAgendaCliente({
           ciCliente: agenda.ciCliente,
           idHorario: resultado.recordset[0].IdHorario,
@@ -875,27 +875,30 @@ const crearSolicitudAgenda = async (agenda) => {
       });
     })
     .then((resAgenda) => {
-      //El resultado de la promesa de insertarAgenda es un objeto con idHorario y idAgenda
-      return insertarServicioAgenda({
-        idAgenda: resAgenda.idAgenda,
-        idHorario: resAgenda.idHorario,
-        servicios: agenda.servicios,
-      });
-    })
-    .then((resServicioAgenda) => {
-      //El resultado de la promesa de insertarServicioAgenda es la cantidad de filas afectadas, es decir la cantidad de registros que se guardaron en la tabla
-      if (resServicioAgenda === agenda.servicios.length) {
-        return { codigo: 200, mensaje: "Agenda insertada correctamente" };
-      } else {
+      if (resAgenda.idHorario === -1) {
         return { codigo: 400, mensaje: "Error al insertar agenda" };
+      } else {
+        return insertarServicioAgenda({
+          idAgenda: resAgenda.idAgenda,
+          idHorario: resAgenda.idHorario,
+          servicios: agenda.servicios,
+        })
+          .then((resServicioAgenda) => {
+            //El resultado de la promesa de insertarServicioAgenda es la cantidad de filas afectadas, es decir la cantidad de registros que se guardaron en la tabla
+            if (resServicioAgenda === agenda.servicios.length) {
+              return { codigo: 200, mensaje: "Agenda insertada correctamente" };
+            } else {
+              return { codigo: 400, mensaje: "Error al insertar agenda" };
+            }
+          })
+          .then((respuestaEntera) => {
+            return mensajeCrearAgenda(respuestaEntera);
+          })
+          .then((resultado) => resultado)
+          .catch((error) => {
+            return error;
+          });
       }
-    })
-    .then((respuestaEntera) => {
-      return mensajeCrearAgenda(respuestaEntera);
-    })
-    .then((resultado) => resultado)
-    .catch((error) => {
-      return error;
     });
 };
 
@@ -993,7 +996,7 @@ const getListadoProductos = async () => {
     const productos = await pool
       .request()
       .query(
-        "select IdProducto as id, Nombre as nombre, Stock as stock, Precio as price from Producto"
+        "select IdProducto as id, Nombre as nombre, Stock as stock, Precio as price, Discontinuado as discontinuado from Producto"
       );
     //Separo el listado
     const listadoProductos = productos.recordset;
@@ -1362,6 +1365,7 @@ const login = async (usuario) => {
               return {
                 codigo: 402,
                 mensaje: "El usuario debe cambiar la contraseña",
+                usuario: resultado.recordset[0],
               };
             } else {
               return resultado.recordset[0];
@@ -1377,6 +1381,7 @@ const login = async (usuario) => {
                   return {
                     codigo: 402,
                     mensaje: "El usuario debe cambiar la contraseña",
+                    usuario: { ...cliente.recordset[0], rol: "Cliente" },
                   };
                 } else {
                   return { ...cliente.recordset[0], rol: "Cliente" };
@@ -2817,43 +2822,6 @@ const verificarStockListadoProductos = async (listadoProductos) => {
   }
 };
 
-//Metodo para calcular las propinas hasta el momento de un empleado
-const calcularPropina = async (ciEmpleado, idCaja) => {
-  try {
-    //Creo la conexion
-    let pool = await sql.connect(conexion);
-    //Hago el select
-    const propinas = await pool
-      .request()
-      .input("idCaja", sql.Int, idCaja)
-      .input("ciEmpleado", sql.VarChar, ciEmpleado)
-      .query(
-        "select SUM(E.Propina) as totalPropinas from EntradaDinero E, Empleado EP, Caja_Entrada C where E.Cedula = EP.Cedula and C.IdEntrada = E.IdEntrada and EP.Cedula = @ciEmpleado, and C.IdCaja = @idCaja "
-      );
-    if (propinas.rowsAffected[0] < 1) {
-      return { codigo: 400, mensaje: "Error al ir a buscar las propinas" };
-    } else {
-      return {
-        codigo: 200,
-        mensaje:
-          "Propina hasta el momento: " + propinas.recordset[0].totalPropinas,
-        propina: propinas.recordset[0].totalPropinas,
-      };
-    }
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-//Metodo para calcular las comisiones de un empleado hasta el momento
-const calcularComision = async (ciEmpleado, idCaja) => {
-  try {
-    //El calculo de comisiones es bastante complicado
-  } catch (error) {
-    console.log(error);
-  }
-};
-
 //Metodo para crear un nuevo producto
 //Los productos nuevos se crean con stock 0 por las dudas
 const crearNuevoProducto = async (nombre, precio) => {
@@ -2866,7 +2834,7 @@ const crearNuevoProducto = async (nombre, precio) => {
       .input("precio", sql.Int, precio)
       .input("nombre", sql.VarChar, nombre)
       .query(
-        "insert into Producto (Nombre, Stock, Precio) values (@nombre, 0, @precio)"
+        "insert into Producto (Nombre, Stock, Precio, Discontinuado) values (@nombre, 0, @precio, 0)"
       );
     if (producto.rowsAffected < 1) {
       return { codigo: 400, mensaje: "Error al crear producto" };
@@ -3068,6 +3036,53 @@ const debeCambiarContra = async (cedula) => {
   } catch (error) {
     console.log(error);
     return { codigo: 400, mensaje: "Algo salio mal" };
+  }
+};
+
+//Metodo para calcular las propinas hasta el momento de un empleado
+const calcularPropina = async (ciEmpleado, idCaja) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el select
+    const propinas = await pool
+      .request()
+      .input("idCaja", sql.Int, idCaja)
+      .input("ciEmpleado", sql.VarChar, ciEmpleado)
+      .query(
+        "select SUM(E.Propina) as totalPropinas from EntradaDinero E, Empleado EP, Caja_Entrada C where E.Cedula = EP.Cedula and C.IdEntrada = E.IdEntrada and EP.Cedula = @ciEmpleado, and C.IdCaja = @idCaja "
+      );
+    if (propinas.rowsAffected[0] < 1) {
+      return { codigo: 400, mensaje: "Error al ir a buscar las propinas" };
+    } else {
+      return {
+        codigo: 200,
+        mensaje:
+          "Propina hasta el momento: " + propinas.recordset[0].totalPropinas,
+        propina: propinas.recordset[0].totalPropinas,
+      };
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo para calcular las comisiones de un empleado hasta el momento
+const calcularComision = async (ciEmpleado, idCaja) => {
+  try {
+    //El calculo de comisiones es bastante complicado
+    /**
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     */
+  } catch (error) {
+    console.log(error);
   }
 };
 
