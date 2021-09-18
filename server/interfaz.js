@@ -1555,6 +1555,7 @@ const nuevaEntradaDinero = async (
           //Recirro todas las promesas y veo el estado de ellas
           respuestas.forEach((promesa) => {
             if (promesa.status !== "fulfilled") {
+              console.log(promesa);
               salioBien = false;
             }
           });
@@ -2575,7 +2576,7 @@ const modificarStockListadoProducto = async (listadoProducto) => {
     let listadoPromesa = [];
     listadoProducto.forEach((producto) => {
       listadoPromesa.push(
-        modificarStockProducto(producto.id, producto.cantidad)
+        modificarStockProducto(producto.idProducto, producto.cantidad)
       );
     });
     return Promise.allSettled(listadoPromesa)
