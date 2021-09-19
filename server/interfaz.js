@@ -1467,7 +1467,7 @@ const abrirCaja = async (entrada) => {
       entrada.servicios,
       "A" //Esto corresponde a la descripcion de la entrada de dinero
     ).then((resultado) => resultado);
-    return { idCaja: idCaja };
+    return insertCaja.recordset;
   } catch (error) {
     console.log(error);
   }
@@ -3193,6 +3193,23 @@ const calcularComisionConLimite = async (ciEmpleado, idCaja) => {
     const cantidadComisionar = await cantidadServiciosComisionar(ciEmpleado, idCaja);
     if (cantidadComisionar.cantidadComisionar === 0) {
       return {codigo: 200, comision: 0}
+    }else {
+
+    }
+  } catch (error) {
+    console.log(error);
+    return { codigo: 400, mensaje: "Error al calcular comision con limite" };
+  }
+};
+
+//Metodo auxiliar para conseguir los precios de los servicios para comision con limite
+const precioServiciosComisionConLimite = async () => {
+  try {
+    const cantidadComisionar = await cantidadServiciosComisionar(ciEmpleado, idCaja);
+    if (cantidadComisionar.cantidadComisionar === 0) {
+      return {codigo: 200, comision: 0}
+    }else {
+
     }
   } catch (error) {
     console.log(error);
