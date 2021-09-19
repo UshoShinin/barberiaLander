@@ -64,14 +64,14 @@ const Visualizador = React.memo((props) => {
     if (id !== null) {
       getAgenda({ url: "/agendaPorId?idAgenda=" + id }, obtenerAgenda);
     }
-  }, [id,getAgenda]);
+  }, [id, getAgenda]);
   const sendAgendas = () => {
     props.mostrarAgenda(agenda);
   };
   return (
     <>
       <Border className={classes.container}>
-        <div>
+        <div className={classes.content}>
           <div>
             <h1
               className={`${classes.downData} ${
@@ -199,40 +199,32 @@ const Visualizador = React.memo((props) => {
             </div>
           </div>
         </div>
-        <div>
-          <div>
-            <h3
-              className={`${classes.downData} ${
-                agenda.IdAgenda !== -1 ? classes.activeData : ""
-              }`}
-            >
-              Descripcion
-            </h3>
+        <div className={classes.Descripcion}>
+          <h2
+            className={`${classes.downData} ${
+              agenda.IdAgenda !== -1 ? classes.activeData : ""
+            }`}
+          >
+            Descripcion
+          </h2>
 
-            <p
-              className={`${classes.hide} ${
-                agenda.IdAgenda !== -1 ? classes.show : ""
-              }`}
-            >
-              {`${
-                agenda.descripcion !== undefined
-                  ? agenda.descripcion
-                  : "No hay una descripción"
-              }`}
-            </p>
-          </div>
-          <div className={classes.foto}>
-            {/* <img
-            alt='Foto cliente'
-              id="referencia"
-              className={`${classes.hide} ${
-                agenda.IdAgenda !== -1 ? classes.show : ""
-              }`}
-              src={`${agenda.img !== null ? agenda.img : ""}`}
-            /> */}
-          </div>
+          <p
+            className={`${classes.hide} ${
+              agenda.IdAgenda !== -1 ? classes.show : ""
+            }`}
+          >
+            {`${
+              agenda.descripcion !== undefined
+                ? agenda.descripcion
+                : "No hay una descripción"
+            }`}
+          </p>
         </div>
-        <SimpleButton disabled={agenda.IdAgenda === -1} active={false} action={sendAgendas}>
+        <SimpleButton
+          disabled={agenda.IdAgenda === -1}
+          active={false}
+          action={sendAgendas}
+        >
           Comenzar a modificar
         </SimpleButton>
       </Border>

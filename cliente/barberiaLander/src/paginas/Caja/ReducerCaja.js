@@ -4,12 +4,13 @@ import {
 } from "../../FuncionesAuxiliares/FuncionesAuxiliares";
 import { formatDate } from "../../FuncionesAuxiliares/FuncionesAuxiliares";
 import { resetAgendaProductos } from "./AuxiliaresCaja/reseteos";
-const today = new Date();
 export const initialState = {
   idCaja: 1,
   fecha: new Date(),
   cajaAbierta: false,
-  desc: "AbrirCaja",
+  seguridadCierre: false,
+  modalCierre: false,
+  Cierre:null,
   montoInicial: { value: "", isValid: null },
   comboAgenda: { value: null, active: false },
   jornal: { value: "", show: false },
@@ -31,35 +32,8 @@ export const initialState = {
   productosSAg: [],
   productosAgregados: [],
   productosSEl: [],
-  agendas: [
-    {
-      id: 1,
-      title: "Manueh Torres 13/08/2021",
-      fecha: new Date(
-        today.getFullYear(),
-        today.getMonth(),
-        today.getDate() + 2
-      ),
-      empleado: "6536251235",
-      servicios: [8, 1, 5],
-    },
-    {
-      id: 2,
-      title: "Pablo Martinez 11/08/2021",
-      fecha: new Date(today.getFullYear(), today.getMonth(), today.getDate()),
-      empleado: "653623547",
-      servicios: [7, 1, 4],
-    },
-  ],
-  agendasHoy: [
-    {
-      id: 2,
-      title: "Pablo Martinez 11/08/2021",
-      fecha: new Date(today.getFullYear(), today.getMonth(), today.getDate()),
-      empleado: "653623547",
-      servicios: [7, 1, 4],
-    },
-  ],
+  agendas: [],
+  agendasHoy: [],
   efectivo: { value: false },
   debito: { value: false },
   cuponera: { value: false },
@@ -74,11 +48,7 @@ export const initialState = {
   montoSalida: { value: "", isValid: null },
   descripcionSalida: { value: "", isValid: null },
   comboSalida: { value: null, active: false },
-  Empleados: [
-    { id: 1, title: "Antonio" },
-    { id: 2, title: "Pablito" },
-    { id: 3, title: "Juan carlos" },
-  ],
+  Empleados: [],
   Mensaje: { show: false, value: "" },
 };
 
@@ -126,11 +96,24 @@ export const cajaReducer = (state, action) => {
   let mEfectivo = null;
   let mDebito = null;
   let mCuponera = null;
+  let date;
+  let cajaAbierta;
+  let newList;
   switch (action.type) {
     case "SHOW_MENSAJE":
       return { ...state, Mensaje: { show: true, value: action.value } };
     case "HIDE_MENSAJE":
-      return { ...state, Mensaje: { show: false, value: "" } };
+      return { ...state, Mensaje: { ...state.Mensaje.value, show: false } };
+    case "SHOW_SEGURIDAD_CIERRE":
+      return { ...state, seguridadCierre: true };
+    case "HIDE_SEGURIDAD_CIERRE":
+      return { ...state, seguridadCierre: false };
+    case "ACEPTAR_SEGURIDAD_CIERRE":
+      return { ...state, seguridadCierre: false, modalCierre: true };
+    case "HIDE_MODAL":
+      return { ...state,modalCierre: false };
+    case 'CARGAR_CIERRE':
+      return {...state,Cierre:action.payload};
     case "ABRIR_CAJA":
       return { ...state, cajaAbierta: true, idCaja: action.id };
     case "CERRAR_CAJA":
@@ -141,9 +124,9 @@ export const cajaReducer = (state, action) => {
         agendasHoy: [...state.agendasHoy],
       };
     case "CARGA_DE_DATOS":
-      const date = new Date();
-      let cajaAbierta = false;
-      let newList = action.payload.agendas.filter(
+      date = new Date();
+      cajaAbierta = false;
+      newList = action.payload.agendas.filter(
         (agenda) =>
           formatDate(agenda.fecha).getDate() === date.getDate() &&
           formatDate(agenda.fecha).getMonth() === date.getMonth()
@@ -159,9 +142,32 @@ export const cajaReducer = (state, action) => {
         Empleados: [...action.payload.empleados],
         productos: [...action.payload.productos],
         cajaAbierta: cajaAbierta,
-        sinAgendar: { value: action.payload.agendas.length===0 },
+        sinAgendar: { value: action.payload.agendas.length === 0 },
       };
       return { ...myState };
+    case "RESET":
+      date = new Date();
+      cajaAbierta = false;
+      newList = action.payload.agendas.filter(
+        (agenda) =>
+          formatDate(agenda.fecha).getDate() === date.getDate() &&
+          formatDate(agenda.fecha).getMonth() === date.getMonth()
+      );
+      if (action.payload.idCaja !== -1) {
+        cajaAbierta = true;
+      }
+      myState = {
+        ...state,
+        ...initialState,
+        idCaja: action.payload.idCaja,
+        agendas: [...action.payload.agendas],
+        agendasHoy: [...newList],
+        Empleados: [...action.payload.empleados],
+        productos: [...action.payload.productos],
+        cajaAbierta: cajaAbierta,
+        sinAgendar: { value: action.payload.agendas.length === 0 },
+      };
+      return { ...myState, Mensaje: { show: true, value: action.value } };
     case "USER_INPUT_MONTO_I":
       return {
         ...state,
@@ -1028,8 +1034,6 @@ export const cajaReducer = (state, action) => {
       };
       break;
 
-
-      
     default:
       return { ...state };
   }

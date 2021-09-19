@@ -6,6 +6,7 @@ import ComboBox from "../../components/ComboBox/ComboBox";
 import Border from "../../components/UI/Border/Border";
 import classesBorder from "../../components/UI/Border/Border.module.css";
 import SimpleNote from "../../components/UI/Note/SimpleNote";
+import Note from "../../components/UI/Note/Note";
 import TextArea from "../../components/UI/TextArea/TextArea";
 import Modal from "../../components/UI/Modal/Modal";
 import classes from "./AperturaCierre.module.css";
@@ -18,6 +19,8 @@ import inputs from "./AuxiliaresCaja/inputs";
 import { getElementById } from "../../FuncionesAuxiliares/FuncionesAuxiliares";
 import AuthContext from "../../store/AuthContext";
 import { useHistory } from "react-router-dom";
+import ContenidoCerrarCaja from "./ContenidoCerrarCaja/ContenidoCerrarCaja";
+
 
 const AperturaCierre = () => {
   const authCtx = useContext(AuthContext);
@@ -53,7 +56,6 @@ const AperturaCierre = () => {
   };
 
   const getValidacion = (res) => {
-    console.log(res);
     if (
       res.mensaje.cuponera === undefined ||
       res.mensaje.cuponera.codigo === 200
@@ -117,7 +119,8 @@ const AperturaCierre = () => {
   };
 
   const cerrarCaja = (res) => {
-    console.log(res);
+    console.log(res.mensaje);
+    dispatchCaja({type:'CARGAR_CIERRE',payload:res.mensaje});
   };
   const salidaSubmitHandler = (e) => {
     e.preventDefault();
@@ -145,6 +148,11 @@ const AperturaCierre = () => {
       );
     }
   };
+
+  const obtenerAgendasReset = (mensaje) => {
+    dispatchCaja({ type: "RESET", payload: mensaje.mensaje,value:'Entrada de dinero satisfactoria' });
+  };
+
   const obtenerAgendas = (mensaje) => {
     dispatchCaja({ type: "CARGA_DE_DATOS", payload: mensaje.mensaje });
   };
@@ -154,8 +162,7 @@ const AperturaCierre = () => {
   };
 
   const getRespuesta = (res) => {
-    console.log(res);
-    dispatchCaja({ type: "SHOW_MENSAJE", value: res.mensaje.mensaje });
+    fetchAgendas({ url: "/datosFormularioCaja" }, obtenerAgendasReset);
   };
   const EntradaDeDinero = () => {
     let montoE = 0;
@@ -220,7 +227,6 @@ const AperturaCierre = () => {
     return datosEnviar;
   };
   const getRespuestaModificar = (res) => {
-    console.log(res);
     if (res.mensaje.codigo !== 400) {
       cobrarCaja(
         {
@@ -299,6 +305,15 @@ const AperturaCierre = () => {
     else fetchAgendas({ url: "/datosFormularioCaja" }, obtenerAgendas);
   }, [user, history, fetchAgendas]);
 
+  let miCombo = cajaState.comboAgenda.value;
+  let CI = cajaState.sinAgendar.value ? miCombo : null;
+  if (CI === null) {
+    CI =
+      miCombo !== null
+        ? getElementById(cajaState.agendas, miCombo).empleado
+        : null;
+  }
+  const Employee = CI !== null ? getElementById(cajaState.Empleados, CI) : null;
   return (
     <>
       <Modal
@@ -347,7 +362,31 @@ const AperturaCierre = () => {
           </div>
         </form>
       </Modal>
+      <Modal tope={14}
+        closed={() => {
+          dispatchCaja({ type: "HIDE_MODAL" });
+        }}
+        show={cajaState.modalCierre}
+      >
+        {cajaState.Cierre!==null&&<ContenidoCerrarCaja Cierre={cajaState.Cierre}/>}
+      </Modal>
       <div className={classes.container}>
+        <Note show={cajaState.Mensaje.show} onClose={()=>{dispatchCaja({ type: "HIDE_MENSAJE" })}}>{cajaState.Mensaje.value}</Note>
+        <SimpleNote
+          show={cajaState.seguridadCierre}
+          aceptar={() => {
+            cierreCaja(
+              { url: "/cierreCaja?idCaja=" + cajaState.idCaja },
+              cerrarCaja
+            );
+            dispatchCaja({type:'ACEPTAR_SEGURIDAD_CIERRE'});
+          }}
+          rechazar={() => {
+            dispatchCaja({type:'HIDE_SEGURIDAD_CIERRE'});
+          }}
+        >
+          ¿Está seguro?
+        </SimpleNote>
         <SimpleNote
           show={cajaState.jornal.show}
           aceptar={() => {
@@ -378,14 +417,12 @@ const AperturaCierre = () => {
           }}
           rechazar={() => {
             dispatchCaja({ type: "HIDE_JORNAL" });
-            console.log("Rechazar");
           }}
         >
           ¿Está seguro?
         </SimpleNote>
         <form className={classes.caja} onSubmit={submitHandler}>
           <Border
-            /* disabled={cajaState.cajaAbierta} */
             className={`${classes.cajaContainer} ${classes.abrirCerrar}`}
           >
             <label
@@ -443,10 +480,7 @@ const AperturaCierre = () => {
             <SimpleButton
               disabled={!cajaState.cajaAbierta}
               action={() => {
-                cierreCaja(
-                  { url: "/cierreCaja?idCaja=" + cajaState.idCaja },
-                  cerrarCaja
-                );
+                dispatchCaja({type:'SHOW_SEGURIDAD_CIERRE'});
               }}
               className={classes.Cerrar}
             >
@@ -548,122 +582,134 @@ const AperturaCierre = () => {
                 </h1>
                 <div className={classes.servicios}>
                   <div>
-                    <h2
-                      onClick={
-                        !cajaState.cajaAbierta
-                          ? null
-                          : () => {
-                              resetAgendaProductos();
-                              dispatchCaja({ type: "CLICK_CORTE" });
-                            }
-                      }
-                      className={`${classes.opcionesServicios} ${
-                        !cajaState.cajaAbierta
-                          ? classes.textDisabled
-                          : cajaState.servicios.corte.active
-                          ? classes.active
-                          : ""
-                      }`}
-                    >
-                      Corte
-                    </h2>
-                    <h2
-                      onClick={
-                        !cajaState.cajaAbierta
-                          ? null
-                          : () => {
-                              resetAgendaProductos();
-                              dispatchCaja({ type: "CLICK_BARBA" });
-                            }
-                      }
-                      className={`${classes.opcionesServicios} ${
-                        !cajaState.cajaAbierta
-                          ? classes.textDisabled
-                          : cajaState.servicios.barba.active
-                          ? classes.active
-                          : ""
-                      }`}
-                    >
-                      Barba
-                    </h2>
-                    <h2
-                      onClick={
-                        !cajaState.cajaAbierta
-                          ? null
-                          : () => {
-                              resetAgendaProductos();
-                              dispatchCaja({ type: "CLICK_MAQUINA" });
-                            }
-                      }
-                      className={`${classes.opcionesServicios} ${
-                        !cajaState.cajaAbierta
-                          ? classes.textDisabled
-                          : cajaState.servicios.maquina.active
-                          ? classes.active
-                          : ""
-                      }`}
-                    >
-                      Maquina
-                    </h2>
+                    {(Employee === null || Employee.duracion[0].duracion !== -1) && (
+                      <h2
+                        onClick={
+                          !cajaState.cajaAbierta
+                            ? null
+                            : () => {
+                                resetAgendaProductos();
+                                dispatchCaja({ type: "CLICK_CORTE" });
+                              }
+                        }
+                        className={`${classes.opcionesServicios} ${
+                          !cajaState.cajaAbierta
+                            ? classes.textDisabled
+                            : cajaState.servicios.corte.active
+                            ? classes.active
+                            : ""
+                        }`}
+                      >
+                        Corte
+                      </h2>
+                    )}
+                    {(Employee === null || Employee.duracion[3].duracion !== -1) && (
+                      <h2
+                        onClick={
+                          !cajaState.cajaAbierta
+                            ? null
+                            : () => {
+                                resetAgendaProductos();
+                                dispatchCaja({ type: "CLICK_BARBA" });
+                              }
+                        }
+                        className={`${classes.opcionesServicios} ${
+                          !cajaState.cajaAbierta
+                            ? classes.textDisabled
+                            : cajaState.servicios.barba.active
+                            ? classes.active
+                            : ""
+                        }`}
+                      >
+                        Barba
+                      </h2>
+                    )}
+                    {(Employee === null || Employee.duracion[4].duracion !== -1) && (
+                      <h2
+                        onClick={
+                          !cajaState.cajaAbierta
+                            ? null
+                            : () => {
+                                resetAgendaProductos();
+                                dispatchCaja({ type: "CLICK_MAQUINA" });
+                              }
+                        }
+                        className={`${classes.opcionesServicios} ${
+                          !cajaState.cajaAbierta
+                            ? classes.textDisabled
+                            : cajaState.servicios.maquina.active
+                            ? classes.active
+                            : ""
+                        }`}
+                      >
+                        Maquina
+                      </h2>
+                    )}
                   </div>
                   <div>
-                    <h2
-                      onClick={
-                        !cajaState.cajaAbierta
-                          ? null
-                          : () => {
-                              resetAgendaProductos();
-                              dispatchCaja({ type: "CLICK_BRUSHING" });
-                            }
-                      }
-                      className={`${classes.opcionesServicios} ${
-                        !cajaState.cajaAbierta
-                          ? classes.textDisabled
-                          : cajaState.servicios.brushing.active
-                          ? classes.active
-                          : ""
-                      }`}
-                    >
-                      Brushing
-                    </h2>
-                    <h2
-                      onClick={
-                        !cajaState.cajaAbierta
-                          ? null
-                          : () => {
-                              resetAgendaProductos();
-                              dispatchCaja({ type: "CLICK_DECOLORACION" });
-                            }
-                      }
-                      className={`${classes.opcionesServicios} ${
-                        !cajaState.cajaAbierta
-                          ? classes.textDisabled
-                          : cajaState.servicios.decoloracion.active
-                          ? classes.active
-                          : ""
-                      }`}
-                    >
-                      Decoloración
-                    </h2>
-                    <h2
-                      onClick={
-                        !cajaState.cajaAbierta
-                          ? null
-                          : () => {
-                              resetAgendaProductos();
-                              dispatchCaja({ type: "CLICK_CLARITOS" });
-                            }
-                      }
-                      className={`${classes.opcionesServicios} ${
-                        !cajaState.cajaAbierta
-                          ? classes.textDisabled
-                          : cajaState.servicios.claritos.active
-                          ? classes.active
-                          : ""
-                      }`}
-                    >
-                      Claritos
-                    </h2>
+                    {(Employee === null || Employee.duracion[7].duracion !== -1) && (
+                      <h2
+                        onClick={
+                          !cajaState.cajaAbierta
+                            ? null
+                            : () => {
+                                resetAgendaProductos();
+                                dispatchCaja({ type: "CLICK_BRUSHING" });
+                              }
+                        }
+                        className={`${classes.opcionesServicios} ${
+                          !cajaState.cajaAbierta
+                            ? classes.textDisabled
+                            : cajaState.servicios.brushing.active
+                            ? classes.active
+                            : ""
+                        }`}
+                      >
+                        Brushing
+                      </h2>
+                    )}
+                    {(Employee === null || Employee.duracion[6].duracion !== -1) && (
+                      <h2
+                        onClick={
+                          !cajaState.cajaAbierta
+                            ? null
+                            : () => {
+                                resetAgendaProductos();
+                                dispatchCaja({ type: "CLICK_DECOLORACION" });
+                              }
+                        }
+                        className={`${classes.opcionesServicios} ${
+                          !cajaState.cajaAbierta
+                            ? classes.textDisabled
+                            : cajaState.servicios.decoloracion.active
+                            ? classes.active
+                            : ""
+                        }`}
+                      >
+                        Decoloración
+                      </h2>
+                    )}
+                    {(Employee === null || Employee.duracion[5].duracion !== -1) && (
+                      <h2
+                        onClick={
+                          !cajaState.cajaAbierta
+                            ? null
+                            : () => {
+                                resetAgendaProductos();
+                                dispatchCaja({ type: "CLICK_CLARITOS" });
+                              }
+                        }
+                        className={`${classes.opcionesServicios} ${
+                          !cajaState.cajaAbierta
+                            ? classes.textDisabled
+                            : cajaState.servicios.claritos.active
+                            ? classes.active
+                            : ""
+                        }`}
+                      >
+                        Claritos
+                      </h2>
+                    )}
                   </div>
                 </div>
                 <div className={classes.dobleFild}>
