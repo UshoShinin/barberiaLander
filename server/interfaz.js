@@ -1453,7 +1453,7 @@ const abrirCaja = async (entrada) => {
     const insertCaja = await pool
       .request()
       .query(
-        "insert into Caja(Fecha, Total) output inserted.IdCaja values (CAST(GETDATE() AS DATE), 0)"
+        "insert into Caja(Fecha, Total) output inserted.IdCaja as idCaja, inserted.Fecha as fecha, inserted.Total as total values (CAST(GETDATE() AS DATE), 0)"
       );
     //Agarro el id de la caja que acabo de insertar
     const idCaja = insertCaja.recordset[0].IdCaja;
@@ -1467,7 +1467,7 @@ const abrirCaja = async (entrada) => {
       entrada.servicios,
       "A" //Esto corresponde a la descripcion de la entrada de dinero
     ).then((resultado) => resultado);
-    return insertCaja.recordset;
+    return insertCaja.recordset[0];
   } catch (error) {
     console.log(error);
   }
