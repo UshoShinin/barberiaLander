@@ -10,7 +10,7 @@
   padding: 20px;
   text-align: center;
   box-sizing: border-box;
-  top: 30%;
+  /* top: 30%; */
   left: 25%;
   width: 50%;
   transition: all 300ms ease-out;

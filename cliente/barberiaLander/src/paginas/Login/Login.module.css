@@ -14,11 +14,12 @@
     overflow: hidden;
 }
 
-.container,.container>div{
+.container{
     width: max-content;
     margin:0;
 }
 .container>div > p{
+    max-width: 327px;
     margin-top: 15px;
     font-size: 1.5em;
     color: var(--clr-inActive);
@@ -49,7 +50,7 @@
 .container >div:hover > div > label{
     color:var(--clr-neon-white);
 }
-@media (max-width:990px) {
+@media (max-width:1400px) {
     .container>div{
         padding: 25px;
     }
@@ -57,6 +58,7 @@
         font-size: 1em;
     }
     .container>div > p{
+        max-width: 228px;
         font-size: 1em;
     }
 }

@@ -2422,7 +2422,7 @@ const getTotalCuponera = async (idCaja) => {
     });
     //Armo un objeto con el total de los efectivos, ya que es el que esta separado
     let totalCuponera = {
-      total: 0,
+      total: 0
     };
     //Recorro todos los pagos para sumarlos y tener el total
     cobrosCuponera.cuponera.forEach((pagos) => {

@@ -39,12 +39,12 @@ const PreAgendas = () => {
   const user = authCtx.user;
   useEffect(() => {
     if (
-      user === null ||
-      (user.rol !== "Administrador" && user.rol !== "Encargado")
+      user === null ||user.rol === "Empleado"
     )
       history.replace("/");
     else fetchAgendas({ url: "/listadoPreAgendas" }, obtenerAgendas);
   }, [user, history, fetchAgendas]);
+  const esCliente = user.rol==='Cliente';
   const showAgenda = (agendita) => {
     dispatch({type:'GET_AGENDA',agenda:agendita});
   };
@@ -90,6 +90,7 @@ const PreAgendas = () => {
               <div className={classes.listado}>
                 {agendasState.agendas !== null && (
                   <Lista
+                    cliente = {esCliente}
                     items={agendasState.agendas}
                     select={(id)=>{dispatch({type:'SELECT_AGENDA',value:id})}}
                     aceptar={aceptarAgenda}

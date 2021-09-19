@@ -36,7 +36,7 @@ const ModalOveryLay = (props) => {
         exitActive: classes.ModalClosed,
       }}
     >
-      <div className={classes.Modal}>
+      <div className={classes.Modal} style={{top:`${props.tope!==undefined?props.tope:30}%`}}>
         {props.children}
         <SimpleButton type="button" action={props.closed} color={"red"}>
           X
@@ -51,7 +51,7 @@ const portalElement = document.getElementById('overlays')
 const Modal = (props) => {
   return <>
     {ReactDOM.createPortal(<Backdrop closed={props.closed} show={props.show}/>,portalElement)}
-    {ReactDOM.createPortal(<ModalOveryLay closed={props.closed} show={props.show}>{props.children}</ModalOveryLay>,portalElement)}
+    {ReactDOM.createPortal(<ModalOveryLay closed={props.closed} show={props.show} tope={props.tope}>{props.children}</ModalOveryLay>,portalElement)}
   </>;
 };
 

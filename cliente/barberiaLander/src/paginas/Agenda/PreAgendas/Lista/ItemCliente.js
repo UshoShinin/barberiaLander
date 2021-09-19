@@ -1,7 +1,5 @@
 import classes from "./Item.module.css";
-import SimpleButton from "../../../../components/UI/SimpleButton/SimpleButton";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faSearch, faTimes } from "@fortawesome/free-solid-svg-icons";
+
 const Item = (props) => {
   const item = props.item;
   return (
