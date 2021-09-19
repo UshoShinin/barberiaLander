@@ -1077,24 +1077,27 @@ const agregarServiciosParaCaja = async (listado) => {
 
 //Metodo auxiliar para agregar si la caja esta abierta o no
 const agregarIdCaja = async (listado) => {
-  const fecha = new Date(Date.now());
-  let dia = fecha.getDate();
-  let mes = fecha.getMonth() + 1;
-  let anio = fecha.getFullYear();
-  let parametroFecha = anio + "-" + mes + "-" + dia;
-  let retorno = getCaja(parametroFecha).then((caja) => {
+  let retorno = getCaja().then((caja) => {
     if (caja.rowsAffected[0] < 1) {
       //Armo el array entero con todo
       return {
         ...listado,
-        idCaja: -1,
+        caja: { idCaja: -1 },
       };
     } else {
-      //Armo el array entero con todo
-      return {
-        ...listado,
-        idCaja: caja.recordset[0].idCaja,
-      };
+      //Si hay caja entonces me tengo que fijar el monto
+      if (caja.recordset[0].total > 0) {
+        return {
+          ...listado,
+          caja: { idCaja: -1 },
+        };
+      } else {
+        //Armo el array entero con todo
+        return {
+          ...listado,
+          caja: caja.recordset[0],
+        };
+      }
     }
   });
   return retorno;
@@ -1813,16 +1816,15 @@ const insertarCajaEntrada = async (idCaja, idEntrada) => {
 };
 
 //Metodo auxiliar para conseguir la caja de un dia dado
-const getCaja = async (fecha) => {
+const getCaja = async () => {
   try {
     //Creo la conexion
     let pool = await sql.connect(conexion);
     //Hago el select para que me traiga la caja
     const caja = await pool
       .request()
-      .input("fecha", sql.Date, fecha)
       .query(
-        "select IdCaja as idCaja, Fecha as fecha, Total as total from Caja C where C.Fecha = @fecha"
+        "select top 1 IdCaja as idCaja, Fecha as fecha, Total as total from Caja C order by Fecha desc"
       );
     return caja;
   } catch (error) {
@@ -3173,7 +3175,7 @@ const calcularComisionSinLimite = async (ciEmpleado, idCaja) => {
       }
     });
     return {
-      codigo: 400,
+      codigo: 200,
       mensaje: totalComision * 0.35,
     };
   } catch (error) {
@@ -3181,6 +3183,27 @@ const calcularComisionSinLimite = async (ciEmpleado, idCaja) => {
     return {
       codigo: 400,
       mensaje: "Error al calcular la comision sin limites",
+    };
+  }
+};
+
+//Metodo para calcular la comision que corresponde a partir de las 10 atenciones
+const calcularComisionConLimite = async (ciEmpleado, idCaja) => {
+  try {
+  } catch (error) {
+    console.log(error);
+    return { codigo: 400, mensaje: "Error al calcular comision con limite" };
+  }
+};
+
+//Metodo auxiliar para traer las cantidades correspondientes a comisionar
+const cantidadServiciosComisionar = async () => {
+  try {
+  } catch (error) {
+    console.log(error);
+    return {
+      codigo: 400,
+      mensaje: "Le erramos a algo calculando la cantidad a comisionar",
     };
   }
 };
