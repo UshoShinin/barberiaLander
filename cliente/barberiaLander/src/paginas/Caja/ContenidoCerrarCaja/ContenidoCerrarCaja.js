@@ -1,12 +1,22 @@
 import SimpleButton from "../../../components/UI/SimpleButton/SimpleButton";
 import classes from "./ContenidoCerrarCaja.module.css";
 const ContenidoCerrarCaja = (props) => {
-  let efectivos = props.Cierre.efectivo;
-  let debitos = props.Cierre.debito;
-  let cuponeras = props.Cierre.cuponera;
-  const efectivo = efectivos.pop();
-  const debito = debitos.pop();
-  const cuponera = cuponeras.pop();
+  console.log(props.Cierre);
+  let efectivos = [];
+  for(let i = 0; i<props.Cierre.efectivo.length-1;i++){
+    efectivos.push(props.Cierre.efectivo[i]);
+  }
+  const efectivo = props.Cierre.efectivo[props.Cierre.efectivo.length-1];
+  let debitos = [];
+  for(let i = 0; i<props.Cierre.debito.length-1;i++){
+    debitos.push(props.Cierre.debito[i]);
+  }
+  const debito = props.Cierre.debito[props.Cierre.debito.length-1];
+  let cuponeras = [];
+  for(let i = 0; i<props.Cierre.cuponera.length-1;i++){
+    cuponeras.push(props.Cierre.cuponera[i]);
+  }
+  const cuponera = props.Cierre.cuponera[props.Cierre.cuponera.length-1];
   return (
     <div className={classes.container}>
       <h1>Cierre caja</h1>
@@ -47,8 +57,8 @@ const ContenidoCerrarCaja = (props) => {
       <h2>{`Total Débito: ${debito.total}`}</h2>
       <h2>{`Total Cuponera: ${cuponera.total}`}</h2>
       <div className={classes.buttons}>
-          <SimpleButton color={"red"}>Limpiar Base</SimpleButton>
-          <SimpleButton>Salir</SimpleButton>
+          <SimpleButton color={"red"}>Cierre parcial</SimpleButton>
+          <SimpleButton color={"red"}>Cierre total</SimpleButton>
       </div>
     </div>
   );

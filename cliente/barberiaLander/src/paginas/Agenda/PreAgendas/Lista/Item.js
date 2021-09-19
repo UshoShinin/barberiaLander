@@ -7,7 +7,7 @@ const Item = (props) => {
   return (
     <li className={classes.item}>
       <div className={classes.content}>
-        <h3>{`${item.nombreCliente.length>10?item.nombreCliente.substring(0,9)+'...':item.nombreCliente} ${item.fecha}`}</h3>
+        <h3>{item.nombreCliente}</h3>
         <h4>
           Inicio:{item.horaInicio} Fin:{item.horaFin}
         </h4>

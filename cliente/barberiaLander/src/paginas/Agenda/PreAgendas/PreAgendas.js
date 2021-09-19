@@ -16,12 +16,23 @@ const PreAgendas = () => {
   const history = useHistory();
   const [agendasState, dispatch] = useReducer(reducer, initialState);
   const authCtx = useContext(AuthContext);
+  const user = authCtx.user;
+  const esCliente = user !== null && user.rol === "Cliente";
   const obtenerAgendas = (agendas) => {
-    dispatch({
-      type: "CARGA",
-      payload: agendas.mensaje.preAgendas,
-      manejo: agendas.mensaje.manejoAgenda.AceptarRechazar,
-    });    
+    console.log(agendas.mensaje);
+    if(esCliente){
+      dispatch({
+        type: "CARGA",
+        payload: agendas.mensaje
+      });
+    }else{
+      dispatch({
+        type: "CARGA",
+        payload: agendas.mensaje.preAgendas,
+        manejo: agendas.mensaje.manejoAgenda.AceptarRechazar,
+      });
+    }
+    
   };
 
   const getRespuesta = (res) => {
@@ -36,17 +47,15 @@ const PreAgendas = () => {
 
   const aceptar = useHttp();
   const rechazar = useHttp();
-  const user = authCtx.user;
+  
   useEffect(() => {
-    if (
-      user === null ||user.rol === "Empleado"
-    )
-      history.replace("/");
+    if (user === null || user.rol === "Empleado") history.replace("/");
+    else if (esCliente)
+      fetchAgendas({ url: "/getAgendasCliente?cedula="+user.ciUsuario }, obtenerAgendas);
     else fetchAgendas({ url: "/listadoPreAgendas" }, obtenerAgendas);
   }, [user, history, fetchAgendas]);
-  const esCliente = user.rol==='Cliente';
   const showAgenda = (agendita) => {
-    dispatch({type:'GET_AGENDA',agenda:agendita});
+    dispatch({ type: "GET_AGENDA", agenda: agendita });
   };
   const aceptarAgenda = (agenda) => {
     aceptar(
@@ -77,7 +86,7 @@ const PreAgendas = () => {
       {agendasState.agendaAModificar !== null && (
         <CrearAgenda
           exitModificar={() => {
-            dispatch({type:'GET_AGENDA',agenda:null});
+            dispatch({ type: "GET_AGENDA", agenda: null });
           }}
           agenda={agendasState.agendaAModificar}
         />
@@ -87,43 +96,55 @@ const PreAgendas = () => {
           {agendasState.agendas === null && <LoaddingSpinner />}
           {agendasState.agendas !== null && (
             <div className={classes.container}>
-              <div className={classes.listado}>
+              <div
+                className={`${
+                  esCliente ? classes.listadoCliente : classes.listado
+                }`}
+              >
                 {agendasState.agendas !== null && (
                   <Lista
-                    cliente = {esCliente}
+                    cliente={esCliente}
                     items={agendasState.agendas}
-                    select={(id)=>{dispatch({type:'SELECT_AGENDA',value:id})}}
+                    select={(id) => {
+                      dispatch({ type: "SELECT_AGENDA", value: id });
+                    }}
                     aceptar={aceptarAgenda}
                     rechazar={rechazarAgenda}
                   />
                 )}
-                <div className={classes.opciones}>
-                  <div className={classes.label}>
-                    <h2>Aceptar todo</h2>
+                {!esCliente && (
+                  <div className={classes.opciones}>
+                    <div className={classes.label}>
+                      <h2>Aceptar todo</h2>
+                    </div>
+                    <div className={classes.actions}>
+                      <Switch
+                        onCheck={() => {
+                          dispatch({ type: "ACEPTAR" });
+                        }}
+                        active={agendasState.aceptar}
+                      />
+                    </div>
+                    <div className={classes.label}>
+                      <h2>Rechazar todo</h2>
+                    </div>
+                    <div className={classes.actions}>
+                      <Switch
+                        onCheck={() => {
+                          dispatch({ type: "RECHAZAR" });
+                        }}
+                        active={agendasState.rechazar}
+                      />
+                    </div>
                   </div>
-                  <div className={classes.actions}>
-                    <Switch
-                      onCheck={() => {
-                        dispatch({ type: "ACEPTAR" });
-                      }}
-                      active={agendasState.aceptar}
-                    />
-                  </div>
-                  <div className={classes.label}>
-                    <h2>Rechazar todo</h2>
-                  </div>
-                  <div className={classes.actions}>
-                    <Switch
-                      onCheck={() => {
-                        dispatch({ type: "RECHAZAR" });
-                      }}
-                      active={agendasState.rechazar}
-                    />
-                  </div>
-                </div>
+                )}
               </div>
               <div className={classes.editor}>
-                <Visualizador id={agendasState.agendaId} mostrarAgenda={showAgenda} />
+                <Visualizador
+                cliente = {esCliente}
+                  id={agendasState.agendaId}
+                  mostrarAgenda={showAgenda}
+                />
               </div>
             </div>
           )}

@@ -39,6 +39,7 @@
   text-align: left;
   color: var(--clr-inActive);
   word-spacing: 0.2em;
+  word-break: break-word;
   text-shadow: 0 0 0em transparent;
   transition: color 160ms ease-out, text-shadow 160ms ease-out;
 }

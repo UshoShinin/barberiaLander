@@ -21,7 +21,6 @@ import AuthContext from "../../store/AuthContext";
 import { useHistory } from "react-router-dom";
 import ContenidoCerrarCaja from "./ContenidoCerrarCaja/ContenidoCerrarCaja";
 
-
 const AperturaCierre = () => {
   const authCtx = useContext(AuthContext);
   const [cajaState, dispatchCaja] = useReducer(cajaReducer, initialState);
@@ -119,8 +118,7 @@ const AperturaCierre = () => {
   };
 
   const cerrarCaja = (res) => {
-    console.log(res.mensaje);
-    dispatchCaja({type:'CARGAR_CIERRE',payload:res.mensaje});
+    dispatchCaja({ type: "CARGAR_CIERRE", payload: res.mensaje });
   };
   const salidaSubmitHandler = (e) => {
     e.preventDefault();
@@ -150,20 +148,37 @@ const AperturaCierre = () => {
   };
 
   const obtenerAgendasReset = (mensaje) => {
-    dispatchCaja({ type: "RESET", payload: mensaje.mensaje,value:'Entrada de dinero satisfactoria' });
+    dispatchCaja({
+      type: "RESET",
+      payload: mensaje.mensaje,
+      value: "Entrada de dinero satisfactoria",
+    });
   };
 
   const obtenerAgendas = (mensaje) => {
+    console.log(mensaje);
     dispatchCaja({ type: "CARGA_DE_DATOS", payload: mensaje.mensaje });
   };
 
   const resultadoCaja = (res) => {
-    dispatchCaja({ type: "ABRIR_CAJA", id: res.mensaje.idCaja });
+    console.log(res);
+    dispatchCaja({ type: "ABRIR_CAJA", id: res.mensaje.Caja });
   };
 
   const getRespuesta = (res) => {
     fetchAgendas({ url: "/datosFormularioCaja" }, obtenerAgendasReset);
   };
+
+  const miFiltro = (lista,objeto) =>{
+    let miLista = [];
+    lista.forEach(l => {
+      if(l.id!==objeto){
+        miLista.push(l);
+      }
+    });
+    return miLista;
+  }
+
   const EntradaDeDinero = () => {
     let montoE = 0;
     let montoD = 0;
@@ -198,7 +213,20 @@ const AperturaCierre = () => {
       return { idProducto: p.id, cantidad: p.stock };
     });
     let servicios = Object.values(cajaState.servicios).filter((s) => s.active);
-    servicios = servicios.length > 0 ? servicios : null;
+    console.log(getElementById(servicios, 4).id);
+    if (servicios.length === 0) servicios = null;
+    
+    else if (getElementById(servicios, 4) !== null) {
+      if(getElementById(servicios, 1) !== null){
+        servicios = miFiltro(servicios,1);
+        servicios = miFiltro(servicios,4);
+        servicios.push({active:true,id:2})
+      }else if(getElementById(servicios, 5) !== null){
+        servicios = miFiltro(servicios,4);
+        servicios = miFiltro(servicios,5);
+        servicios.push({active:true,id:3})
+      }
+    } 
     productosVendidos = productosVendidos.length > 0 ? productosVendidos : null;
     const agenda = getElementById(
       cajaState.agendas,
@@ -224,6 +252,7 @@ const AperturaCierre = () => {
       idAgenda: agenda !== null ? agenda.id : -1,
       idHorario: agenda !== null ? agenda.idHorario : -1,
     };
+    console.log(datosEnviar);
     return datosEnviar;
   };
   const getRespuestaModificar = (res) => {
@@ -362,16 +391,26 @@ const AperturaCierre = () => {
           </div>
         </form>
       </Modal>
-      <Modal tope={14}
+      <Modal
+        tope={14}
         closed={() => {
           dispatchCaja({ type: "HIDE_MODAL" });
         }}
         show={cajaState.modalCierre}
       >
-        {cajaState.Cierre!==null&&<ContenidoCerrarCaja Cierre={cajaState.Cierre}/>}
+        {cajaState.Cierre !== null && (
+          <ContenidoCerrarCaja Cierre={cajaState.Cierre} />
+        )}
       </Modal>
       <div className={classes.container}>
-        <Note show={cajaState.Mensaje.show} onClose={()=>{dispatchCaja({ type: "HIDE_MENSAJE" })}}>{cajaState.Mensaje.value}</Note>
+        <Note
+          show={cajaState.Mensaje.show}
+          onClose={() => {
+            dispatchCaja({ type: "HIDE_MENSAJE" });
+          }}
+        >
+          {cajaState.Mensaje.value}
+        </Note>
         <SimpleNote
           show={cajaState.seguridadCierre}
           aceptar={() => {
@@ -379,10 +418,10 @@ const AperturaCierre = () => {
               { url: "/cierreCaja?idCaja=" + cajaState.idCaja },
               cerrarCaja
             );
-            dispatchCaja({type:'ACEPTAR_SEGURIDAD_CIERRE'});
+            dispatchCaja({ type: "ACEPTAR_SEGURIDAD_CIERRE" });
           }}
           rechazar={() => {
-            dispatchCaja({type:'HIDE_SEGURIDAD_CIERRE'});
+            dispatchCaja({ type: "HIDE_SEGURIDAD_CIERRE" });
           }}
         >
           ¿Está seguro?
@@ -422,9 +461,7 @@ const AperturaCierre = () => {
           ¿Está seguro?
         </SimpleNote>
         <form className={classes.caja} onSubmit={submitHandler}>
-          <Border
-            className={`${classes.cajaContainer} ${classes.abrirCerrar}`}
-          >
+          <Border className={`${classes.cajaContainer} ${classes.abrirCerrar}`}>
             <label
               className={`${classes.labelText} ${
                 !cajaState.cajaAbierta ? classes.text : classes.textDisabled
@@ -480,7 +517,7 @@ const AperturaCierre = () => {
             <SimpleButton
               disabled={!cajaState.cajaAbierta}
               action={() => {
-                dispatchCaja({type:'SHOW_SEGURIDAD_CIERRE'});
+                dispatchCaja({ type: "SHOW_SEGURIDAD_CIERRE" });
               }}
               className={classes.Cerrar}
             >
@@ -582,7 +619,8 @@ const AperturaCierre = () => {
                 </h1>
                 <div className={classes.servicios}>
                   <div>
-                    {(Employee === null || Employee.duracion[0].duracion !== -1) && (
+                    {(Employee === null ||
+                      Employee.duracion[0].duracion !== -1) && (
                       <h2
                         onClick={
                           !cajaState.cajaAbierta
@@ -603,7 +641,8 @@ const AperturaCierre = () => {
                         Corte
                       </h2>
                     )}
-                    {(Employee === null || Employee.duracion[3].duracion !== -1) && (
+                    {(Employee === null ||
+                      Employee.duracion[3].duracion !== -1) && (
                       <h2
                         onClick={
                           !cajaState.cajaAbierta
@@ -624,7 +663,8 @@ const AperturaCierre = () => {
                         Barba
                       </h2>
                     )}
-                    {(Employee === null || Employee.duracion[4].duracion !== -1) && (
+                    {(Employee === null ||
+                      Employee.duracion[4].duracion !== -1) && (
                       <h2
                         onClick={
                           !cajaState.cajaAbierta
@@ -647,7 +687,8 @@ const AperturaCierre = () => {
                     )}
                   </div>
                   <div>
-                    {(Employee === null || Employee.duracion[7].duracion !== -1) && (
+                    {(Employee === null ||
+                      Employee.duracion[7].duracion !== -1) && (
                       <h2
                         onClick={
                           !cajaState.cajaAbierta
@@ -668,7 +709,8 @@ const AperturaCierre = () => {
                         Brushing
                       </h2>
                     )}
-                    {(Employee === null || Employee.duracion[6].duracion !== -1) && (
+                    {(Employee === null ||
+                      Employee.duracion[6].duracion !== -1) && (
                       <h2
                         onClick={
                           !cajaState.cajaAbierta
@@ -689,7 +731,8 @@ const AperturaCierre = () => {
                         Decoloración
                       </h2>
                     )}
-                    {(Employee === null || Employee.duracion[5].duracion !== -1) && (
+                    {(Employee === null ||
+                      Employee.duracion[5].duracion !== -1) && (
                       <h2
                         onClick={
                           !cajaState.cajaAbierta
