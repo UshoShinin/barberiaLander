@@ -2424,7 +2424,7 @@ const getTotalCuponera = async (idCaja) => {
     });
     //Armo un objeto con el total de los efectivos, ya que es el que esta separado
     let totalCuponera = {
-      total: 0
+      total: 0,
     };
     //Recorro todos los pagos para sumarlos y tener el total
     cobrosCuponera.cuponera.forEach((pagos) => {
@@ -3190,6 +3190,10 @@ const calcularComisionSinLimite = async (ciEmpleado, idCaja) => {
 //Metodo para calcular la comision que corresponde a partir de las 10 atenciones
 const calcularComisionConLimite = async (ciEmpleado, idCaja) => {
   try {
+    const cantidadComisionar = await cantidadServiciosComisionar(ciEmpleado, idCaja);
+    if (cantidadComisionar.cantidadComisionar === 0) {
+      return {codigo: 200, comision: 0}
+    }
   } catch (error) {
     console.log(error);
     return { codigo: 400, mensaje: "Error al calcular comision con limite" };
@@ -3197,8 +3201,27 @@ const calcularComisionConLimite = async (ciEmpleado, idCaja) => {
 };
 
 //Metodo auxiliar para traer las cantidades correspondientes a comisionar
-const cantidadServiciosComisionar = async () => {
+const cantidadServiciosComisionar = async (ciEmpleado, idCaja) => {
   try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el select
+    const cantComisionar = await pool
+      .request()
+      .input("idCaja", sql.Int, idCaja)
+      .input("ciEmpleado", sql.VarChar, ciEmpleado)
+      .query(
+        "select COUNT(DISTINCT  E.IdEntrada) as cantEntradas from EntradaDinero E, Caja_Entrada CE, Entrada_Servicio ES, Servicio S where E.IdEntrada = CE.IdEntrada and ES.IdEntrada = E.IdEntrada and S.IdServicio = ES.IdServicio and S.IdServicio in (1, 2, 3, 4, 5) and CE.IdCaja = @idCaja and E.Cedula = @ciEmpleado"
+      );
+    //Reviso cual es lo que me devuelve la consulta anterior
+    //Si es 10 o menor devuelvo que la cantidad a comisionar es 0
+    if (cantComisionar.recordset[0].cantEntradas < 11) {
+      return {codigo: 200, cantidadComisionar: 0}
+    }else{
+      //Guardo la cantidad de entradas que deberia poder comisionar
+      let cantidad = cantComisionar.recordset[0].cantEntradas - 10;
+      return {codigo: 200, cantidadComisionar: cantidad}
+    }
   } catch (error) {
     console.log(error);
     return {
@@ -3207,6 +3230,8 @@ const cantidadServiciosComisionar = async () => {
     };
   }
 };
+
+
 
 //Creo un objeto que voy a exportar para usarlo desde el index.js
 //Adentro voy a tener todos los metodos de llamar a la base
