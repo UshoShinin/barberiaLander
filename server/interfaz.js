@@ -1456,7 +1456,7 @@ const abrirCaja = async (entrada) => {
         "insert into Caja(Fecha, Total) output inserted.IdCaja as idCaja, inserted.Fecha as fecha, inserted.Total as total values (CAST(GETDATE() AS DATE), 0)"
       );
     //Agarro el id de la caja que acabo de insertar
-    const idCaja = insertCaja.recordset[0].IdCaja;
+    const idCaja = insertCaja.recordset[0].idCaja;
     //Despues de insertar tengo que hacer una entrada de caja a la caja actual con el monto inicial
     const insertMontoInicial = nuevaEntradaDinero(
       idCaja,
