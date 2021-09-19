@@ -1,7 +1,6 @@
 import SimpleButton from "../../../components/UI/SimpleButton/SimpleButton";
 import classes from "./ContenidoCerrarCaja.module.css";
 const ContenidoCerrarCaja = (props) => {
-  console.log(props.Cierre);
   let efectivos = [];
   for(let i = 0; i<props.Cierre.efectivo.length-1;i++){
     efectivos.push(props.Cierre.efectivo[i]);

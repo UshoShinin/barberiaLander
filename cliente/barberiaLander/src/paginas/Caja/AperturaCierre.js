@@ -156,28 +156,34 @@ const AperturaCierre = () => {
   };
 
   const obtenerAgendas = (mensaje) => {
-    console.log(mensaje);
+    const date = new Date();
+    const caja = mensaje.mensaje.caja;
+    /* const fechita =  */
+    /* if(comparaFechas(date.getDate(),date.getUTCMonth()+1,date.getFullYear(),fechita))
+    cierreCaja(
+      { url: "/cierreCaja?idCaja=" + cajaState.idCaja },
+      cerrarCaja
+    ); */
     dispatchCaja({ type: "CARGA_DE_DATOS", payload: mensaje.mensaje });
   };
 
   const resultadoCaja = (res) => {
-    console.log(res);
-    dispatchCaja({ type: "ABRIR_CAJA", id: res.mensaje.Caja });
+    dispatchCaja({ type: "ABRIR_CAJA", Caja: res.mensaje });
   };
 
   const getRespuesta = (res) => {
     fetchAgendas({ url: "/datosFormularioCaja" }, obtenerAgendasReset);
   };
 
-  const miFiltro = (lista,objeto) =>{
+  const miFiltro = (lista, objeto) => {
     let miLista = [];
-    lista.forEach(l => {
-      if(l.id!==objeto){
+    lista.forEach((l) => {
+      if (l.id !== objeto) {
         miLista.push(l);
       }
     });
     return miLista;
-  }
+  };
 
   const EntradaDeDinero = () => {
     let montoE = 0;
@@ -213,20 +219,19 @@ const AperturaCierre = () => {
       return { idProducto: p.id, cantidad: p.stock };
     });
     let servicios = Object.values(cajaState.servicios).filter((s) => s.active);
-    console.log(getElementById(servicios, 4).id);
     if (servicios.length === 0) servicios = null;
-    
     else if (getElementById(servicios, 4) !== null) {
-      if(getElementById(servicios, 1) !== null){
-        servicios = miFiltro(servicios,1);
-        servicios = miFiltro(servicios,4);
-        servicios.push({active:true,id:2})
-      }else if(getElementById(servicios, 5) !== null){
-        servicios = miFiltro(servicios,4);
-        servicios = miFiltro(servicios,5);
-        servicios.push({active:true,id:3})
+      if (getElementById(servicios, 1) !== null) {
+        servicios = miFiltro(servicios, 1);
+        servicios = miFiltro(servicios, 4);
+        servicios.push({ active: true, id: 2 });
+      } else if (getElementById(servicios, 5) !== null) {
+        servicios = miFiltro(servicios, 4);
+        servicios = miFiltro(servicios, 5);
+        servicios.push({ active: true, id: 3 });
       }
-    } 
+    }
+    console.log(servicios);
     productosVendidos = productosVendidos.length > 0 ? productosVendidos : null;
     const agenda = getElementById(
       cajaState.agendas,
@@ -252,7 +257,6 @@ const AperturaCierre = () => {
       idAgenda: agenda !== null ? agenda.id : -1,
       idHorario: agenda !== null ? agenda.idHorario : -1,
     };
-    console.log(datosEnviar);
     return datosEnviar;
   };
   const getRespuestaModificar = (res) => {
@@ -268,6 +272,13 @@ const AperturaCierre = () => {
       );
     }
   };
+
+  const comparaFechas = (dia,mes,year,fecha)=>{
+    let myYear = parseInt(fecha.substring(0,4),10);
+    let miMes = parseInt(fecha.substring(5,7),10);
+    let miDia = parseInt(fecha.substring(8,10),10);
+    return (myYear<year||miMes<mes||miDia<dia);
+  }
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -333,6 +344,7 @@ const AperturaCierre = () => {
       history.replace("/");
     else fetchAgendas({ url: "/datosFormularioCaja" }, obtenerAgendas);
   }, [user, history, fetchAgendas]);
+  const cajaInvalida = cajaState.cajaInvalida;
 
   let miCombo = cajaState.comboAgenda.value;
   let CI = cajaState.sinAgendar.value ? miCombo : null;
@@ -394,12 +406,15 @@ const AperturaCierre = () => {
       <Modal
         tope={14}
         closed={() => {
-          dispatchCaja({ type: "HIDE_MODAL" });
+          if (!cajaState.cajaInvalida) dispatchCaja({ type: "HIDE_MODAL" });
         }}
-        show={cajaState.modalCierre}
+        show={cajaState.modalCierre || cajaState.cajaInvalida}
       >
         {cajaState.Cierre !== null && (
-          <ContenidoCerrarCaja Cierre={cajaState.Cierre} />
+          <ContenidoCerrarCaja
+            Cierre={cajaState.Cierre}
+            cajaInvalida={cajaState.cajaInvalida}
+          />
         )}
       </Modal>
       <div className={classes.container}>
