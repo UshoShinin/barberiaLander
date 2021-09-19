@@ -1648,7 +1648,7 @@ const insertarEntradaDinero = async (monto, cedula, descripcion, propina) => {
       .input("descripcion", sql.Char, descripcion)
       .input("propina", sql.Int, propina)
       .query(
-        "insert into EntradaDinero(Cedula, Monto, Fecha, Descripcion, Propina) output inserted.IdEntrada values(@cedula, @monto, CAST(GETDATE() AS DATE), @descripcion, @propina)"
+        "insert into EntradaDinero(Cedula, Monto, Fecha, Descripcion, Propina) output inserted.IdEntrada values(@cedula, @monto, GETDATE(), @descripcion, @propina)"
       );
     return insertEntradaDinero.recordset[0].IdEntrada;
   } catch (error) {
@@ -3137,9 +3137,9 @@ const calcularComisionSinLimite = async (ciEmpleado, idCaja) => {
         "select IdServicio, Precio from Servicio where IdServicio in (6, 7, 8)"
       );
     //Separo los precios de esos servicios
-    let claritos = { precio: 0, id: 0 };
-    let brushing = { precio: 0, id: 0 };
-    let deco = { precio: 0, id: 0 };
+    let claritos = { precio: 0, id: 6 };
+    let brushing = { precio: 0, id: 8 };
+    let deco = { precio: 0, id: 7 };
     //Recorro los servicios para ponerle precio a las variables
     precioServicios.recordset.forEach((servicio) => {
       switch (servicio.IdServicio) {
@@ -3190,11 +3190,17 @@ const calcularComisionSinLimite = async (ciEmpleado, idCaja) => {
 //Metodo para calcular la comision que corresponde a partir de las 10 atenciones
 const calcularComisionConLimite = async (ciEmpleado, idCaja) => {
   try {
-    const cantidadComisionar = await cantidadServiciosComisionar(ciEmpleado, idCaja);
+    const cantidadComisionar = await cantidadServiciosComisionar(
+      ciEmpleado,
+      idCaja
+    );
     if (cantidadComisionar.cantidadComisionar === 0) {
-      return {codigo: 200, comision: 0}
-    }else {
+      return { codigo: 200, comision: 0 };
+    } else {
+      //Voy a buscar los servicios de las atenciones que son despues de la nro 10
 
+      //Voy a buscar todos los precios
+      const preciosServicios = await precioServiciosComisionConLimite();
     }
   } catch (error) {
     console.log(error);
@@ -3202,15 +3208,57 @@ const calcularComisionConLimite = async (ciEmpleado, idCaja) => {
   }
 };
 
+//Metodo auxiliar que me trae los idServicio con la cantidad de cada uno que voy a comisionar
+const serviciosComisionar = async (ciEmpleado, idCaja, cantidadTop) => {
+try {
+  
+} catch (error) {
+  console.log(error);
+}
+}
+
 //Metodo auxiliar para conseguir los precios de los servicios para comision con limite
 const precioServiciosComisionConLimite = async () => {
   try {
-    const cantidadComisionar = await cantidadServiciosComisionar(ciEmpleado, idCaja);
-    if (cantidadComisionar.cantidadComisionar === 0) {
-      return {codigo: 200, comision: 0}
-    }else {
-
-    }
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el select
+    const servicios = await pool
+      .request()
+      .query(
+        "select IdServicio as idServicio, Precio as precio from Servicio where IdServicio in (1, 2, 3, 4, 5)"
+      );
+    //Armo un objeto con el nombre del servicio y el precio
+    let retorno = {
+      precioCorte: 0,
+      precioCorteBarba: 0,
+      precioMaquinaBarba: 0,
+      precioBarba: 0,
+      precioMaquina: 0,
+    };
+    //Recorro los servicios y le agrego los precios al objeto anterior
+    servicios.recordset.forEach((servicio) => {
+      switch (servicio.idServicio) {
+        case 1:
+          retorno.precioCorte = servicio.precio;
+          break;
+        case 2:
+          retorno.precioCorteBarba = servicio.precio;
+          break;
+        case 3:
+          retorno.precioMaquinaBarba = servicio.precio;
+          break;
+        case 4:
+          retorno.precioBarba = servicio.precio;
+          break;
+        case 5:
+          retorno.precioMaquina = servicio.precio;
+          break;
+        default:
+          break;
+      }
+    });
+    return retorno;
   } catch (error) {
     console.log(error);
     return { codigo: 400, mensaje: "Error al calcular comision con limite" };
@@ -3233,11 +3281,11 @@ const cantidadServiciosComisionar = async (ciEmpleado, idCaja) => {
     //Reviso cual es lo que me devuelve la consulta anterior
     //Si es 10 o menor devuelvo que la cantidad a comisionar es 0
     if (cantComisionar.recordset[0].cantEntradas < 11) {
-      return {codigo: 200, cantidadComisionar: 0}
-    }else{
+      return { codigo: 200, cantidadComisionar: 0 };
+    } else {
       //Guardo la cantidad de entradas que deberia poder comisionar
       let cantidad = cantComisionar.recordset[0].cantEntradas - 10;
-      return {codigo: 200, cantidadComisionar: cantidad}
+      return { codigo: 200, cantidadComisionar: cantidad };
     }
   } catch (error) {
     console.log(error);
@@ -3247,8 +3295,6 @@ const cantidadServiciosComisionar = async (ciEmpleado, idCaja) => {
     };
   }
 };
-
-
 
 //Creo un objeto que voy a exportar para usarlo desde el index.js
 //Adentro voy a tener todos los metodos de llamar a la base
