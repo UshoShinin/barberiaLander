@@ -10,6 +10,7 @@ export const initialState = {
   cajaAbierta: false,
   seguridadCierre: false,
   modalCierre: false,
+  cajaInvalida:false,
   Cierre:null,
   montoInicial: { value: "", isValid: null },
   comboAgenda: { value: null, active: false },
@@ -115,7 +116,7 @@ export const cajaReducer = (state, action) => {
     case 'CARGAR_CIERRE':
       return {...state,Cierre:action.payload};
     case "ABRIR_CAJA":
-      return { ...state, cajaAbierta: true, idCaja: action.id };
+      return { ...state, cajaAbierta: true, idCaja: action.Caja.idCaja, fecha:action.Caja.fecha };
     case "CERRAR_CAJA":
       return {
         ...initialState,
@@ -131,12 +132,12 @@ export const cajaReducer = (state, action) => {
           formatDate(agenda.fecha).getDate() === date.getDate() &&
           formatDate(agenda.fecha).getMonth() === date.getMonth()
       );
-      if (action.payload.idCaja !== -1) {
+      if (action.payload.caja.idCaja !== -1) {
         cajaAbierta = true;
       }
       myState = {
         ...state,
-        idCaja: action.payload.idCaja,
+        idCaja: action.payload.caja.idCaja,
         agendas: [...action.payload.agendas],
         agendasHoy: [...newList],
         Empleados: [...action.payload.empleados],
@@ -153,13 +154,13 @@ export const cajaReducer = (state, action) => {
           formatDate(agenda.fecha).getDate() === date.getDate() &&
           formatDate(agenda.fecha).getMonth() === date.getMonth()
       );
-      if (action.payload.idCaja !== -1) {
+      if (action.payload.caja.idCaja !== -1) {
         cajaAbierta = true;
       }
       myState = {
         ...state,
         ...initialState,
-        idCaja: action.payload.idCaja,
+        idCaja: action.payload.caja.idCaja,
         agendas: [...action.payload.agendas],
         agendasHoy: [...newList],
         Empleados: [...action.payload.empleados],

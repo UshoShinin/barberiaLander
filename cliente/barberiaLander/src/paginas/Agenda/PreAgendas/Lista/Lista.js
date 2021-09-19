@@ -3,12 +3,14 @@ import ItemCliente from "./ItemCliente";
 import classes from "./Lista.module.css";
 const Lista = (props) => {
   const Cli = props.cliente;
+  console.log(Cli);
   const content = props.items.map((item) => {
-    if (!Cli) {
+    if (Cli) {
       return (
         <ItemCliente
           key={item.idAgenda}
           item={item}
+          select={props.select}
         />
       );
     } else {

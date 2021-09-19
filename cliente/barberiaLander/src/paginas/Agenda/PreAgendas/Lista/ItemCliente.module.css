@@ -6,27 +6,8 @@
   transition: border 180ms ease-out, box-shadow 180ms ease-out;
   display: grid;
   grid-template-columns: auto max-content;
-  grid-column-gap:5px;
-}
-
-.contentBotones {
-  display: grid;
-  grid-template-areas:
-    "accept deny"
-    "info info";
-  justify-content: center;
-  height: max-content;
-  grid-row-gap:15px;
-  grid-column-gap: 15px ;
-}
-.accept{
-  grid-area: accept;
-}
-.deny{
-  grid-area: deny;
-}
-.info{
-  grid-area: info;
+  grid-column-gap: 5px;
+  cursor: pointer;
 }
 .item:hover {
   border: 2px var(--clr-neon-blue) solid;
@@ -40,11 +21,12 @@
   color: var(--clr-inActive);
   word-spacing: 0.2em;
   text-shadow: 0 0 0em transparent;
+  word-break: break-word;
   transition: color 160ms ease-out, text-shadow 160ms ease-out;
 }
 .item > .content > h3 {
-  font-size: 1.3em;
-  letter-spacing: 0.03em;
+  font-size: 2em;
+  letter-spacing: 0.07em;
 }
 
 .item:hover > .content > h3,
@@ -55,26 +37,23 @@
 }
 
 .item > .content > h4 {
-  font-size: 1.05em;
+  font-size: 1.5em;
   letter-spacing: 0.06em;
+}
+
+.item > .content > p {
+  font-size: 1.3em;
 }
 
 .item + .item {
   margin-top: 0.5em;
 }
-
-@media (max-width:900px){
-  .contentBotones {
-    grid-template-areas:
-      "accept deny";
+@media (max-width: 1400px) {
+  .item > .content > h4 {
+    font-size: 1.3em;
+    letter-spacing: 0.06em;
   }
-  .accept{
-    grid-area: accept;
-  }
-  .deny{
-    grid-area: deny;
-  }
-  .info{
-    display: none;
+  .item> .content > p {
+    font-size: 1.3em;
   }
 }

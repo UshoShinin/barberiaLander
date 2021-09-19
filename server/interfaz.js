@@ -2863,7 +2863,7 @@ const getAgendasCliente = async (cedula) => {
       .request()
       .input("cedula", sql.VarChar, cedula)
       .query(
-        "select H.Fecha as fecha, H.HoraInicio as horaInicio, H.HoraFin as horaFin, A.IdAgenda as idAgenda, A.IdHorario as idHorario, E.Nombre as nombreEmpleado from Agenda A, Agenda_Cliente AC, Horario H, Empleado E where A.IdHorario = H.IdHorario and AC.IdAgenda = A.IdAgenda and E.Cedula = H.Cedula and AC.Cedula = @cedula"
+        "select H.Fecha as fecha, H.HoraInicio as horaInicio, H.HoraFin as horaFin, A.IdAgenda as idAgenda, A.IdHorario as idHorario, A.Descripcion as descripcion, E.Nombre as nombreEmpleado from Agenda A, Agenda_Cliente AC, Horario H, Empleado E where A.IdHorario = H.IdHorario and AC.IdAgenda = A.IdAgenda and E.Cedula = H.Cedula and AC.Cedula = @cedula"
       );
     if (agendas.rowsAffected < 1) {
       return { codigo: 400, mensaje: "No hay ninguna agenda" };
