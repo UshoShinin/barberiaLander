@@ -2963,16 +2963,22 @@ const listadoEmpleadosHabilitacion = async () => {
 //Metodo para establecer que un usuario necesita cambiar su pass
 const insertarCambiarContra = async (cedula) => {
   try {
-    //Creo la conexion
-    let pool = await sql.connect(conexion);
-    //Hago el update
-    const ret = await pool
-      .request()
-      .input("cedula", sql.VarChar, cedula)
-      .query(
-        "insert into ReseteoClave (Cedula, DebeCambiar) values (@cedula, 1)"
-      );
-    return { codigo: 200, mensaje: "Se reseteo la clave correctamente" };
+    //Verifico de si ya se reseteo la clave
+    const yaCambio = await debeCambiarContra(cedula)
+    if (yaCambio) {
+      return { codigo: 201, mensaje: "La clave ya fue reseteada" };
+    }else{
+      //Creo la conexion
+      let pool = await sql.connect(conexion);
+      //Hago el update
+      const ret = await pool
+        .request()
+        .input("cedula", sql.VarChar, cedula)
+        .query(
+          "insert into ReseteoClave (Cedula, DebeCambiar) values (@cedula, 1)"
+        );
+      return { codigo: 200, mensaje: "Se reseteo la clave correctamente" };
+    }
   } catch (error) {
     console.log(error);
     return { codigo: 400, mensaje: "Algo salio mal" };
@@ -3079,7 +3085,7 @@ const debeCambiarContra = async (cedula) => {
       .request()
       .input("cedula", sql.VarChar, cedula)
       .query("select * from ReseteoClave where Cedula = @cedula");
-    if (ret.recordset > 0) {
+    if (ret.rowsAffected[0] > 0) {
       return true;
     } else {
       return false;
