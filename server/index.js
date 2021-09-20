@@ -378,8 +378,26 @@ app.put("/discontinuarProducto", (req, res) => {
   });
 });
 
-app.use("/comisiones", (req, res) => {
-  let ret = interfaz.calcularComisionSinLimite(req.body.ciEmpleado, req.body.idCaja);
+app.use("/comision", (req, res) => {
+  let ret = interfaz.calcularComision(req.body.ciEmpleado, req.body.idCaja);
+  ret.then((resultado) => {
+    res.json({
+      mensaje: resultado,
+    });
+  });
+});
+
+app.use("/propina", (req, res) => {
+  let ret = interfaz.calcularPropina(req.body.ciEmpleado, req.body.idCaja);
+  ret.then((resultado) => {
+    res.json({
+      mensaje: resultado,
+    });
+  });
+});
+
+app.use("/jornal", (req, res) => {
+  let ret = interfaz.calcularJornal(req.body.ciEmpleado, req.body.idCaja, req.body.minExtra);
   ret.then((resultado) => {
     res.json({
       mensaje: resultado,

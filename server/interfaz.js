@@ -3077,16 +3077,14 @@ const calcularPropina = async (ciEmpleado, idCaja) => {
       .input("idCaja", sql.Int, idCaja)
       .input("ciEmpleado", sql.VarChar, ciEmpleado)
       .query(
-        "select SUM(E.Propina) as totalPropinas from EntradaDinero E, Empleado EP, Caja_Entrada C where E.Cedula = EP.Cedula and C.IdEntrada = E.IdEntrada and EP.Cedula = @ciEmpleado, and C.IdCaja = @idCaja "
+        "select SUM(E.Propina) as totalPropinas from EntradaDinero E, Empleado EP, Caja_Entrada C where E.Cedula = EP.Cedula and C.IdEntrada = E.IdEntrada and EP.Cedula = @ciEmpleado and C.IdCaja = @idCaja "
       );
     if (propinas.rowsAffected[0] < 1) {
       return { codigo: 400, mensaje: "Error al ir a buscar las propinas" };
     } else {
       return {
         codigo: 200,
-        mensaje:
-          "Propina hasta el momento: " + propinas.recordset[0].totalPropinas,
-        propina: propinas.recordset[0].totalPropinas,
+        mensaje: propinas.recordset[0].totalPropinas,
       };
     }
   } catch (error) {
@@ -3097,17 +3095,19 @@ const calcularPropina = async (ciEmpleado, idCaja) => {
 //Metodo para calcular las comisiones de un empleado hasta el momento
 const calcularComision = async (ciEmpleado, idCaja) => {
   try {
-    //El calculo de comisiones es bastante complicado
-    /**
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     */
+    //Voy a buscar el total de comision sin limite del empleado
+    const comisionSinLimite = await calcularComisionSinLimite(
+      ciEmpleado,
+      idCaja
+    );
+    //Voy a buscar el total de comision con limite del empleado
+    const comisionConLimite = await calcularComisionConLimite(
+      ciEmpleado,
+      idCaja
+    );
+    //Hago la suma de las comisiones
+    let comisionTotal = comisionConLimite.mensaje + comisionSinLimite.mensaje;
+    return { codigo: 200, mensaje: comisionTotal };
   } catch (error) {
     console.log(error);
   }
@@ -3198,9 +3198,40 @@ const calcularComisionConLimite = async (ciEmpleado, idCaja) => {
       return { codigo: 200, comision: 0 };
     } else {
       //Voy a buscar los servicios de las atenciones que son despues de la nro 10
-
+      const serviciosComision = await serviciosComisionar(
+        ciEmpleado,
+        idCaja,
+        cantidadComisionar.cantidadComisionar
+      );
       //Voy a buscar todos los precios
       const preciosServicios = await precioServiciosComisionConLimite();
+      //Guardo el total a comisionar
+      let totalComision = 0;
+      //Recorro los servicios a comisionar y sumo el precio al total
+      serviciosComision.forEach((servicio) => {
+        switch (servicio.idServicio) {
+          case 1:
+            totalComision += servicio.cantidad * preciosServicios.precioCorte;
+            break;
+          case 2:
+            totalComision +=
+              servicio.cantidad * preciosServicios.precioCorteBarba;
+            break;
+          case 3:
+            totalComision +=
+              servicio.cantidad * preciosServicios.precioMaquinaBarba;
+            break;
+          case 4:
+            totalComision += servicio.cantidad * preciosServicios.precioBarba;
+            break;
+          case 5:
+            totalComision += servicio.cantidad * preciosServicios.precioMaquina;
+            break;
+          default:
+            break;
+        }
+      });
+      return { codigo: 200, mensaje: totalComision * 0.35 };
     }
   } catch (error) {
     console.log(error);
@@ -3210,12 +3241,23 @@ const calcularComisionConLimite = async (ciEmpleado, idCaja) => {
 
 //Metodo auxiliar que me trae los idServicio con la cantidad de cada uno que voy a comisionar
 const serviciosComisionar = async (ciEmpleado, idCaja, cantidadTop) => {
-try {
-  
-} catch (error) {
-  console.log(error);
-}
-}
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el select
+    const comisionesConLimite = await pool
+      .request()
+      .input("idCaja", sql.Int, idCaja)
+      .input("ciEmpleado", sql.VarChar, ciEmpleado)
+      .input("cantidad", sql.Int, cantidadTop)
+      .query(
+        "select COUNT(aux.IdEntrada) as cantidad, aux.IdServicio as idServicio from (select top (@cantidad) E.IdEntrada, ES.IdServicio from EntradaDinero E, Caja_Entrada CE, Entrada_Servicio ES where E.IdEntrada = CE.IdEntrada and ES.IdEntrada = E.IdEntrada and ES.IdServicio in (1, 2, 3, 4, 5) and CE.IdCaja = @idCaja and E.Cedula = @ciEmpleado  order by E.Fecha desc) as aux group by aux.IdServicio"
+      );
+    return comisionesConLimite.recordset;
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 //Metodo auxiliar para conseguir los precios de los servicios para comision con limite
 const precioServiciosComisionConLimite = async () => {
@@ -3261,7 +3303,6 @@ const precioServiciosComisionConLimite = async () => {
     return retorno;
   } catch (error) {
     console.log(error);
-    return { codigo: 400, mensaje: "Error al calcular comision con limite" };
   }
 };
 
@@ -3292,6 +3333,60 @@ const cantidadServiciosComisionar = async (ciEmpleado, idCaja) => {
     return {
       codigo: 400,
       mensaje: "Le erramos a algo calculando la cantidad a comisionar",
+    };
+  }
+};
+
+//Metodo auxiliar para calcular cuanto hay que pagar por horas extra
+const calcularPagoHorasExtra = async (ciEmpleado, minExtra) => {
+  try {
+    const salarioBase = await getSalarioBaseEmpleado(ciEmpleado);
+    return ((minExtra * salarioBase) / 480) * 2;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo auxiliar para conseguir el salario base de un empleado
+const getSalarioBaseEmpleado = async (ciEmpleado) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el select
+    const salarioBase = await pool
+      .request()
+      .input("ciEmpleado", sql.VarChar, ciEmpleado)
+      .query("select SalarioBase from Empleado where Cedula = @ciEmpleado");
+    return salarioBase.recordset[0].SalarioBase;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo para calcular el jornal de un empleado
+const calcularJornal = async (ciEmpleado, idCaja, minExtra) => {
+  try {
+    //Voy a buscar todos los montos por separado
+    const comision = await calcularComision(ciEmpleado, idCaja);
+    const propina = await calcularPropina(ciEmpleado, idCaja);
+    const horasExtra = await calcularPagoHorasExtra(ciEmpleado, minExtra);
+    const salarioBase = await getSalarioBaseEmpleado(ciEmpleado);
+    //Devuelvo la suma de todos estos valores
+    return {
+      codigo: 200,
+      mensaje: comision.mensaje + propina.mensaje + horasExtra + salarioBase,
+      detalle: {
+        comision: comision.mensaje,
+        propina: propina.mensaje,
+        horasExtra: horasExtra,
+        salarioBase: salarioBase
+      },
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      codigo: 400,
+      mensaje: "Error al calcular jornal del empleado",
     };
   }
 };
@@ -3334,7 +3429,9 @@ const interfaz = {
   listadoEmpleadosHabilitacion,
   reestablecerContra,
   discontinuarProducto,
-  calcularComisionSinLimite,
+  calcularComision,
+  calcularPropina,
+  calcularJornal,
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar
