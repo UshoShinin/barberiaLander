@@ -2,7 +2,7 @@ import NormalCard from "../../../components/UI/Card/NormalCard";
 import classes from "./PreAgendas.module.css";
 import Lista from "./Lista/Lista";
 import useHttp from "../../../hooks/useHttp";
-import { useEffect, useReducer, useState, useContext } from "react";
+import { useEffect, useReducer, useContext } from "react";
 import LoaddingSpinner from "../../../components/LoaddingSpinner/LoaddingSpinner";
 import Switch from "../../../components/UI/Switch/Switch";
 import Visualizador from "./Visualizador/Visualizador";
@@ -19,38 +19,64 @@ const PreAgendas = () => {
   const user = authCtx.user;
   const esCliente = user !== null && user.rol === "Cliente";
   const obtenerAgendas = (agendas) => {
-    if(esCliente){
+    if (esCliente) {
       dispatch({
         type: "CARGA",
-        payload: agendas.mensaje
+        payload: agendas.mensaje,
       });
-    }else{
+    } else {
       dispatch({
         type: "CARGA",
         payload: agendas.mensaje.preAgendas,
         manejo: agendas.mensaje.manejoAgenda.AceptarRechazar,
       });
     }
-    
+  };
+
+  const reset = (datos) => {
+    let misAgendas = [];
+    let manejo = datos.manejo;
+    datos.payload.forEach((agenda) => {
+      misAgendas.push({ ...agenda, fecha: agenda.fecha.slice(0, 10) });
+    });
+    return {
+      agendaId: null,
+      agendaAModificar: null,
+      aceptar: manejo === 1,
+      rechazar: manejo === -1,
+      agendas: [...misAgendas],
+      Mensaje:{show:true,value:datos.mensaje}
+    };
   };
 
   const getRespuesta = (res) => {
-    const Data = {};
-    if (res.mensaje.codigo === 400) {
-    }
+    reset(res.mensaje);
   };
   const getRespuestaEliminar = (res) => {
-    console.log(res);
+    reset(res.mensaje);
   };
+
+  const respuestaModAR = (res) => {
+    dispatch({
+      type: "RESPUESTA",
+      value: res.mensaje.valor,
+      mensaje: res.mensaje.mensaje,
+    });
+  };
+
   const fetchAgendas = useHttp();
 
   const aceptar = useHttp();
   const rechazar = useHttp();
-  
+  const manejoAgenda = useHttp();
+
   useEffect(() => {
     if (user === null || user.rol === "Empleado") history.replace("/");
     else if (esCliente)
-      fetchAgendas({ url: "/getAgendasCliente?cedula="+user.ciUsuario }, obtenerAgendas);
+      fetchAgendas(
+        { url: "/getAgendasCliente?cedula=" + user.ciUsuario },
+        obtenerAgendas
+      );
     else fetchAgendas({ url: "/listadoPreAgendas" }, obtenerAgendas);
   }, [user, history, fetchAgendas]);
   const showAgenda = (agendita) => {
@@ -79,22 +105,60 @@ const PreAgendas = () => {
       getRespuestaEliminar
     );
   };
-
+  const aceptarT = agendasState.aceptar;
+  const rechazarT = agendasState.rechazar;
   return (
     <>
-    
       {agendasState.agendaAModificar !== null && (
         <CrearAgenda
           exitModificar={() => {
             dispatch({ type: "GET_AGENDA", agenda: null });
+            fetchAgendas({ url: "/listadoPreAgendas" }, obtenerAgendas);
           }}
           agenda={agendasState.agendaAModificar}
         />
       )}
       {agendasState.agendaAModificar === null && (
         <NormalCard className={classes.ajuste}>
-          <SimpleNote show={agendasState.aceptarModal}>ACEPTAR</SimpleNote>
-          <SimpleNote show={agendasState.rechazarModal}>RECHAZAR</SimpleNote>
+          <SimpleNote
+            show={agendasState.preguntaAceptar}
+            aceptar={() => {
+              manejoAgenda(
+                {
+                  url:
+                    "/manejoDeAgendas?aceptarRechazar=" + `${aceptarT ? 0 : 1}`,
+                },
+                respuestaModAR
+              );
+            }}
+            rechazar={() => {
+              dispatch({ type: "PREGUNTA_ACEPTAR" });
+            }}
+          >
+            {`¿Está seguro que desea ${
+              aceptarT ? "des" : ""
+            }activar el aceptar todo?`}
+          </SimpleNote>
+          <SimpleNote
+            show={agendasState.preguntaRechazar}
+            aceptar={() => {
+              manejoAgenda(
+                {
+                  url:
+                    "/manejoDeAgendas?aceptarRechazar=" +
+                    `${rechazarT ? 0 : -1}`,
+                },
+                respuestaModAR
+              );
+            }}
+            rechazar={() => {
+              dispatch({ type: "PREGUNTA_RECHAZAR" });
+            }}
+          >
+            {`¿Está seguro que desea ${
+              rechazarT ? "des" : ""
+            }activar el rechazar todo?`}
+          </SimpleNote>
           {agendasState.agendas === null && <LoaddingSpinner />}
           {agendasState.agendas !== null && (
             <div className={classes.container}>
@@ -122,7 +186,7 @@ const PreAgendas = () => {
                     <div className={classes.actions}>
                       <Switch
                         onCheck={() => {
-                          dispatch({ type: "PREGUNTA",value:''});
+                          dispatch({ type: "PREGUNTA_ACEPTAR" });
                         }}
                         active={agendasState.aceptar}
                       />
@@ -133,7 +197,7 @@ const PreAgendas = () => {
                     <div className={classes.actions}>
                       <Switch
                         onCheck={() => {
-                          dispatch({ type: "PREGUNTA",value:''});
+                          dispatch({ type: "PREGUNTA_RECHAZAR" });
                         }}
                         active={agendasState.rechazar}
                       />
@@ -143,7 +207,7 @@ const PreAgendas = () => {
               </div>
               <div className={classes.editor}>
                 <Visualizador
-                cliente = {esCliente}
+                  cliente={esCliente}
                   id={agendasState.agendaId}
                   mostrarAgenda={showAgenda}
                 />

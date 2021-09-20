@@ -1,17 +1,20 @@
 export const initialState = {
   aceptar: false,
   rechazar: false,
-  aceptarModal: false,
-  rechazarModal: false,
+  preguntaAceptar: false,
+  preguntaRechazar: false,
   agendas: null,
   agendaId: null,
   agendaAModificar: null,
+  Mensaje:{show:false,value:''}
 };
 export const reducer = (state, action) => {
+  let myState;
+  let manejo;
   switch (action.type) {
     case "CARGA":
-      let manejo = action.manejo;
       let misAgendas = [];
+      manejo = action.manejo;
       action.payload.forEach((agenda) => {
         misAgendas.push({ ...agenda, fecha: agenda.fecha.slice(0, 10) });
       });
@@ -42,18 +45,21 @@ export const reducer = (state, action) => {
       return {...state,pregunta:{show:true,value:action.value}}
     case 'HIDE_PREGUNTA':
       return {...state,pregunta:{show:false,value:state.pregunta.value}}
-    case "ACEPTAR_MODAL":
-      return { ...state, aceptarModal: !state.aceptarModal, rechazarModal: false,aceptar: !state.aceptar,rechazar: false };
-    case "RECHAZAR_MODAL":
-      return { ...state, aceptarModal: false, rechazarModal: !state.rechazarModal,aceptar: false,rechazar: !state.rechazar };
-    case "ACEPTAR_SUCC":
-      return { ...state, rechazar: false};
-    case "ACEPTAR_FAIL":
-      return { ...state, aceptar: false};
-    case "RECHAZAR_SUCC":
-      return { ...state, aceptar: false };
-    case "RECHAZAR_FAIL":
-      return { ...state, rechazar: false };
+    case 'PREGUNTA_ACEPTAR':
+      return{...state,preguntaAceptar:!state.preguntaAceptar,preguntaRechazar:false};
+    case 'PREGUNTA_RECHAZAR':
+      return{...state,preguntaAceptar:false,preguntaRechazar:!state.preguntaRechazar};
+    case 'RESPUESTA':
+      manejo = action.value;
+      myState = {...state,preguntaAceptar:false,preguntaRechazar:false};
+      if(manejo!==null){
+        myState = {...myState,aceptar:manejo==='1',rechazar:manejo==='-1'};
+      }
+      return{...myState}
+    case 'RESET':
+      return {...state};
+    case 'HIDE_MENSAJE':
+      return {...state,Mensaje:{show:false,value:state.Mensaje.value}};
     default:
       return { ...state };
   }
