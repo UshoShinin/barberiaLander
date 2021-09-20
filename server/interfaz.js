@@ -2475,6 +2475,7 @@ const updateManejarAgenda = async (valor) => {
     return {
       codigo: 200,
       mensaje: "Manejo de agendas actualizado correctamente",
+      valor: valor
     };
   } catch (error) {
     console.log(error);
@@ -3418,7 +3419,6 @@ const interfaz = {
   updateManejarAgenda,
   verificarHorario,
   verificacionEntradaCaja,
-  modificarStockListadoProducto,
   updateStockProducto,
   cierreCaja,
   realizarEntradaDinero,
