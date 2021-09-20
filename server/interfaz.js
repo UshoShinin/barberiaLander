@@ -3577,6 +3577,29 @@ const cierreTotal = async (idCaja) => {
   }
 };
 
+//Metodo para dejar la caja con el total correspondiente
+const actualizarMontoCaja = async (idCaja, entradas, salidas) => {
+  try {
+    //Guardo el total
+    let total = entradas + salidas
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el update
+    const retorno = await pool
+      .request()
+      .input("idCaja", sql.Int, idCaja)
+      .input("total", sql.Int, total)
+      .query("update Caja set Total = @total where IdCaja = @idCaja");
+    if (retorno.rowsAffected[0] > 0) {
+      return true;
+    }
+  } catch (error) {
+    console.log(error);
+    return false
+  }
+}
+
+
 //Metodo auxiliar que se llama para hacer la limpieza de todo
 //Este metodo llama a los metodos de limpieza individual
 //La fecha de la caja es lo que le paso como parametro a todos los metodos de eliminar
@@ -3588,6 +3611,12 @@ const mantenimientoDatos = async (idCaja, fechaCaja, totalEntradas, totalSalidas
       return {codigo: 400, mensaje: "Error al eliminar las agendas"}
     }
     //Llamo para actualizar la caja y ponerle el total correspondiente
+    const caja = await actualizarMontoCaja(idCaja, totalEntradas, totalSalidas)
+    if (!caja) {
+      return {codigo: 400, mensaje: "Error al actualizar el total de la caja"}
+    }
+    //Llamo para limpiar todas las entradas de dinero
+
     /**
      * 
      * 
@@ -3606,19 +3635,9 @@ const mantenimientoDatos = async (idCaja, fechaCaja, totalEntradas, totalSalidas
   }
 };
 
-//Metodo para dejar la caja con el total correspondiente
-const actualizarMontoCaja = async (idCaja, entradas, salidas) => {
-  try {
-    //Creo la conexion
-    let pool = await sql.connect(conexion);
-    //Hago el update
-    const retorno = await pool
-      .request()
-      .input("fecha", sql.Date, fecha)
-      .query("delete from Horario where IdHorario in (select H.IdHorario as idHorario from Horario H where H.Fecha <= @fecha)");
-  } catch (error) {
-    console.log(error);
-  }
+//Metodo para limpiar la caja entera
+const limpiarCaja = async (idCaja, fechaCaja) => {
+
 }
 
 //Creo un objeto que voy a exportar para usarlo desde el index.js
