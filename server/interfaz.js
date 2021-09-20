@@ -1380,7 +1380,7 @@ const login = async (usuario) => {
                 usuario: resultado.recordset[0],
               };
             } else {
-              return resultado.recordset[0];
+              return {codigo: 200, usuario: resultado.recordset[0]};
             }
           }
         );
@@ -1396,7 +1396,7 @@ const login = async (usuario) => {
                     usuario: { ...cliente.recordset[0], rol: "Cliente" },
                   };
                 } else {
-                  return { ...cliente.recordset[0], rol: "Cliente" };
+                  return { codigo: 200, usuario: {...cliente.recordset[0], rol: "Cliente"} };
                 }
               }
             );
