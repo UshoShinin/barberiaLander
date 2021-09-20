@@ -9,6 +9,8 @@ import { initialState, reducer } from "./LoginReducer";
 import inputs from "./inputs";
 import useHttp from "../../hooks/useHttp";
 import AuthContext from "../../store/AuthContext";
+import Modal from "../../components/UI/Modal/Modal";
+import Note from "../../components/UI/Note/Note";
 import { useHistory } from "react-router-dom";
 const Login = (props) => {
   const history = useHistory();
@@ -21,9 +23,13 @@ const Login = (props) => {
   const login = useHttp();
   const getRespuesta = (res) => {
     console.log(res);
-    if (res.mensaje.ciUsuario !== undefined) {
-      authCtx.login(res.mensaje);
+    if (res.mensaje.codigo === 200) {
+      authCtx.login(res.mensaje.usuario);
       history.replace('/');
+    }else if(res.mensaje.codigo===400){
+      dispatchLogin({type:'SHOW_MENSAJE',value:res.mensaje.error});
+    }else{
+      dispatchLogin({type:'MODAL'});
     }
   };
 
@@ -47,7 +53,26 @@ const Login = (props) => {
       );
     }
   };
-  return (
+  return (<>
+    <Modal show={loginState.modal} closed={()=>{}}>
+      <div className={classes.menuReset}>
+        <div>
+          <label>Contraseña: </label>
+            <Input
+              ref={refCi}
+              isValid={loginState.contra1.isValid}
+              input={INPUTS[2]}
+            />
+          <label>Repeticion contraseña: </label>
+            <Input
+              ref={refCi}
+              isValid={loginState.contra2.isValid}
+              input={INPUTS[3]}
+            />
+        </div>
+      </div>
+    </Modal>
+    <Note show={loginState.Mensaje.show} onClose={()=>{dispatchLogin({type:'HIDE_MENSAJE'})}}>{loginState.Mensaje.value}</Note>
     <Marco use={true} className={classes.alinear}>
       <form onSubmit={submitHandler}>
         <NormalCard className={classes.container}>
@@ -76,6 +101,8 @@ const Login = (props) => {
         </NormalCard>
       </form>
     </Marco>
+  </>
+    
   );
 };
 export default Login;

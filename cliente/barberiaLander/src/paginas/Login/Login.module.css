@@ -50,6 +50,16 @@
 .container >div:hover > div > label{
     color:var(--clr-neon-white);
 }
+.menuReset{
+    align-items: center;
+    justify-content: center;
+}
+.menuReset > div{
+    display: grid;
+    grid-template-columns: max-content max-content;
+    text-align: right;
+}
+
 @media (max-width:1400px) {
     .container>div{
         padding: 25px;

@@ -52,6 +52,8 @@ export const reducer = (state,action) =>{
             return {...state,Mensaje : {show:true,value:action.value}}
         case 'HIDE_MENSAJE':
             return {...state,Mensaje : {show:false,value:state.Mensaje.value}}
+        default:
+            return { ...state };
     }
 
 }

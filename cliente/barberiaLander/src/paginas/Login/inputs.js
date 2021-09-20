@@ -36,6 +36,42 @@ const inputs = (registerState, dispatchCaja) => {
         dispatchCaja({ type: "FOCUS_CONT" });
       },
     },
+    {
+      id: 3,
+      type: "password",
+      value: registerState.contra1.value,
+      placeholder: "Contraseña",
+      onChange: (event) => {
+        dispatchCaja({
+          type: "INPUT_CONT1",
+          value: event.target.value,
+        });
+      },
+      onBlur: () => {
+        dispatchCaja({ type: "BLUR_CONT1" });
+      },
+      onFocus: () => {
+        dispatchCaja({ type: "FOCUS_CONT1" });
+      },
+    },
+    {
+      id: 4,
+      type: "password",
+      value: registerState.contra2.value,
+      placeholder: "Repetición",
+      onChange: (event) => {
+        dispatchCaja({
+          type: "INPUT_CONT2",
+          value: event.target.value,
+        });
+      },
+      onBlur: () => {
+        dispatchCaja({ type: "BLUR_CONT2" });
+      },
+      onFocus: () => {
+        dispatchCaja({ type: "FOCUS_CONT2" });
+      },
+    },
   ];
 };
 

@@ -50,10 +50,12 @@ const PreAgendas = () => {
   };
 
   const getRespuesta = (res) => {
-    reset(res.mensaje);
+    console.log(res.mensaje.preAgendas);
+    /* reset(res.mensaje); */
   };
   const getRespuestaEliminar = (res) => {
-    reset(res.mensaje);
+    console.log(res.mensaje.preAgendas);
+    /* reset(res.mensaje); */
   };
 
   const respuestaModAR = (res) => {

@@ -1,10 +1,16 @@
 export const initialState = {
   ciUsuario: { value: "", isValid: null },
   contra: { value: "", isValid: null },
+  contra1: { value: "", isValid: null },
+  contra2: { value: "", isValid: null },
+  modal : false,
+  Mensaje:{show:false,value:''},
   problema: -1,
   problemas: [
     { id: 1, pro: "" },
     { id: 2, pro: "" },
+    { id: 3, pro: "" },
+    { id: 4, pro: "" },
   ],
 };
 
@@ -142,7 +148,93 @@ export const reducer = (state, action) => {
         problemas: [...problemasAux],
         problema: problem,
       };
+
+    //Modal
+    case "INPUT_CONT1":
+      return {
+        ...state,
+        contra1: { value: action.value, isValid: state.contra1.isValid },
+      };
+    case "FOCUS_CONT1":
+      return {
+        ...state,
+        contra1: {
+          value: state.contra1.value,
+          isValid: null,
+        },
+      };
+    case "BLUR_CONT1":
+      valido = validarCI(state.contra1.value);
+      problemasAux = state.problemas.filter((p) => p.id !== 3);
+      if (!valido)
+        problemasAux = [
+          ...problemasAux,
+          {
+            id: 3,
+            pro: "Escriba la cédula sin puntos ni guiones, esta debe tener entre 7 y 8 carácteres",
+          },
+        ];
+      else problemasAux = [...problemasAux, { id: 3, pro: "" }];
+      problemasAux.sort(ordenar);
+      for (let i = 0; i < state.problemas.length; i++) {
+        if (problemasAux[i].pro !== "") {
+          problem = i;
+          break;
+        }
+      }
+      return {
+        ...state,
+        contra1: {
+          value: state.contra1.value,
+          isValid: valido,
+        },
+        problemas: [...problemasAux],
+        problema: problem,
+      };
+
+    case "INPUT_CONT2":
+      return {
+        ...state,
+        contra2: { value: action.value, isValid: state.contra2.isValid },
+      };
+    case "FOCUS_CONT2":
+      return {
+        ...state,
+        contra2: {
+          value: state.contra2.value,
+          isValid: null,
+        },
+      };
+    case "BLUR_CONT2":
+      valido = state.contra1.value===state.contra2.value;
+      problemasAux = state.problemas.filter((p) => p.id !== 4);
+      if (!valido.value)
+        problemasAux = [...problemasAux, { id: 4, pro: 'La repeticion debe ser igual a la contraseña' }];
+      else problemasAux = [...problemasAux, { id: 4, pro: "" }];
+      problemasAux.sort(ordenar);
+      for (let i = 0; i < state.problemas.length; i++) {
+        if (problemasAux[i].pro !== "") {
+          problem = i;
+          break;
+        }
+      }
+      return {
+        ...state,
+        contra2: {
+          value: state.contra2.value,
+          isValid: valido.valido,
+        },
+        problemas: [...problemasAux],
+        problema: problem,
+      };
+      case 'SHOW_MENSAJE':
+        return {...state,Mensaje:{show:true,value:action.value}}
+      case 'HIDE_MENSAJE':
+        return {...state,Mensaje:{show:false,value:''}}
+      case 'MODAL':
+        return {...state,modal:true};
     default:
       return { ...state };
   }
 };
+
