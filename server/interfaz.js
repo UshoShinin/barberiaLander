@@ -39,12 +39,9 @@ const aceptarAgenda = async (id, horario) => {
           //Hago update de la agenda
           let empleados = await pool.request().query(queryUpdate);
           //Si salio todo bien y no fue al catch se confirma de que fue aceptada
-          //Voy a buscar todos los datos para devolver
-          const preAgendas = await datosListadoPreagendas();
           let ret = {
             codigo: 200,
-            mensaje: "La agenda fue aceptada",
-            preAgendas: preAgendas
+            mensaje: "La agenda fue aceptada"
           };
           return ret;
         }
@@ -67,13 +64,7 @@ const cancelarAgenda = async (idAgenda, idHorario) => {
   try {
     //Llamo al metodo que elimina todos los datos
     const resultado = eliminarDatosAgenda(idAgenda, idHorario).then(
-      (mensaje) => {
-        const preAgendas = datosListadoPreagendas();
-        return {
-          ...mensaje,
-          preAgendas: preAgendas
-        }
-      }
+      (mensaje) => mensaje
     );
     return resultado;
   } catch (error) {
