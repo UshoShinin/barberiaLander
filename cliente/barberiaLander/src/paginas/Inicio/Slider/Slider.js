@@ -1,12 +1,15 @@
 import classes from "./Slider.module.css";
 import classesAnim from "./Animations.module.css";
-import one from "../../../recursos/ImagenesPrueba/1.png";
-import two from "../../../recursos/ImagenesPrueba/2.png";
-import three from "../../../recursos/ImagenesPrueba/3.png";
-import four from "../../../recursos/ImagenesPrueba/4.png";
-import five from "../../../recursos/ImagenesPrueba/5.png";
-import six from "../../../recursos/ImagenesPrueba/6.png";
-import mantel from "../../../recursos/ImagenesPrueba/mantel.png";
+import one from "../../../recursos/ImagenesPrueba/1.jpg";
+import two from "../../../recursos/ImagenesPrueba/2.jpg";
+import three from "../../../recursos/ImagenesPrueba/3.jpg";
+import four from "../../../recursos/ImagenesPrueba/4.jpg";
+import five from "../../../recursos/ImagenesPrueba/5.jpg";
+import six from "../../../recursos/ImagenesPrueba/6.jpg";
+import seven from "../../../recursos/ImagenesPrueba/7.jpg";
+import eight from "../../../recursos/ImagenesPrueba/8.jpg";
+import nine from "../../../recursos/ImagenesPrueba/9.jpg";
+import ten from "../../../recursos/ImagenesPrueba/10.jpg";
 import pelu from "../../../recursos/ImagenesPrueba/PeluqueriaDeEjemplo.jpg";
 import { CSSTransition } from "react-transition-group";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -24,7 +27,7 @@ const Slider = (props) => {
     /* clearTimeout();
     setTimeout(autoMove, 5000); */
   }, []);
-  const imagenes = [pelu, one, two, three, four, five, six, mantel];
+  const imagenes = [one, two, three, four, five, six, seven,eight,nine,ten];
   let posiciones = [];
   for (let i = 0; i < imagenes.length; i++) {
     posiciones.push(i);

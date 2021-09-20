@@ -37,7 +37,7 @@
   position: absolute;
   inset: 0;
   background-color: var(--clr-background);
-  opacity: 0.4;
+  opacity: 0.3;
   z-index: 101;
 }
 .Content > img {

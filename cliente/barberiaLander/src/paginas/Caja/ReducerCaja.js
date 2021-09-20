@@ -877,7 +877,11 @@ export const cajaReducer = (state, action) => {
     case "SHOW_SALIDA":
       return { ...state, showSalida: { value: true } };
     case "HIDE_SALIDA":
-      return { ...state, showSalida: { value: false } };
+      return { ...state,
+         showSalida: { value: false },
+         comboSalida:{...initialState.comboSalida},
+         montoSalida :{...initialState.montoSalida },
+         descripcionSalida:{...initialState.descripcionSalida} };
     case "USER_INPUT_MONTO_S":
       return {
         ...state,

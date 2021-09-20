@@ -6,6 +6,7 @@ export const initialState = {
   modal : false,
   Mensaje:{show:false,value:''},
   problema: -1,
+  identificador:0,
   problemas: [
     { id: 1, pro: "" },
     { id: 2, pro: "" },
@@ -164,16 +165,10 @@ export const reducer = (state, action) => {
         },
       };
     case "BLUR_CONT1":
-      valido = validarCI(state.contra1.value);
+      valido = validarContraseña(state.contra1.value);
       problemasAux = state.problemas.filter((p) => p.id !== 3);
-      if (!valido)
-        problemasAux = [
-          ...problemasAux,
-          {
-            id: 3,
-            pro: "Escriba la cédula sin puntos ni guiones, esta debe tener entre 7 y 8 carácteres",
-          },
-        ];
+      if (!valido.value)
+        problemasAux = [...problemasAux, { id: 3, pro: valido.problema }];
       else problemasAux = [...problemasAux, { id: 3, pro: "" }];
       problemasAux.sort(ordenar);
       for (let i = 0; i < state.problemas.length; i++) {
@@ -186,7 +181,7 @@ export const reducer = (state, action) => {
         ...state,
         contra1: {
           value: state.contra1.value,
-          isValid: valido,
+          isValid: valido.valido,
         },
         problemas: [...problemasAux],
         problema: problem,
@@ -208,8 +203,14 @@ export const reducer = (state, action) => {
     case "BLUR_CONT2":
       valido = state.contra1.value===state.contra2.value;
       problemasAux = state.problemas.filter((p) => p.id !== 4);
-      if (!valido.value)
-        problemasAux = [...problemasAux, { id: 4, pro: 'La repeticion debe ser igual a la contraseña' }];
+      if (!valido)
+        problemasAux = [
+          ...problemasAux,
+          {
+            id: 4,
+            pro: "La contraseña y la repeticion deben ser iguales",
+          },
+        ];
       else problemasAux = [...problemasAux, { id: 4, pro: "" }];
       problemasAux.sort(ordenar);
       for (let i = 0; i < state.problemas.length; i++) {
@@ -222,17 +223,19 @@ export const reducer = (state, action) => {
         ...state,
         contra2: {
           value: state.contra2.value,
-          isValid: valido.valido,
+          isValid: valido,
         },
         problemas: [...problemasAux],
         problema: problem,
       };
-      case 'SHOW_MENSAJE':
-        return {...state,Mensaje:{show:true,value:action.value}}
-      case 'HIDE_MENSAJE':
-        return {...state,Mensaje:{show:false,value:''}}
-      case 'MODAL':
-        return {...state,modal:true};
+    case 'SHOW_MENSAJE':
+      return {...state,Mensaje:{show:true,value:action.value}}
+    case 'HIDE_MENSAJE':
+      return {...state,Mensaje:{show:false,value:''}}
+    case 'MODAL':
+      return {...state,modal:true,identificador:action.value==='Cliente'?2:1};
+      case 'CLOSE_MODAL':
+      return {...state,...initialState};
     default:
       return { ...state };
   }

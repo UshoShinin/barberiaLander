@@ -12,15 +12,19 @@ import AuthContext from "../../store/AuthContext";
 import Modal from "../../components/UI/Modal/Modal";
 import Note from "../../components/UI/Note/Note";
 import { useHistory } from "react-router-dom";
+import SimpleButton from "../../components/UI/SimpleButton/SimpleButton";
 const Login = (props) => {
   const history = useHistory();
 
   const refCi = useRef();
   const refCon = useRef();
+  const refCon1 = useRef();
+  const refCon2 = useRef();
   const [loginState, dispatchLogin] = useReducer(reducer, initialState);
   const INPUTS = inputs(loginState, dispatchLogin);
   const authCtx = useContext(AuthContext);
   const login = useHttp();
+  const reseteoContra = useHttp();
   const getRespuesta = (res) => {
     console.log(res);
     if (res.mensaje.codigo === 200) {
@@ -29,7 +33,7 @@ const Login = (props) => {
     }else if(res.mensaje.codigo===400){
       dispatchLogin({type:'SHOW_MENSAJE',value:res.mensaje.error});
     }else{
-      dispatchLogin({type:'MODAL'});
+      dispatchLogin({type:'MODAL',value:res.mensaje.usuario.rol});
     }
   };
 
@@ -53,24 +57,54 @@ const Login = (props) => {
       );
     }
   };
+
+  const reseteoRespuesta = (res) =>{
+    console.log(res);
+    if(res.mensaje.codigo===200){
+      dispatchLogin({type:'CLOSE_MODAL'});
+    }
+  }
+  const submitCambiar = (event) =>{
+    event.preventDefault();
+    if(!loginState.contra1.isValid) refCon1.current.focus();
+    else if(!loginState.contra2.isValid) refCon2.current.focus();
+    else{
+      const data = {cedula:loginState.ciUsuario.value,contra:loginState.contra1.value,identificador:loginState.identificador};
+      reseteoContra(
+        {
+          url: "/nuevaContra",
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: data,
+        },
+        reseteoRespuesta
+      );
+    }
+  }
+
   return (<>
     <Modal show={loginState.modal} closed={()=>{}}>
-      <div className={classes.menuReset}>
+      <h1>Reseteo de contraseña</h1>
+      <form onSubmit={submitCambiar} className={classes.menuReset}>
         <div>
           <label>Contraseña: </label>
             <Input
-              ref={refCi}
+              ref={refCon1}
               isValid={loginState.contra1.isValid}
               input={INPUTS[2]}
             />
           <label>Repeticion contraseña: </label>
             <Input
-              ref={refCi}
+              ref={refCon2}
               isValid={loginState.contra2.isValid}
               input={INPUTS[3]}
             />
         </div>
-      </div>
+        {loginState.problema !==-1 && (
+          <p>{loginState.problemas[loginState.problema].pro}</p>
+        )}
+        <SimpleButton type='submit'>Cambiar contraseña</SimpleButton>
+      </form>
     </Modal>
     <Note show={loginState.Mensaje.show} onClose={()=>{dispatchLogin({type:'HIDE_MENSAJE'})}}>{loginState.Mensaje.value}</Note>
     <Marco use={true} className={classes.alinear}>
@@ -92,7 +126,7 @@ const Login = (props) => {
                 input={INPUTS[1]}
               />
             </div>
-            {loginState.problema !== -1 && (
+            {loginState.problema === 0 || loginState.problema === 1 && (
               <p>{loginState.problemas[loginState.problema].pro}</p>
             )}
             {/* {errorLogin !== null && <p>{errorLogin}</p>} */}
