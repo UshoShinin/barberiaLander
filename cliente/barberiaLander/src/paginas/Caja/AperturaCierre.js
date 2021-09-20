@@ -120,6 +120,10 @@ const AperturaCierre = () => {
   const cerrarCaja = (res) => {
     dispatchCaja({ type: "CARGAR_CIERRE", payload: res.mensaje });
   };
+
+  const cerrarCajaInvalido = (res) => {
+    dispatchCaja({ type: "CARGAR_CIERRE_INVALIDO", payload: res.mensaje });
+  };
   const salidaSubmitHandler = (e) => {
     e.preventDefault();
     if (!cajaState.montoSalida.isValid) {
@@ -158,17 +162,23 @@ const AperturaCierre = () => {
   const obtenerAgendas = (mensaje) => {
     const date = new Date();
     const caja = mensaje.mensaje.caja;
-    /* const fechita =  */
-    /* if(comparaFechas(date.getDate(),date.getUTCMonth()+1,date.getFullYear(),fechita))
-    cierreCaja(
-      { url: "/cierreCaja?idCaja=" + cajaState.idCaja },
-      cerrarCaja
-    ); */
-    dispatchCaja({ type: "CARGA_DE_DATOS", payload: mensaje.mensaje });
+    const fechita =  caja.fecha.substring(0,10)
+    if(comparaFechas(date.getDate(),date.getUTCMonth()+1,date.getFullYear(),fechita)){
+      cierreCaja(
+      { url: "/cierreCaja?idCaja=" + caja.idCaja },
+      cerrarCajaInvalido
+    )}
+    dispatchCaja({ type: "CARGA_DE_DATOS", payload: mensaje.mensaje});
+    
   };
+
+  const obtenerAgendasAbrir = (mensaje) =>{
+    dispatchCaja({ type: "CARGA_DE_DATOS", payload: mensaje.mensaje});
+  }
 
   const resultadoCaja = (res) => {
     dispatchCaja({ type: "ABRIR_CAJA", Caja: res.mensaje });
+    fetchAgendas({ url: "/datosFormularioCaja" }, obtenerAgendasAbrir)
   };
 
   const getRespuesta = (res) => {

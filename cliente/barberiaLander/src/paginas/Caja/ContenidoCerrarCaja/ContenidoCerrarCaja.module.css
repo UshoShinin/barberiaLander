@@ -22,10 +22,16 @@
 .container > .buttons{
     margin-top: 3%;
     display:grid;
-    grid-template-columns: 49% 49%;
-    
+    grid-template-columns: 49% 49%;  
 }
-.container > .buttons > button{
+
+.container > .buttonsIn{
+    margin-top: 3%;
+    display:grid;
+    grid-template-columns: 100%;  
+}
+.container > .buttons > button,
+.container > .buttonsIn > button{
     margin:0 auto;
 }
 .container>div>.text{

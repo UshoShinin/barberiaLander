@@ -1,6 +1,8 @@
 export const initialState = {
   aceptar: false,
   rechazar: false,
+  aceptarModal: false,
+  rechazarModal: false,
   agendas: null,
   agendaId: null,
   agendaAModificar: null,
@@ -22,7 +24,7 @@ export const reducer = (state, action) => {
         agendas: [...misAgendas],
       };
     case "GET_AGENDA":
-        console.log(action.agenda);
+      console.log(action.agenda);
       const agendita =
         action.agenda != null
           ? {
@@ -34,12 +36,24 @@ export const reducer = (state, action) => {
             }
           : null;
       return { ...state, agendaAModificar: agendita };
-    case 'SELECT_AGENDA':
-        return {...state,agendaId:action.value};
-    case "ACEPTAR":
-      return { aceptar: !state.aceptar, rechazar: false };
-    case "RECHAZAR":
-      return { aceptar: false, rechazar: !state.rechazar };
+    case "SELECT_AGENDA":
+      return { ...state, agendaId: action.value };
+    case 'SHOW_PREGUNTA':
+      return {...state,pregunta:{show:true,value:action.value}}
+    case 'HIDE_PREGUNTA':
+      return {...state,pregunta:{show:false,value:state.pregunta.value}}
+    case "ACEPTAR_MODAL":
+      return { ...state, aceptarModal: !state.aceptarModal, rechazarModal: false,aceptar: !state.aceptar,rechazar: false };
+    case "RECHAZAR_MODAL":
+      return { ...state, aceptarModal: false, rechazarModal: !state.rechazarModal,aceptar: false,rechazar: !state.rechazar };
+    case "ACEPTAR_SUCC":
+      return { ...state, rechazar: false};
+    case "ACEPTAR_FAIL":
+      return { ...state, aceptar: false};
+    case "RECHAZAR_SUCC":
+      return { ...state, aceptar: false };
+    case "RECHAZAR_FAIL":
+      return { ...state, rechazar: false };
     default:
       return { ...state };
   }

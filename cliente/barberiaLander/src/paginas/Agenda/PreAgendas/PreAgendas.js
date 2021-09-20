@@ -19,7 +19,6 @@ const PreAgendas = () => {
   const user = authCtx.user;
   const esCliente = user !== null && user.rol === "Cliente";
   const obtenerAgendas = (agendas) => {
-    console.log(agendas.mensaje);
     if(esCliente){
       dispatch({
         type: "CARGA",
@@ -83,6 +82,7 @@ const PreAgendas = () => {
 
   return (
     <>
+    
       {agendasState.agendaAModificar !== null && (
         <CrearAgenda
           exitModificar={() => {
@@ -93,6 +93,8 @@ const PreAgendas = () => {
       )}
       {agendasState.agendaAModificar === null && (
         <NormalCard className={classes.ajuste}>
+          <SimpleNote show={agendasState.aceptarModal}>ACEPTAR</SimpleNote>
+          <SimpleNote show={agendasState.rechazarModal}>RECHAZAR</SimpleNote>
           {agendasState.agendas === null && <LoaddingSpinner />}
           {agendasState.agendas !== null && (
             <div className={classes.container}>
@@ -120,7 +122,7 @@ const PreAgendas = () => {
                     <div className={classes.actions}>
                       <Switch
                         onCheck={() => {
-                          dispatch({ type: "ACEPTAR" });
+                          dispatch({ type: "PREGUNTA",value:''});
                         }}
                         active={agendasState.aceptar}
                       />
@@ -131,7 +133,7 @@ const PreAgendas = () => {
                     <div className={classes.actions}>
                       <Switch
                         onCheck={() => {
-                          dispatch({ type: "RECHAZAR" });
+                          dispatch({ type: "PREGUNTA",value:''});
                         }}
                         active={agendasState.rechazar}
                       />

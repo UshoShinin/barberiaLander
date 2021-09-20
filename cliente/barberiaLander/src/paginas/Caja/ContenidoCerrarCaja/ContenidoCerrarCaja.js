@@ -55,8 +55,8 @@ const ContenidoCerrarCaja = (props) => {
       <h2>{`Total Efectivo: ${efectivo.total}`}</h2>
       <h2>{`Total Débito: ${debito.total}`}</h2>
       <h2>{`Total Cuponera: ${cuponera.total}`}</h2>
-      <div className={classes.buttons}>
-          <SimpleButton color={"red"}>Cierre parcial</SimpleButton>
+      <div className={`${props.cajaInvalida?classes.buttonsIn:classes.buttons}`}>
+          {!props.cajaInvalida&&<SimpleButton color={"red"}>Cierre parcial</SimpleButton>}
           <SimpleButton color={"red"}>Cierre total</SimpleButton>
       </div>
     </div>
