@@ -56,8 +56,8 @@ export const reducer = (state, action) => {
         myState = {...myState,aceptar:manejo==='1',rechazar:manejo==='-1'};
       }
       return{...myState}
-    case 'RESET':
-      return {...state};
+    case 'SHOW_MENSAJE':
+      return {...state,Mensaje:{show:true,value:action.value}};
     case 'HIDE_MENSAJE':
       return {...state,Mensaje:{show:false,value:state.Mensaje.value}};
     default:

@@ -10,6 +10,7 @@ import CrearAgenda from "../CrearAgenda";
 import AuthContext from "../../../store/AuthContext";
 import { useHistory } from "react-router-dom";
 import SimpleNote from "../../../components/UI/Note/SimpleNote";
+import Note from "../../../components/UI/Note/Note";
 import { initialState, reducer } from "./FAReducer";
 
 const PreAgendas = () => {
@@ -35,8 +36,8 @@ const PreAgendas = () => {
 
   const reset = (datos) => {
     let misAgendas = [];
-    let manejo = datos.manejo;
-    datos.payload.forEach((agenda) => {
+    let manejo = datos.manejoAgendas.AceptarRechazar;
+    datos.preAgendas.forEach((agenda) => {
       misAgendas.push({ ...agenda, fecha: agenda.fecha.slice(0, 10) });
     });
     return {
@@ -50,12 +51,14 @@ const PreAgendas = () => {
   };
 
   const getRespuesta = (res) => {
-    console.log(res.mensaje.preAgendas);
-    /* reset(res.mensaje); */
+    console.log(res);
+    dispatch({type:'SHOW_MENSAJE',value:res.mensaje.mensaje});
+    fetchAgendas({ url: "/listadoPreAgendas" }, obtenerAgendas)
   };
   const getRespuestaEliminar = (res) => {
-    console.log(res.mensaje.preAgendas);
-    /* reset(res.mensaje); */
+    console.log(res);
+    dispatch({type:'SHOW_MENSAJE',value:res.mensaje.mensaje});
+    fetchAgendas({ url: "/listadoPreAgendas" }, obtenerAgendas)
   };
 
   const respuestaModAR = (res) => {
@@ -122,6 +125,7 @@ const PreAgendas = () => {
       )}
       {agendasState.agendaAModificar === null && (
         <NormalCard className={classes.ajuste}>
+          <Note show={agendasState.Mensaje.show} onClose={()=>{dispatch({type:'HIDE_MENSAJE'})}}>{agendasState.Mensaje.value}</Note>
           <SimpleNote
             show={agendasState.preguntaAceptar}
             aceptar={() => {
