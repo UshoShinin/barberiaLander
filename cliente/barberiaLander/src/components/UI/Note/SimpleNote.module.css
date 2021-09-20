@@ -8,7 +8,7 @@
     padding: 1em;
     border-radius: 30px;
     width: 200px;
-    height: 90px;
+    height: max-content;
     position: absolute;
     z-index: 210;
     bottom: 20px;

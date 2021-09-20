@@ -3,7 +3,6 @@ import ItemCliente from "./ItemCliente";
 import classes from "./Lista.module.css";
 const Lista = (props) => {
   const Cli = props.cliente;
-  console.log(Cli);
   const content = props.items.map((item) => {
     if (Cli) {
       return (

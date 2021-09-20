@@ -20,6 +20,7 @@ const Login = (props) => {
   const authCtx = useContext(AuthContext);
   const login = useHttp();
   const getRespuesta = (res) => {
+    console.log(res);
     if (res.mensaje.ciUsuario !== undefined) {
       authCtx.login(res.mensaje);
       history.replace('/');

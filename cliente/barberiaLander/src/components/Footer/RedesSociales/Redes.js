@@ -39,7 +39,7 @@ const Redes = () => {
   };
 
   const redirectToWasa = () => {
-    window.location.href = "https://api.whatsapp.com/send?phone=+59895533279";
+    window.location.href = "https://api.whatsapp.com/send?phone=+59899646298";
   };
   return (
     <ul className={classes.redes}>

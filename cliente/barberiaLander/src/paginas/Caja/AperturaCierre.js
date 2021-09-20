@@ -50,8 +50,8 @@ const AperturaCierre = () => {
   const cierreCaja = useHttp();
   const getRespuestaSalida = (res) => {
     console.log(res);
-    if (res.mensaje.codigo === 200) {
-    }
+    dispatchCaja({type:'SHOW_MENSAJE',value:res.mensaje.mensaje});
+    dispatchCaja({type:'HIDE_SALIDA'});
   };
 
   const getValidacion = (res) => {
@@ -354,7 +354,6 @@ const AperturaCierre = () => {
       history.replace("/");
     else fetchAgendas({ url: "/datosFormularioCaja" }, obtenerAgendas);
   }, [user, history, fetchAgendas]);
-  const cajaInvalida = cajaState.cajaInvalida;
 
   let miCombo = cajaState.comboAgenda.value;
   let CI = cajaState.sinAgendar.value ? miCombo : null;

@@ -2970,7 +2970,7 @@ const insertarCambiarContra = async (cedula) => {
       .request()
       .input("cedula", sql.VarChar, cedula)
       .query(
-        "insert into Reseteo Clave (Cedula, DebeCambiar) values (@cedula, 1)"
+        "insert into ReseteoClave (Cedula, DebeCambiar) values (@cedula, 1)"
       );
     return { codigo: 200, mensaje: "Se reseteo la clave correctamente" };
   } catch (error) {
@@ -3022,7 +3022,7 @@ const nuevaContra = async (cedula, contra, identificadorUsu) => {
 const updateContra = async (cedula, contra, identificadorUsu) => {
   try {
     //Verifico si va a ser Empleado o Cliente al que le tengo que cambiar la contra
-    const queryUpdate = "";
+    let queryUpdate = "";
     if (identificadorUsu === 1) {
       //Armo la query que voy a hacer
       queryUpdate =

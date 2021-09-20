@@ -390,7 +390,7 @@ app.post("/reestablecerContra", (req, res) => {
   const ret = interfaz.reestablecerContra(
     req.body.cedula,
     req.body.contra,
-    req.body.indentificador
+    req.body.identificador
   );
   ret.then((resultado) => {
     res.json({

@@ -18,6 +18,7 @@ import VisualAgendas from "./paginas/Agenda/VisualAgendas/VisualAgendas";
 import Registro from "./paginas/Registro/Registro";
 import Login from "./paginas/Login/Login";
 import NoEncontrado from "./paginas/NoEncontrado";
+import Reseteo from './paginas/ReseteoContra/ReseteoContra';
 import NavBar from './paginas/NavBars/NavBar';
 import React from "react";
 import {
@@ -52,6 +53,9 @@ const App = () => {
             </Route>
             <Route path="/empleados" exact>
               <Empleados />
+            </Route>
+            <Route path="/reseteo" exact>
+              <Reseteo />
             </Route>
             <Route path="/productos" exact>
               <Productos />
