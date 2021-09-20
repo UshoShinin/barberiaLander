@@ -10,8 +10,8 @@ export const initialState = {
   cajaAbierta: false,
   seguridadCierre: false,
   modalCierre: false,
-  cajaInvalida:false,
-  Cierre:null,
+  cajaInvalida: false,
+  Cierre: null,
   montoInicial: { value: "", isValid: null },
   comboAgenda: { value: null, active: false },
   jornal: { value: "", show: false },
@@ -112,11 +112,18 @@ export const cajaReducer = (state, action) => {
     case "ACEPTAR_SEGURIDAD_CIERRE":
       return { ...state, seguridadCierre: false, modalCierre: true };
     case "HIDE_MODAL":
-      return { ...state,modalCierre: false };
-    case 'CARGAR_CIERRE':
-      return {...state,Cierre:action.payload};
+      return { ...state, modalCierre: false };
+    case "CARGAR_CIERRE":
+      return { ...state, Cierre: action.payload };
+    case "CARGAR_CIERRE_INVALIDO":
+      return { ...state, Cierre: action.payload,modalCierre:true,cajaInvalida:true};
     case "ABRIR_CAJA":
-      return { ...state, cajaAbierta: true, idCaja: action.Caja.idCaja, fecha:action.Caja.fecha };
+      return {
+        ...state,
+        cajaAbierta: true,
+        idCaja: action.Caja.idCaja,
+        fecha: action.Caja.fecha,
+      };
     case "CERRAR_CAJA":
       return {
         ...initialState,
