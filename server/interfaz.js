@@ -2977,7 +2977,18 @@ const insertarCambiarContra = async (cedula) => {
         .query(
           "insert into ReseteoClave (Cedula, DebeCambiar) values (@cedula, 1)"
         );
-      return { codigo: 200, mensaje: "Se reseteo la clave correctamente" };
+      //Voy a buscar los datos del cliente
+      const cliente = await pool
+        .request()
+        .input("cedula", sql.VarChar, cedula)
+        .query(
+          "select Nombre as nombre, Tel as tel from Cliente where Cedula = @cedula"
+        );
+      if (cliente.rowsAffected[0] < 1) {
+        return { codigo: 200, mensaje: "Se reseteo la clave correctamente" };
+      }else{
+        return { codigo: 200, mensaje: "Se reseteo la clave correctamente", cliente: cliente.recordset[0] };
+      }
     }
   } catch (error) {
     console.log(error);
