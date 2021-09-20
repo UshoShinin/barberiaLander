@@ -3481,7 +3481,7 @@ const calcularJornal = async (ciEmpleado, idCaja, minExtra) => {
 };
 
 //Metodo para conseguir una caja por su id
-const getCajaId = async (idCaja) => {
+const getCajaIdLimpieza = async (idCaja) => {
   try {
     //Creo la conexion
     let pool = await sql.connect(conexion);
@@ -3490,9 +3490,27 @@ const getCajaId = async (idCaja) => {
       .request()
       .input("idCaja", sql.Int, idCaja)
       .query(
-        "select IdCaja as idCaja, Fecha as fecha, Monto as monto from Caja where IdCaja = @idCaja"
+        "select IdCaja as idCaja, DATEADD(day, 1, Fecha) as fecha, Total as total from Caja where IdCaja = @idCaja"
       );
     return caja.recordset[0];
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Metodo para conseguir una caja por su id
+const getFechaCaja = async (idCaja) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el select
+    const caja = await pool
+      .request()
+      .input("idCaja", sql.Int, idCaja)
+      .query(
+        "select Fecha as fecha from Caja where IdCaja = @idCaja"
+      );
+    return caja.recordset[0].fecha;
   } catch (error) {
     console.log(error);
   }
@@ -3579,16 +3597,16 @@ const limpiarHorario = async (fecha) => {
 }
 
 //Metodo para el cierre total de la caja
-const cierreTotal = async (idCaja) => {
+const cierreTotal = async (idCaja, totalEntradas, totalSalidas) => {
   try {
     //Voy a buscar la caja
-    const caja = await getCajaId(idCaja);
+    const caja = await getCajaIdLimpieza(idCaja);
     //Verifico que la caja no este cerrada ya
-    if (caja.monto > 0) {
+    if (caja.total > 0) {
       return { codigo: 400, mensaje: "La caja ya fue cerrada" };
     }
     //Llamo al metodo para limpiar todo
-    const limparTodo = await mantenimientoDatos(caja.idCaja, caja.fecha);
+    return await mantenimientoDatos(caja.idCaja, caja.fecha, totalEntradas, totalSalidas);
   } catch (error) {
     console.log(error);
   }
@@ -3620,8 +3638,10 @@ const actualizarMontoCaja = async (idCaja, entradas, salidas) => {
 //Metodo auxiliar que se llama para hacer la limpieza de todo
 //Este metodo llama a los metodos de limpieza individual
 //La fecha de la caja es lo que le paso como parametro a todos los metodos de eliminar
-const mantenimientoDatos = async (idCaja, fechaCaja, totalEntradas, totalSalidas) => {
+const mantenimientoDatos = async (idCaja, fechaCajaEntradas, totalEntradas, totalSalidas) => {
   try {
+    //Voy a buscar la fecha de la caja porque necesito la fecha de la caja para eliminar las agendas y la fecha + 1 para eliminar las entradas
+    const fechaCaja = await getFechaCaja(idCaja)
     //Llamo a limpiar todas las agendas
     const agendas = await limpiarAgendas(fechaCaja)
     if (!agendas) {
@@ -3633,28 +3653,162 @@ const mantenimientoDatos = async (idCaja, fechaCaja, totalEntradas, totalSalidas
       return {codigo: 400, mensaje: "Error al actualizar el total de la caja"}
     }
     //Llamo para limpiar todas las entradas de dinero
-
-    /**
-     * 
-     * 
-     * 
-     * 
-     * 
-     * 
-     * 
-     * 
-     * 
-     * 
-     * 
-     */
+    const limpiezaCaja = limpiarCaja(fechaCajaEntradas);
+    if (!limpiezaCaja) {
+      return {codigo: 400, mensaje: "Error al limpiar la caja"}
+    }
+    //Si llegamos aca sin algun mensaje devuelvo que se limpio todo
+    return {codigo: 200, mensaje: "Mantenimiento realizado correctamente"}
   } catch (error) {
     console.log(error);
   }
 };
 
 //Metodo para limpiar la caja entera
-const limpiarCaja = async (idCaja, fechaCaja) => {
+const limpiarCaja = async (fechaCaja) => {
+  try {
+    //De aca llamo a todos los metodos de eliminar caja individuales
+    const cajaSalida = await limpiarCajaSalida(fechaCaja);
+    const cajaEntrada = await limpiarCajaEntrada(fechaCaja);
+    const entradaDebito = await limpiarEntradaDebito(fechaCaja);
+    const entradaEfectivo = await limpiarEntradaEfectivo(fechaCaja);
+    const entradaProducto = await limpiarEntradaProducto(fechaCaja);
+    const EntradaServicio = await limpiarEntradaServicio(fechaCaja);
+    const entrada = await limpiarEntrada(fechaCaja);
+    const salida = await limpiarSalida(fechaCaja);
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+}
 
+//Metodo para eliminar los datos de la tabla Agenda_Servicio
+const limpiarCajaSalida = async (fecha) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el delete
+    const retorno = await pool
+      .request()
+      .input("fecha", sql.Date, fecha)
+      .query("delete from Caja_Salida where IdSalida in (select IdSalida from SalidaDinero where Fecha <= @fecha)");
+    return retorno.rowsAffected[0];
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+//Metodo para eliminar los datos de la tabla Agenda_Servicio
+const limpiarCajaEntrada = async (fecha) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el delete
+    const retorno = await pool
+      .request()
+      .input("fecha", sql.Date, fecha)
+      .query("delete from Caja_Entrada where IdEntrada in (select IdEntrada from EntradaDinero where Fecha <= @fecha)");
+    return retorno.rowsAffected[0];
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+//Metodo para eliminar los datos de la tabla Agenda_Servicio
+const limpiarEntradaDebito = async (fecha) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el delete
+    const retorno = await pool
+      .request()
+      .input("fecha", sql.Date, fecha)
+      .query("delete from Entrada_Debito where IdEntrada in (select IdEntrada from EntradaDinero where Fecha <= @fecha)");
+    return retorno.rowsAffected[0];
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+//Metodo para eliminar los datos de la tabla Agenda_Servicio
+const limpiarEntradaEfectivo = async (fecha) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el delete
+    const retorno = await pool
+      .request()
+      .input("fecha", sql.Date, fecha)
+      .query("delete from Entrada_Efectivo where IdEntrada in (select IdEntrada from EntradaDinero where Fecha <= @fecha)");
+    return retorno.rowsAffected[0];
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+//Metodo para eliminar los datos de la tabla Agenda_Servicio
+const limpiarEntradaProducto = async (fecha) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el delete
+    const retorno = await pool
+      .request()
+      .input("fecha", sql.Date, fecha)
+      .query("delete from Entrada_Producto where IdEntrada in (select IdEntrada from EntradaDinero where Fecha <= @fecha)");
+    return retorno.rowsAffected[0];
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+//Metodo para eliminar los datos de la tabla Agenda_Servicio
+const limpiarEntradaServicio = async (fecha) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el delete
+    const retorno = await pool
+      .request()
+      .input("fecha", sql.Date, fecha)
+      .query("delete from Entrada_Servicio where IdEntrada in (select IdEntrada from EntradaDinero where Fecha <= @fecha)");
+    return retorno.rowsAffected[0];
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+//Metodo para eliminar los datos de la tabla Agenda_Servicio
+const limpiarSalida = async (fecha) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el delete
+    const retorno = await pool
+      .request()
+      .input("fecha", sql.Date, fecha)
+      .query("delete from SalidaDinero where IdSalida in (select IdSalida from SalidaDinero where Fecha <= @fecha)");
+    return retorno.rowsAffected[0];
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+//Metodo para eliminar los datos de la tabla Agenda_Servicio
+const limpiarEntrada = async (fecha) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el delete
+    const retorno = await pool
+      .request()
+      .input("fecha", sql.Date, fecha)
+      .query("delete from EntradaDinero where IdEntrada in (select IdEntrada from EntradaDinero where Fecha <= @fecha)");
+    return retorno.rowsAffected[0];
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 //Creo un objeto que voy a exportar para usarlo desde el index.js
@@ -3698,7 +3852,7 @@ const interfaz = {
   calcularPropina,
   calcularJornal,
   nuevaContra,
-  mantenimientoDatos
+  cierreTotal
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar

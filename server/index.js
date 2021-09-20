@@ -412,8 +412,8 @@ app.post("/nuevaContra", (req, res) => {
   });
 });
 
-app.delete("/mantenimientoDatos", (req, res) => {
-  const ret = interfaz.mantenimientoDatos(req.body.idCaja, req.body.fechaCaja, req.body.totalEntradas, req.body.totalSalidas);
+app.delete("/cierreTotal", (req, res) => {
+  const ret = interfaz.cierreTotal(req.body.idCaja, req.body.totalEntradas, req.body.totalSalidas);
   ret.then((resultado) => {
     res.json({
       mensaje: resultado,
