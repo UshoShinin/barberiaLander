@@ -343,19 +343,6 @@ app.post("/habilitarEmpleado", (req, res) => {
   });
 });
 
-app.post("/reestablecerContra", (req, res) => {
-  const ret = interfaz.reestablecerContra(
-    req.body.cedula,
-    req.body.contra,
-    req.body.indentificador
-  );
-  ret.then((resultado) => {
-    res.json({
-      mensaje: resultado,
-    });
-  });
-});
-
 app.put("/discontinuarProducto", (req, res) => {
   const ret = interfaz.discontinuarProducto(
     req.body.idProducto,
@@ -387,7 +374,46 @@ app.use("/propina", (req, res) => {
 });
 
 app.use("/jornal", (req, res) => {
-  let ret = interfaz.calcularJornal(req.body.ciEmpleado, req.body.idCaja, req.body.minExtra);
+  let ret = interfaz.calcularJornal(
+    req.body.ciEmpleado,
+    req.body.idCaja,
+    req.body.minExtra
+  );
+  ret.then((resultado) => {
+    res.json({
+      mensaje: resultado,
+    });
+  });
+});
+
+app.post("/reestablecerContra", (req, res) => {
+  const ret = interfaz.reestablecerContra(
+    req.body.cedula,
+    req.body.contra,
+    req.body.indentificador
+  );
+  ret.then((resultado) => {
+    res.json({
+      mensaje: resultado,
+    });
+  });
+});
+
+app.post("/nuevaContra", (req, res) => {
+  const ret = interfaz.nuevaContra(
+    req.body.cedula,
+    req.body.contra,
+    req.body.indentificador
+  );
+  ret.then((resultado) => {
+    res.json({
+      mensaje: resultado,
+    });
+  });
+});
+
+app.delete("/mantenimientoDatos", (req, res) => {
+  const ret = interfaz.mantenimientoDatos(req.body.idCaja, req.body.fechaCaja, req.body.totalEntradas, req.body.totalSalidas);
   ret.then((resultado) => {
     res.json({
       mensaje: resultado,
