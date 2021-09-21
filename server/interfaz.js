@@ -1829,7 +1829,7 @@ const getCaja = async () => {
     const caja = await pool
       .request()
       .query(
-        "select top 1 IdCaja as idCaja, Fecha as fecha, Total as total from Caja C order by Fecha desc"
+        "select top 1 IdCaja as idCaja, Fecha as fecha, Total as total from Caja C order by Fecha desc, total"
       );
     return caja;
   } catch (error) {
@@ -2241,7 +2241,7 @@ const cierreCaja = async (idCaja) => {
   //Agrego todas las promesas al listado de promesas
   listadoPromesas.push(promesaEfectivo, promesaDebito, promesaCuponera);
   //Las resuelvo todas
-  return Promise.allSettled(listadoPromesas).then((resultados) => {
+  return Promise.allSettled(listadoPromesas).then(async (resultados) => {
     //Armo el objeto que voy a devolver
     let retorno = {};
     resultados.forEach((promesa) => {
@@ -2261,7 +2261,9 @@ const cierreCaja = async (idCaja) => {
           break;
       }
     });
-    return retorno;
+  //Voy a buscar todas las salidas
+  const salidas = await getSalidasDineroEmpleados(idCaja);
+  return {entradas: retorno, salidas: salidas};
   });
 };
 
@@ -3811,6 +3813,27 @@ const limpiarEntrada = async (fecha) => {
   }
 }
 
+//Metodo para conseguir el total de salidas de dinero de cada empleado
+const getSalidasDineroEmpleados = async (idCaja) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el select
+    const retorno = await pool
+      .request()
+      .input("idCaja", sql.Int, idCaja)
+      .query("select E.Nombre as nombre, S.Cedula as cedula, SUM(S.Monto) as totalSalidas from SalidaDinero S, Empleado E, Caja_Salida CS where S.Cedula = E.Cedula and CS.IdSalida = S.IdSalida and CS.IdCaja = @idCaja group by S.Cedula, E.Nombre");
+      //Sumo todos los valores y armo un total
+    let totalSalida = 0
+    retorno.recordset.forEach(salida => {
+      totalSalida += salida.totalSalidas
+    });
+    return [...retorno.recordset, {total: totalSalida}];
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 //Creo un objeto que voy a exportar para usarlo desde el index.js
 //Adentro voy a tener todos los metodos de llamar a la base
 const interfaz = {
@@ -3852,7 +3875,7 @@ const interfaz = {
   calcularPropina,
   calcularJornal,
   nuevaContra,
-  cierreTotal
+  cierreTotal,
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar
