@@ -6,12 +6,15 @@ export const initialState = {
   agendas: null,
   agendaId: null,
   agendaAModificar: null,
-  Mensaje:{show:false,value:''}
+  Mensaje:{show:false,value:''},
+  Modal:{show:false,value:''},
 };
 export const reducer = (state, action) => {
   let myState;
   let manejo;
   switch (action.type) {
+    case 'SHOW_MODAL':
+      return {...state,Modal:{show:true,value:action.value}}
     case "CARGA":
       let misAgendas = [];
       manejo = action.manejo;

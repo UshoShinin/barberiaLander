@@ -12,6 +12,7 @@ import { useHistory } from "react-router-dom";
 import SimpleNote from "../../../components/UI/Note/SimpleNote";
 import Note from "../../../components/UI/Note/Note";
 import { initialState, reducer } from "./FAReducer";
+import Modal from "../../../components/UI/Modal/Modal";
 
 const PreAgendas = () => {
   const history = useHistory();
@@ -20,34 +21,23 @@ const PreAgendas = () => {
   const user = authCtx.user;
   const esCliente = user !== null && user.rol === "Cliente";
   const obtenerAgendas = (agendas) => {
-    if (esCliente) {
-      dispatch({
-        type: "CARGA",
-        payload: agendas.mensaje,
-      });
-    } else {
-      dispatch({
-        type: "CARGA",
-        payload: agendas.mensaje.preAgendas,
-        manejo: agendas.mensaje.manejoAgenda.AceptarRechazar,
-      });
+    console.log(agendas.mensaje);
+    if(agendas.mensaje.codigo===400){
+      dispatch({type: "SHOW_MODAL",value: agendas.mensaje.mensaje});
+    }else{
+      if (esCliente) {
+        dispatch({
+          type: "CARGA",
+          payload: agendas.mensaje,
+        });
+      } else {
+        dispatch({
+          type: "CARGA",
+          payload: agendas.mensaje.preAgendas,
+          manejo: agendas.mensaje.manejoAgenda.AceptarRechazar,
+        });
+      }
     }
-  };
-
-  const reset = (datos) => {
-    let misAgendas = [];
-    let manejo = datos.manejoAgendas.AceptarRechazar;
-    datos.preAgendas.forEach((agenda) => {
-      misAgendas.push({ ...agenda, fecha: agenda.fecha.slice(0, 10) });
-    });
-    return {
-      agendaId: null,
-      agendaAModificar: null,
-      aceptar: manejo === 1,
-      rechazar: manejo === -1,
-      agendas: [...misAgendas],
-      Mensaje:{show:true,value:datos.mensaje}
-    };
   };
 
   const getRespuesta = (res) => {
@@ -114,6 +104,7 @@ const PreAgendas = () => {
   const rechazarT = agendasState.rechazar;
   return (
     <>
+    <Modal show={agendasState.Modal.show} closed={()=>{history.replace("/")}}><h1>{agendasState.Modal.value}</h1></Modal>
       {agendasState.agendaAModificar !== null && (
         <CrearAgenda
           exitModificar={() => {
