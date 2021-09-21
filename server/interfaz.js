@@ -169,7 +169,7 @@ const getDatosListadoAgendas = async () => {
   let consultaAgendas = await pool
     .request()
     .query(
-      "select A.IdAgenda, H.Cedula, H.HoraInicio, H.HoraFin from Agenda A, Horario H where A.IdHorario = H.IdHorario and A.Aceptada = 1 order by H.Cedula, H.HoraInicio"
+      "select A.IdAgenda, H.Cedula, H.HoraInicio, H.HoraFin from Agenda A, Horario H where A.IdHorario = H.IdHorario and A.Aceptada = 1 and H.Fecha = CONVERT(date, getdate()) order by H.Cedula, H.HoraInicio"
     );
   //Dejo armado un array con los datos de las agendas
   let agendas = consultaAgendas.recordset;
