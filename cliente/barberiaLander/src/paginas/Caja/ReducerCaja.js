@@ -58,7 +58,6 @@ const orden = (a, b) => {
 };
 
 const validarMonto = (value) => {
-  console.log(value);
   return (
     (value !== ""&&value!==0 ? value.trim().length > 0 : null) && parseInt(value) >= 0
   );

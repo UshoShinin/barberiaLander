@@ -3,11 +3,8 @@
 import "./App.css";
 //IMPORTS PARA LAS PAGINAS
 import Inicio from "./paginas/Inicio/Inicio";
-import Administracion from "./paginas/Administracion";
 import Cuponeras from "./paginas/Cuponera/Cuponeras";
-import Productos from "./paginas/Productos";
 import Empleados from "./paginas/Empleados/Empleados";
-import Slider from "./paginas/Slider";
 import AperturaCierre from "./paginas/Caja/AperturaCierre";
 import CalculoJornal from "./paginas/Caja/CalculoJornal";
 import Historial from "./paginas/Caja/Historial";
@@ -45,9 +42,6 @@ const App = () => {
             <Route path="/inicio">
               <Inicio />
             </Route>
-            <Route path="/administracion">
-              <Administracion />
-            </Route>
             <Route path="/agenda/visualagendas" exact>
               <VisualAgendas />
             </Route>
@@ -56,12 +50,6 @@ const App = () => {
             </Route>
             <Route path="/reseteo" exact>
               <Reseteo />
-            </Route>
-            <Route path="/productos" exact>
-              <Productos />
-            </Route>
-            <Route path="/slider" exact>
-              <Slider />
             </Route>
             <Route path="/agenda/crearagenda" exact>
               <CrearAgenda agenda={null}/>

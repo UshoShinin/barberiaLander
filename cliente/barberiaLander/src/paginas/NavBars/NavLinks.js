@@ -85,7 +85,7 @@ const NavLinks = (props) => {
               activeClassName={classes.active}
               to="/agenda/preagendas"
             >
-              <span data="Pre Agendas">Pre Agendas</span>
+              <span data="Pre Agendas">{authCtx.user.rol === "Cliente"?'Agendas':'Pre Agendas'}</span>
             </NavLink>
           </li>
         )}

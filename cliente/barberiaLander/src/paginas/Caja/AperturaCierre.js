@@ -48,8 +48,8 @@ const AperturaCierre = () => {
   const salidaDinero = useHttp();
   const validarDatos = useHttp();
   const cierreCaja = useHttp();
+  const cierreTotalCaja = useHttp();
   const getRespuestaSalida = (res) => {
-    console.log(res);
     dispatchCaja({type:'SHOW_MENSAJE',value:res.mensaje.mensaje});
     dispatchCaja({type:'HIDE_SALIDA'});
   };
@@ -185,6 +185,10 @@ const AperturaCierre = () => {
     fetchAgendas({ url: "/datosFormularioCaja" }, obtenerAgendasReset);
   };
 
+  const cierreTotalRespuesta = (res) => {
+    console.log(res);
+  };
+
   const miFiltro = (lista, objeto) => {
     let miLista = [];
     lista.forEach((l) => {
@@ -241,7 +245,6 @@ const AperturaCierre = () => {
         servicios.push({ active: true, id: 3 });
       }
     }
-    console.log(servicios);
     productosVendidos = productosVendidos.length > 0 ? productosVendidos : null;
     const agenda = getElementById(
       cajaState.agendas,
@@ -415,12 +418,16 @@ const AperturaCierre = () => {
       <Modal
         tope={14}
         closed={() => {
-          if (!cajaState.cajaInvalida) dispatchCaja({ type: "HIDE_MODAL" });
+          if (!cajaState.cajaInvalida) {
+            dispatchCaja({ type: "HIDE_MODAL" });
+            dispatchCaja({ type: "HIDE_SEGURIDAD_CIERRE" });
+          };
         }}
         show={cajaState.modalCierre || cajaState.cajaInvalida}
       >
         {cajaState.Cierre !== null && (
           <ContenidoCerrarCaja
+          cerrarTodo = {()=>{dispatchCaja({ type: "SHOW_SEGURIDAD_CIERRE" });}}
             Cierre={cajaState.Cierre}
             cajaInvalida={cajaState.cajaInvalida}
           />
@@ -438,11 +445,26 @@ const AperturaCierre = () => {
         <SimpleNote
           show={cajaState.seguridadCierre}
           aceptar={() => {
-            cierreCaja(
-              { url: "/cierreCaja?idCaja=" + cajaState.idCaja },
-              cerrarCaja
+            const efectivo = cajaState.Cierre.entradas.efectivo;
+            const debito = cajaState.Cierre.entradas.debito;
+            const cuponera = cajaState.Cierre.entradas.cuponera;
+            const montoE = efectivo[efectivo.length-1].total;
+            const montoD = debito[debito.length-1].total;
+            const montoC = cuponera[cuponera.length-1].total;
+            const data = {
+              idCaja:cajaState.idCaja,
+              totalEntradas:montoE+montoD+montoC,
+              totalSalidas:-cajaState.Cierre.salidas[cajaState.Cierre.salidas.length-1].total
+            }
+            cierreTotalCaja(
+              {
+                url: "/cierreTotal",
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: data,
+              },
+              cierreTotalRespuesta
             );
-            dispatchCaja({ type: "ACEPTAR_SEGURIDAD_CIERRE" });
           }}
           rechazar={() => {
             dispatchCaja({ type: "HIDE_SEGURIDAD_CIERRE" });
@@ -541,7 +563,11 @@ const AperturaCierre = () => {
             <SimpleButton
               disabled={!cajaState.cajaAbierta}
               action={() => {
-                dispatchCaja({ type: "SHOW_SEGURIDAD_CIERRE" });
+                cierreCaja(
+                  { url: "/cierreCaja?idCaja=" + cajaState.idCaja },
+                  cerrarCaja
+                );
+                dispatchCaja({ type: "ACEPTAR_SEGURIDAD_CIERRE" });
               }}
               className={classes.Cerrar}
             >

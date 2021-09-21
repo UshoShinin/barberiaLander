@@ -1,15 +1,30 @@
 .container{
+    display: grid;
+    grid-template-columns: 48% 48%;
+    grid-column-gap:4%;
+    position: relative;
+}
+
+.containerS{
+    display: grid;
+    grid-template-columns: auto;
+}
+
+
+.efectivos,.salidas{
     display: flex;
     text-align: center;
     flex-direction: column;
     height: max-content;
 }
 
-.container>h1,.container>h2 {
+.efectivos>h1,.efectivos>h2,
+.salidas>h1,.salidas>h2 {
     text-shadow: 0 0 0.18em hsl(240 100% 78%/0.3), 0 0 0.45em var(--clr-neon-blue);
   }
 
-.container>div{
+.efectivos>div,
+.salidas>div{
     height: max-content;
     justify-content: center;
     display: grid;
@@ -19,25 +34,31 @@
     margin-bottom: 3.5%;
 }
 
-.container > .buttons{
+.efectivos > .buttons,
+.salidas > .buttons{
     margin-top: 3%;
     display:grid;
     grid-template-columns: 49% 49%;  
 }
 
-.container > .buttonsIn{
+.efectivos > .buttonsIn,
+.salidas > .buttonsIn{
     margin-top: 3%;
     display:grid;
     grid-template-columns: 100%;  
 }
-.container > .buttons > button,
-.container > .buttonsIn > button{
+.efectivos > .buttons > button,
+.efectivos > .buttonsIn > button,
+.salidas > .buttons > button,
+.salidas > .buttonsIn > button{
     margin:0 auto;
 }
-.container>div>.text{
+.efectivos>div>.text,
+.salidas>div>.text{
     text-align: right;
 }
 
-.container>div>.num{
+.efectivos>div>.num,
+.salidas>div>.num{
     text-align: left;
 }
