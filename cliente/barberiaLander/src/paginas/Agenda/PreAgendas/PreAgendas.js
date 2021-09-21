@@ -13,6 +13,7 @@ import SimpleNote from "../../../components/UI/Note/SimpleNote";
 import Note from "../../../components/UI/Note/Note";
 import { initialState, reducer } from "./FAReducer";
 import Modal from "../../../components/UI/Modal/Modal";
+import Marco from "../../../components/UI/Marco/Marco";
 
 const PreAgendas = () => {
   const history = useHistory();
@@ -104,6 +105,7 @@ const PreAgendas = () => {
   const rechazarT = agendasState.rechazar;
   return (
     <>
+    {agendasState.agendas === null &&<Marco use={true} logo={true}><LoaddingSpinner /></Marco>}
     <Modal show={agendasState.Modal.show} closed={()=>{history.replace("/")}}><h1>{agendasState.Modal.value}</h1></Modal>
       {agendasState.agendaAModificar !== null && (
         <CrearAgenda
@@ -156,7 +158,6 @@ const PreAgendas = () => {
               rechazarT ? "des" : ""
             }activar el rechazar todo?`}
           </SimpleNote>
-          {agendasState.agendas === null && <LoaddingSpinner />}
           {agendasState.agendas !== null && (
             <div className={classes.container}>
               <div

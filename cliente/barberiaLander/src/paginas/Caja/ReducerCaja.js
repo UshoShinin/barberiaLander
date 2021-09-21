@@ -697,15 +697,15 @@ export const cajaReducer = (state, action) => {
       switch (action.type) {
         case "CLICK_EFECTIVO":
           siguiente = !state.efectivo.value;
-          myState = { ...state, efectivo: { value: siguiente } };
+          myState = { ...state, efectivo: { value: siguiente },montoEfectivo:{...initialState.montoEfectivo} };
           break;
         case "CLICK_DEBITO":
           siguiente = !state.debito.value;
-          myState = { ...state, debito: { value: siguiente } };
+          myState = { ...state, debito: { value: siguiente },montoDebito:{...initialState.montoDebito},ticketDebito:{...initialState.ticketDebito} };
           break;
         case "CLICK_CUPONERA":
           siguiente = !state.cuponera.value;
-          myState = { ...state, cuponera: { value: siguiente } };
+          myState = { ...state, cuponera: { value: siguiente },montoCuponera:{...initialState.montoCuponera},codCuponera:{...initialState.codCuponera} };
           break;
         default:
           break;
@@ -776,7 +776,9 @@ export const cajaReducer = (state, action) => {
       };
     case "BLUR_INPUT_EFECTIVO":
       valido = validarMonto(state.montoEfectivo.value);
-      efectivo =state.montoEfectivo.value!==0
+      console.log(state.montoEfectivo.value);
+      efectivo =state.montoEfectivo.value!==0&&state.montoEfectivo.value!=='';
+      console.log(efectivo);
       cantidad = state.cantidadMedios.value;
       return {
         ...state,
@@ -784,7 +786,7 @@ export const cajaReducer = (state, action) => {
           value: state.montoEfectivo.value,
           isValid: valido,
         },
-        efectivo:efectivo,
+        efectivo:{value:efectivo},
         cantidadMedios:{value:!efectivo?cantidad-1:cantidad}
       };
     case "USER_INPUT_DEBITO":
@@ -813,7 +815,7 @@ export const cajaReducer = (state, action) => {
       };
     case "BLUR_INPUT_DEBITO":
       valido = validarMonto(state.montoDebito.value);
-      debito =state.montoDebito.value!==0
+      debito =state.montoDebito.value!==0&&state.montoDebito.value!=='';
       cantidad = state.cantidadMedios.value;
       return {
         ...state,
@@ -821,7 +823,7 @@ export const cajaReducer = (state, action) => {
           value: state.montoDebito.value,
           isValid: valido,
         },
-        debito:debito,
+        debito:{value:debito},
         cantidadMedios:{value:!debito?cantidad-1:cantidad}
       };
     case "USER_INPUT_CUPONERA":
@@ -850,7 +852,7 @@ export const cajaReducer = (state, action) => {
       };
     case "BLUR_INPUT_CUPONERA":
       valido = validarMonto(state.montoCuponera.value);
-      cuponera =state.montoCuponera.value!==0
+      cuponera =state.montoCuponera.value!==0&&state.montoCuponera.value!=='';
       cantidad = state.cantidadMedios.value;
       return {
         ...state,
@@ -858,7 +860,7 @@ export const cajaReducer = (state, action) => {
           value: state.montoCuponera.value,
           isValid: valido,
         },
-        cuponera:cuponera,
+        cuponera:{value:cuponera},
         cantidadMedios:{value:!cuponera?cantidad-1:cantidad}
       };
     case "USER_INPUT_TOTAL":

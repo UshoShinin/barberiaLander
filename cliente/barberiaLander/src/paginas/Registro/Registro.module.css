@@ -4,7 +4,7 @@
   justify-content: center;
 }
 .container {
-  overflow: hidden;
+  /* overflow: hidden; */
 }
 .container > div {
   padding: 40px;

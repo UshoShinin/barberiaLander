@@ -3,7 +3,7 @@ const Marco = (props) => {
   
   return (
     <>
-    {props.use&&<div className={`${props.className!==undefined?props.className:''} ${classes.ajuste}`}>
+    {props.use&&<div className={`${props.className!==undefined?props.className:''} ${classes.ajuste} ${props.logo!==undefined?classes.centrado:''}`}>
       {props.children}
     </div>}
     {!props.use&&<div className={`${props.className!==undefined?props.className:''}`}>

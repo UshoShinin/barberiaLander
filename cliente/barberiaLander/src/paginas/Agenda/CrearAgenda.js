@@ -253,6 +253,10 @@ const CrearAgenda = (props) => {
     }
   }, []);
   return (
+  <>
+    {inputState.Horarios === null&&<Marco use={true} logo={true}>
+       <LoaddingSpinner />
+    </Marco>}
     <Marco use={width > 900} className={classes.nuevaAgenda}>
       <Note
         show={inputState.Mensaje.show}
@@ -274,7 +278,6 @@ const CrearAgenda = (props) => {
       </Modal>
       {inputState.manejoAgenda !== -1 && (
         <NormalCard>
-          {inputState.Horarios === null && <LoaddingSpinner />}
           {inputState.Horarios !== null && (
             <FormularioAgenda
               onSaveDatosAgenda={guardarDatosAgendaHandler}
@@ -294,6 +297,7 @@ const CrearAgenda = (props) => {
         </NormalCard>
       )}
     </Marco>
+    </>
   );
 };
 

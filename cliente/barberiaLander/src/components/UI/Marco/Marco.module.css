@@ -5,3 +5,8 @@
     right: 0;
     left: 0;
   }
+
+  .ajuste{
+    display: grid;
+    align-items: center;
+}

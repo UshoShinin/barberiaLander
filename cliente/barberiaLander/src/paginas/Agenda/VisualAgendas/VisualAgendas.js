@@ -19,6 +19,7 @@ import AuthContext from "../../../store/AuthContext";
 import { useHistory } from "react-router-dom";
 import { initialState, reducer } from "./reducer";
 import Note from "../../../components/UI/Note/Note";
+import Marco from "../../../components/UI/Marco/Marco";
 
 const VisualAgendas = () => {
   const history = useHistory();
@@ -98,7 +99,7 @@ const VisualAgendas = () => {
   }
 
   return (
-    <>
+    <>{state.agendas === null &&<Marco use={true} logo={true}><LoaddingSpinner /></Marco>}
       <Note
         show={state.Mensaje.show}
         onClose={() => {
@@ -117,7 +118,7 @@ const VisualAgendas = () => {
       )}
       {state.agenda === null && (
         <>
-          {state.agendas === null && <LoaddingSpinner />}
+          
           {state.agendas !== null && (
             <div className={classes.myContainer}>
               <div className={classes.navigation}>
