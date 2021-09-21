@@ -58,8 +58,9 @@ const orden = (a, b) => {
 };
 
 const validarMonto = (value) => {
+  console.log(value);
   return (
-    (value !== "" ? value.trim().length > 0 : null) && parseInt(value) >= 0
+    (value !== ""&&value!==0 ? value.trim().length > 0 : null) && parseInt(value) >= 0
   );
 };
 
@@ -97,6 +98,9 @@ export const cajaReducer = (state, action) => {
   let mEfectivo = null;
   let mDebito = null;
   let mCuponera = null;
+  let efectivo;
+  let debito;
+  let cuponera;
   let date;
   let cajaAbierta;
   let newList;
@@ -772,12 +776,16 @@ export const cajaReducer = (state, action) => {
       };
     case "BLUR_INPUT_EFECTIVO":
       valido = validarMonto(state.montoEfectivo.value);
+      efectivo =state.montoEfectivo.value!==0
+      cantidad = state.cantidadMedios.value;
       return {
         ...state,
         montoEfectivo: {
           value: state.montoEfectivo.value,
           isValid: valido,
         },
+        efectivo:efectivo,
+        cantidadMedios:{value:!efectivo?cantidad-1:cantidad}
       };
     case "USER_INPUT_DEBITO":
       mDebito = action.value === "" ? 0 : action.value;
@@ -805,12 +813,16 @@ export const cajaReducer = (state, action) => {
       };
     case "BLUR_INPUT_DEBITO":
       valido = validarMonto(state.montoDebito.value);
+      debito =state.montoDebito.value!==0
+      cantidad = state.cantidadMedios.value;
       return {
         ...state,
         montoDebito: {
           value: state.montoDebito.value,
           isValid: valido,
         },
+        debito:debito,
+        cantidadMedios:{value:!debito?cantidad-1:cantidad}
       };
     case "USER_INPUT_CUPONERA":
       mCuponera = action.value === "" ? 0 : action.value;
@@ -838,12 +850,16 @@ export const cajaReducer = (state, action) => {
       };
     case "BLUR_INPUT_CUPONERA":
       valido = validarMonto(state.montoCuponera.value);
+      cuponera =state.montoCuponera.value!==0
+      cantidad = state.cantidadMedios.value;
       return {
         ...state,
         montoCuponera: {
           value: state.montoCuponera.value,
           isValid: valido,
         },
+        cuponera:cuponera,
+        cantidadMedios:{value:!cuponera?cantidad-1:cantidad}
       };
     case "USER_INPUT_TOTAL":
       return {
