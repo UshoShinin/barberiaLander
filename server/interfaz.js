@@ -3227,13 +3227,40 @@ const calcularComision = async (ciEmpleado, idCaja) => {
       ciEmpleado,
       idCaja
     );
+    //Voy a buscar el total de comision de productos
+    const comisionProductos = await calcularComisionProductos(ciEmpleado, idCaja)
     //Hago la suma de las comisiones
-    let comisionTotal = comisionConLimite.mensaje + comisionSinLimite.mensaje;
+    let comisionTotal = comisionConLimite.mensaje + comisionSinLimite.mensaje + comisionProductos.mensaje;
     return { codigo: 200, mensaje: comisionTotal };
   } catch (error) {
     console.log(error);
   }
 };
+
+//Metodo para calcular la comision para productos
+const calcularComisionProductos = async (ciEmpleado, idCaja) => {
+  try {
+    //Tengo que ir a buscar los productos vendidos, sus cantidas y su precio
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el select
+    const productos = await pool
+      .request()
+      .input("idCaja", sql.Int, idCaja)
+      .input("ciEmpleado", sql.VarChar, ciEmpleado)
+      .query("select SUM(EP.Cantidad) as totalVendidos, EP.IdProducto as idProducto, E.Cedula as ciEmpleado, P.Precio as precio from EntradaDinero E, Entrada_Producto EP, Producto P, Caja_Entrada C where E.IdEntrada = EP.IdEntrada and P.IdProducto = EP.IdProducto and C.IdEntrada = E.IdEntrada and E.Cedula = @ciEmpleado and C.IdCaja = @idCaja group by P.Nombre, EP.IdProducto, E.Cedula, P.Precio");
+    //Agarro el array que me devuelve
+    const arrayProductos = productos.recordset;
+    //Guardo el valor al que le voy a sumar el total de la comision
+    let totalComision = 0;
+    arrayProductos.forEach(producto => {
+      totalComision += (producto.totalVendidos * producto.precio) * 0.1
+    });
+    return {codigo: 200, mensaje: totalComision}
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 //Metodo para calcular la comision de los que corresponden siempre el 35%
 const calcularComisionSinLimite = async (ciEmpleado, idCaja) => {
@@ -3317,7 +3344,7 @@ const calcularComisionConLimite = async (ciEmpleado, idCaja) => {
       idCaja
     );
     if (cantidadComisionar.cantidadComisionar === 0) {
-      return { codigo: 200, comision: 0 };
+      return { codigo: 200, mensaje: 0 };
     } else {
       //Voy a buscar los servicios de las atenciones que son despues de la nro 10
       const serviciosComision = await serviciosComisionar(
