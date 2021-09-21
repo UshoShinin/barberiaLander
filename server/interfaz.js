@@ -41,7 +41,7 @@ const aceptarAgenda = async (id, horario) => {
           //Si salio todo bien y no fue al catch se confirma de que fue aceptada
           let ret = {
             codigo: 200,
-            mensaje: "La agenda fue aceptada"
+            mensaje: "La agenda fue aceptada",
           };
           return ret;
         }
@@ -1380,7 +1380,7 @@ const login = async (usuario) => {
                 usuario: resultado.recordset[0],
               };
             } else {
-              return {codigo: 200, usuario: resultado.recordset[0]};
+              return { codigo: 200, usuario: resultado.recordset[0] };
             }
           }
         );
@@ -1396,7 +1396,10 @@ const login = async (usuario) => {
                     usuario: { ...cliente.recordset[0], rol: "Cliente" },
                   };
                 } else {
-                  return { codigo: 200, usuario: {...cliente.recordset[0], rol: "Cliente"} };
+                  return {
+                    codigo: 200,
+                    usuario: { ...cliente.recordset[0], rol: "Cliente" },
+                  };
                 }
               }
             );
@@ -1837,46 +1840,78 @@ const getCaja = async () => {
   }
 };
 
+//Metodo para ir a buscar la caja mediante su id
+const getCajaPorId = async (idCaja) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el select para que me traiga la caja
+    const caja = await pool
+      .request()
+      .input("idCaja", sql.Int, idCaja)
+      .query("select * from Caja where IdCaja = @idCaja");
+    if (caja.rowsAffected[0] < 1) {
+      return { codigo: 400, mensaje: "La caja no existe" };
+    }
+    if (caja.recordset[0].Total > 0) {
+      return { codigo: 400, mensaje: "La caja ya esta cerrada" };
+    }
+    return {
+      codigo: 200,
+      mensaje: "Caja encontrada",
+      idCaja: caja.recordset[0].IdCaja,
+    };
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 //Metodo para crear una cuponera
 const crearCuponera = async (cedula, monto, caja) => {
   try {
-    //Verifico si el cliente ya tiene una cuponera
-    const cuponera = existeCuponera(cedula).then((existe) => {
-      if (existe) {
-        //Si existe devuelvo mensaje de error
-        return { codigo: 400, mensaje: "El cliente ya tiene una cuponera" };
+    //Verifico si la caja esta abierta
+    return getCajaPorId(caja.idCaja).then((cajaAbierta) => {
+      if (cajaAbierta.codigo === 400) {
+        return cajaAbierta;
       } else {
-        return insertarCuponera(cedula, monto).then((resultado) => {
-          if (resultado.rowsAffected[0] < 1) {
-            return { codigo: 400, mensaje: "Error al crear cuponera" };
+        //Verifico si el cliente ya tiene una cuponera
+        return existeCuponera(cedula).then((existe) => {
+          if (existe) {
+            //Si existe devuelvo mensaje de error
+            return { codigo: 400, mensaje: "El cliente ya tiene una cuponera" };
           } else {
-            //Hago la entrada de dinero que corresponde a esto
-            return nuevaEntradaDinero(
-              caja.idCaja,
-              caja.montoTotal,
-              caja.pago,
-              caja.ciEmpleado,
-              caja.productosVendidos,
-              caja.servicios,
-              caja.descripcion
-            ).then((resultado) => {
-              if (resultado.codigo === 200) {
-                return {
-                  codigo: 200,
-                  mensaje: "Cuponera creada correctamente",
-                };
+            return insertarCuponera(cedula, monto).then((resultado) => {
+              if (resultado.rowsAffected[0] < 1) {
+                return { codigo: 400, mensaje: "Error al crear cuponera" };
               } else {
-                return {
-                  codigo: 400,
-                  mensaje: "Error al pagar la plata de la cuponera",
-                };
+                //Hago la entrada de dinero que corresponde a esto
+                return nuevaEntradaDinero(
+                  caja.idCaja,
+                  caja.montoTotal,
+                  caja.pago,
+                  caja.ciEmpleado,
+                  caja.productosVendidos,
+                  caja.servicios,
+                  caja.descripcion
+                ).then((resultado) => {
+                  if (resultado.codigo === 200) {
+                    return {
+                      codigo: 200,
+                      mensaje: "Cuponera creada correctamente",
+                    };
+                  } else {
+                    return {
+                      codigo: 400,
+                      mensaje: "Error al pagar la plata de la cuponera",
+                    };
+                  }
+                });
               }
             });
           }
         });
       }
     });
-    return cuponera;
   } catch (error) {
     console.log(error);
   }
@@ -2261,9 +2296,9 @@ const cierreCaja = async (idCaja) => {
           break;
       }
     });
-  //Voy a buscar todas las salidas
-  const salidas = await getSalidasDineroEmpleados(idCaja);
-  return {entradas: retorno, salidas: salidas};
+    //Voy a buscar todas las salidas
+    const salidas = await getSalidasDineroEmpleados(idCaja);
+    return { entradas: retorno, salidas: salidas };
   });
 };
 
@@ -2672,7 +2707,13 @@ const updateStockProducto = async (idProducto, nuevaCantidad) => {
 };
 
 //Metodo para modificar el producto entero
-const updateProducto = async (idProducto, nombre, stock, precio, discontinuado) => {
+const updateProducto = async (
+  idProducto,
+  nombre,
+  stock,
+  precio,
+  discontinuado
+) => {
   try {
     //Creo la conexion
     let pool = await sql.connect(conexion);
@@ -2692,7 +2733,7 @@ const updateProducto = async (idProducto, nombre, stock, precio, discontinuado) 
         codigo: 400,
         mensaje: "Error al modificar producto",
       };
-    }else{
+    } else {
       return {
         codigo: 200,
         mensaje: "Producto modificado correctamente",
@@ -2999,10 +3040,10 @@ const listadoEmpleadosHabilitacion = async () => {
 const insertarCambiarContra = async (cedula) => {
   try {
     //Verifico de si ya se reseteo la clave
-    const yaCambio = await debeCambiarContra(cedula)
+    const yaCambio = await debeCambiarContra(cedula);
     if (yaCambio) {
       return { codigo: 201, mensaje: "La clave ya fue reseteada" };
-    }else{
+    } else {
       //Creo la conexion
       let pool = await sql.connect(conexion);
       //Hago el update
@@ -3021,8 +3062,12 @@ const insertarCambiarContra = async (cedula) => {
         );
       if (cliente.rowsAffected[0] < 1) {
         return { codigo: 200, mensaje: "Se reseteo la clave correctamente" };
-      }else{
-        return { codigo: 200, mensaje: "Se reseteo la clave correctamente", cliente: cliente.recordset[0] };
+      } else {
+        return {
+          codigo: 200,
+          mensaje: "Se reseteo la clave correctamente",
+          cliente: cliente.recordset[0],
+        };
       }
     }
   } catch (error) {
@@ -3077,9 +3122,11 @@ const updateContra = async (cedula, contra, identificadorUsu) => {
     let queryUpdate = "";
     if (identificadorUsu === 1) {
       //Armo la query que voy a hacer
-      queryUpdate = "update Empleado set Contra = @contra where Cedula = @cedula";
+      queryUpdate =
+        "update Empleado set Contra = @contra where Cedula = @cedula";
     } else if (identificadorUsu === 2) {
-      queryUpdate = "update Cliente set Contra = @contra where Cedula = @cedula";
+      queryUpdate =
+        "update Cliente set Contra = @contra where Cedula = @cedula";
     }
     //Creo la conexion
     let pool = await sql.connect(conexion);
@@ -3228,9 +3275,15 @@ const calcularComision = async (ciEmpleado, idCaja) => {
       idCaja
     );
     //Voy a buscar el total de comision de productos
-    const comisionProductos = await calcularComisionProductos(ciEmpleado, idCaja)
+    const comisionProductos = await calcularComisionProductos(
+      ciEmpleado,
+      idCaja
+    );
     //Hago la suma de las comisiones
-    let comisionTotal = comisionConLimite.mensaje + comisionSinLimite.mensaje + comisionProductos.mensaje;
+    let comisionTotal =
+      comisionConLimite.mensaje +
+      comisionSinLimite.mensaje +
+      comisionProductos.mensaje;
     return { codigo: 200, mensaje: comisionTotal };
   } catch (error) {
     console.log(error);
@@ -3248,19 +3301,21 @@ const calcularComisionProductos = async (ciEmpleado, idCaja) => {
       .request()
       .input("idCaja", sql.Int, idCaja)
       .input("ciEmpleado", sql.VarChar, ciEmpleado)
-      .query("select SUM(EP.Cantidad) as totalVendidos, EP.IdProducto as idProducto, E.Cedula as ciEmpleado, P.Precio as precio from EntradaDinero E, Entrada_Producto EP, Producto P, Caja_Entrada C where E.IdEntrada = EP.IdEntrada and P.IdProducto = EP.IdProducto and C.IdEntrada = E.IdEntrada and E.Cedula = @ciEmpleado and C.IdCaja = @idCaja group by P.Nombre, EP.IdProducto, E.Cedula, P.Precio");
+      .query(
+        "select SUM(EP.Cantidad) as totalVendidos, EP.IdProducto as idProducto, E.Cedula as ciEmpleado, P.Precio as precio from EntradaDinero E, Entrada_Producto EP, Producto P, Caja_Entrada C where E.IdEntrada = EP.IdEntrada and P.IdProducto = EP.IdProducto and C.IdEntrada = E.IdEntrada and E.Cedula = @ciEmpleado and C.IdCaja = @idCaja group by P.Nombre, EP.IdProducto, E.Cedula, P.Precio"
+      );
     //Agarro el array que me devuelve
     const arrayProductos = productos.recordset;
     //Guardo el valor al que le voy a sumar el total de la comision
     let totalComision = 0;
-    arrayProductos.forEach(producto => {
-      totalComision += (producto.totalVendidos * producto.precio) * 0.1
+    arrayProductos.forEach((producto) => {
+      totalComision += producto.totalVendidos * producto.precio * 0.1;
     });
-    return {codigo: 200, mensaje: totalComision}
+    return { codigo: 200, mensaje: totalComision };
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 //Metodo para calcular la comision de los que corresponden siempre el 35%
 const calcularComisionSinLimite = async (ciEmpleado, idCaja) => {
@@ -3567,9 +3622,7 @@ const getFechaCaja = async (idCaja) => {
     const caja = await pool
       .request()
       .input("idCaja", sql.Int, idCaja)
-      .query(
-        "select Fecha as fecha from Caja where IdCaja = @idCaja"
-      );
+      .query("select Fecha as fecha from Caja where IdCaja = @idCaja");
     return caja.recordset[0].fecha;
   } catch (error) {
     console.log(error);
@@ -3590,7 +3643,7 @@ const limpiarAgendas = async (fecha) => {
     console.log(error);
     return false;
   }
-}
+};
 
 //Metodo para eliminar los datos de la tabla Agenda_Servicio
 const limpiarAgendaServicio = async (fecha) => {
@@ -3601,12 +3654,14 @@ const limpiarAgendaServicio = async (fecha) => {
     const retorno = await pool
       .request()
       .input("fecha", sql.Date, fecha)
-      .query("delete from Agenda_Servicio where IdHorario in (select H.IdHorario as idHorario from Horario H where H.Fecha <= @fecha)");
+      .query(
+        "delete from Agenda_Servicio where IdHorario in (select H.IdHorario as idHorario from Horario H where H.Fecha <= @fecha)"
+      );
     return retorno.rowsAffected[0];
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 //Metodo para eliminar los datos de la tabla Agenda_Cliente
 const limpiarAgendaCliente = async (fecha) => {
@@ -3617,12 +3672,14 @@ const limpiarAgendaCliente = async (fecha) => {
     const retorno = await pool
       .request()
       .input("fecha", sql.Date, fecha)
-      .query("delete from Agenda_Cliente where IdHorario in (select H.IdHorario as idHorario from Horario H where H.Fecha <= @fecha)");
+      .query(
+        "delete from Agenda_Cliente where IdHorario in (select H.IdHorario as idHorario from Horario H where H.Fecha <= @fecha)"
+      );
     return retorno.rowsAffected[0];
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 //Metodo para eliminar los datos de la tabla Agenda_Servicio
 const limpiarAgendaNorm = async (fecha) => {
@@ -3633,12 +3690,14 @@ const limpiarAgendaNorm = async (fecha) => {
     const retorno = await pool
       .request()
       .input("fecha", sql.Date, fecha)
-      .query("delete from Agenda where IdHorario in (select H.IdHorario as idHorario from Horario H where H.Fecha <= @fecha)");
+      .query(
+        "delete from Agenda where IdHorario in (select H.IdHorario as idHorario from Horario H where H.Fecha <= @fecha)"
+      );
     return retorno.rowsAffected[0];
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 //Metodo para eliminar los datos de la tabla Agenda_Servicio
 const limpiarHorario = async (fecha) => {
@@ -3649,12 +3708,14 @@ const limpiarHorario = async (fecha) => {
     const retorno = await pool
       .request()
       .input("fecha", sql.Date, fecha)
-      .query("delete from Horario where IdHorario in (select H.IdHorario as idHorario from Horario H where H.Fecha <= @fecha)");
+      .query(
+        "delete from Horario where IdHorario in (select H.IdHorario as idHorario from Horario H where H.Fecha <= @fecha)"
+      );
     return retorno.rowsAffected[0];
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 //Metodo para el cierre total de la caja
 const cierreTotal = async (idCaja, totalEntradas, totalSalidas) => {
@@ -3666,7 +3727,12 @@ const cierreTotal = async (idCaja, totalEntradas, totalSalidas) => {
       return { codigo: 400, mensaje: "La caja ya fue cerrada" };
     }
     //Llamo al metodo para limpiar todo
-    return await mantenimientoDatos(caja.idCaja, caja.fecha, totalEntradas, totalSalidas);
+    return await mantenimientoDatos(
+      caja.idCaja,
+      caja.fecha,
+      totalEntradas,
+      totalSalidas
+    );
   } catch (error) {
     console.log(error);
   }
@@ -3676,7 +3742,7 @@ const cierreTotal = async (idCaja, totalEntradas, totalSalidas) => {
 const actualizarMontoCaja = async (idCaja, entradas, salidas) => {
   try {
     //Guardo el total
-    let total = entradas + salidas
+    let total = entradas + salidas;
     //Creo la conexion
     let pool = await sql.connect(conexion);
     //Hago el update
@@ -3690,35 +3756,42 @@ const actualizarMontoCaja = async (idCaja, entradas, salidas) => {
     }
   } catch (error) {
     console.log(error);
-    return false
+    return false;
   }
-}
-
+};
 
 //Metodo auxiliar que se llama para hacer la limpieza de todo
 //Este metodo llama a los metodos de limpieza individual
 //La fecha de la caja es lo que le paso como parametro a todos los metodos de eliminar
-const mantenimientoDatos = async (idCaja, fechaCajaEntradas, totalEntradas, totalSalidas) => {
+const mantenimientoDatos = async (
+  idCaja,
+  fechaCajaEntradas,
+  totalEntradas,
+  totalSalidas
+) => {
   try {
     //Voy a buscar la fecha de la caja porque necesito la fecha de la caja para eliminar las agendas y la fecha + 1 para eliminar las entradas
-    const fechaCaja = await getFechaCaja(idCaja)
+    const fechaCaja = await getFechaCaja(idCaja);
     //Llamo a limpiar todas las agendas
-    const agendas = await limpiarAgendas(fechaCaja)
+    const agendas = await limpiarAgendas(fechaCaja);
     if (!agendas) {
-      return {codigo: 400, mensaje: "Error al eliminar las agendas"}
+      return { codigo: 400, mensaje: "Error al eliminar las agendas" };
     }
     //Llamo para actualizar la caja y ponerle el total correspondiente
-    const caja = await actualizarMontoCaja(idCaja, totalEntradas, totalSalidas)
+    const caja = await actualizarMontoCaja(idCaja, totalEntradas, totalSalidas);
     if (!caja) {
-      return {codigo: 400, mensaje: "Error al actualizar el total de la caja"}
+      return {
+        codigo: 400,
+        mensaje: "Error al actualizar el total de la caja",
+      };
     }
     //Llamo para limpiar todas las entradas de dinero
     const limpiezaCaja = limpiarCaja(fechaCajaEntradas);
     if (!limpiezaCaja) {
-      return {codigo: 400, mensaje: "Error al limpiar la caja"}
+      return { codigo: 400, mensaje: "Error al limpiar la caja" };
     }
     //Si llegamos aca sin algun mensaje devuelvo que se limpio todo
-    return {codigo: 200, mensaje: "Mantenimiento realizado correctamente"}
+    return { codigo: 200, mensaje: "Mantenimiento realizado correctamente" };
   } catch (error) {
     console.log(error);
   }
@@ -3741,7 +3814,7 @@ const limpiarCaja = async (fechaCaja) => {
     console.log(error);
     return false;
   }
-}
+};
 
 //Metodo para eliminar los datos de la tabla Agenda_Servicio
 const limpiarCajaSalida = async (fecha) => {
@@ -3752,12 +3825,14 @@ const limpiarCajaSalida = async (fecha) => {
     const retorno = await pool
       .request()
       .input("fecha", sql.Date, fecha)
-      .query("delete from Caja_Salida where IdSalida in (select IdSalida from SalidaDinero where Fecha <= @fecha)");
+      .query(
+        "delete from Caja_Salida where IdSalida in (select IdSalida from SalidaDinero where Fecha <= @fecha)"
+      );
     return retorno.rowsAffected[0];
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 //Metodo para eliminar los datos de la tabla Agenda_Servicio
 const limpiarCajaEntrada = async (fecha) => {
@@ -3768,12 +3843,14 @@ const limpiarCajaEntrada = async (fecha) => {
     const retorno = await pool
       .request()
       .input("fecha", sql.Date, fecha)
-      .query("delete from Caja_Entrada where IdEntrada in (select IdEntrada from EntradaDinero where Fecha <= @fecha)");
+      .query(
+        "delete from Caja_Entrada where IdEntrada in (select IdEntrada from EntradaDinero where Fecha <= @fecha)"
+      );
     return retorno.rowsAffected[0];
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 //Metodo para eliminar los datos de la tabla Agenda_Servicio
 const limpiarEntradaDebito = async (fecha) => {
@@ -3784,12 +3861,14 @@ const limpiarEntradaDebito = async (fecha) => {
     const retorno = await pool
       .request()
       .input("fecha", sql.Date, fecha)
-      .query("delete from Entrada_Debito where IdEntrada in (select IdEntrada from EntradaDinero where Fecha <= @fecha)");
+      .query(
+        "delete from Entrada_Debito where IdEntrada in (select IdEntrada from EntradaDinero where Fecha <= @fecha)"
+      );
     return retorno.rowsAffected[0];
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 //Metodo para eliminar los datos de la tabla Agenda_Servicio
 const limpiarEntradaEfectivo = async (fecha) => {
@@ -3800,12 +3879,14 @@ const limpiarEntradaEfectivo = async (fecha) => {
     const retorno = await pool
       .request()
       .input("fecha", sql.Date, fecha)
-      .query("delete from Entrada_Efectivo where IdEntrada in (select IdEntrada from EntradaDinero where Fecha <= @fecha)");
+      .query(
+        "delete from Entrada_Efectivo where IdEntrada in (select IdEntrada from EntradaDinero where Fecha <= @fecha)"
+      );
     return retorno.rowsAffected[0];
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 //Metodo para eliminar los datos de la tabla Agenda_Servicio
 const limpiarEntradaProducto = async (fecha) => {
@@ -3816,12 +3897,14 @@ const limpiarEntradaProducto = async (fecha) => {
     const retorno = await pool
       .request()
       .input("fecha", sql.Date, fecha)
-      .query("delete from Entrada_Producto where IdEntrada in (select IdEntrada from EntradaDinero where Fecha <= @fecha)");
+      .query(
+        "delete from Entrada_Producto where IdEntrada in (select IdEntrada from EntradaDinero where Fecha <= @fecha)"
+      );
     return retorno.rowsAffected[0];
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 //Metodo para eliminar los datos de la tabla Agenda_Servicio
 const limpiarEntradaServicio = async (fecha) => {
@@ -3832,12 +3915,14 @@ const limpiarEntradaServicio = async (fecha) => {
     const retorno = await pool
       .request()
       .input("fecha", sql.Date, fecha)
-      .query("delete from Entrada_Servicio where IdEntrada in (select IdEntrada from EntradaDinero where Fecha <= @fecha)");
+      .query(
+        "delete from Entrada_Servicio where IdEntrada in (select IdEntrada from EntradaDinero where Fecha <= @fecha)"
+      );
     return retorno.rowsAffected[0];
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 //Metodo para eliminar los datos de la tabla Agenda_Servicio
 const limpiarSalida = async (fecha) => {
@@ -3848,12 +3933,14 @@ const limpiarSalida = async (fecha) => {
     const retorno = await pool
       .request()
       .input("fecha", sql.Date, fecha)
-      .query("delete from SalidaDinero where IdSalida in (select IdSalida from SalidaDinero where Fecha <= @fecha)");
+      .query(
+        "delete from SalidaDinero where IdSalida in (select IdSalida from SalidaDinero where Fecha <= @fecha)"
+      );
     return retorno.rowsAffected[0];
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 //Metodo para eliminar los datos de la tabla Agenda_Servicio
 const limpiarEntrada = async (fecha) => {
@@ -3864,12 +3951,14 @@ const limpiarEntrada = async (fecha) => {
     const retorno = await pool
       .request()
       .input("fecha", sql.Date, fecha)
-      .query("delete from EntradaDinero where IdEntrada in (select IdEntrada from EntradaDinero where Fecha <= @fecha)");
+      .query(
+        "delete from EntradaDinero where IdEntrada in (select IdEntrada from EntradaDinero where Fecha <= @fecha)"
+      );
     return retorno.rowsAffected[0];
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 //Metodo para conseguir el total de salidas de dinero de cada empleado
 const getSalidasDineroEmpleados = async (idCaja) => {
@@ -3880,18 +3969,19 @@ const getSalidasDineroEmpleados = async (idCaja) => {
     const retorno = await pool
       .request()
       .input("idCaja", sql.Int, idCaja)
-      .query("select E.Nombre as nombre, S.Cedula as cedula, SUM(S.Monto) as totalSalidas from SalidaDinero S, Empleado E, Caja_Salida CS where S.Cedula = E.Cedula and CS.IdSalida = S.IdSalida and CS.IdCaja = @idCaja group by S.Cedula, E.Nombre");
-      //Sumo todos los valores y armo un total
-    let totalSalida = 0
-    retorno.recordset.forEach(salida => {
-      totalSalida += salida.totalSalidas
+      .query(
+        "select E.Nombre as nombre, S.Cedula as cedula, SUM(S.Monto) as totalSalidas from SalidaDinero S, Empleado E, Caja_Salida CS where S.Cedula = E.Cedula and CS.IdSalida = S.IdSalida and CS.IdCaja = @idCaja group by S.Cedula, E.Nombre"
+      );
+    //Sumo todos los valores y armo un total
+    let totalSalida = 0;
+    retorno.recordset.forEach((salida) => {
+      totalSalida += salida.totalSalidas;
     });
-    return [...retorno.recordset, {total: totalSalida}];
+    return [...retorno.recordset, { total: totalSalida }];
   } catch (error) {
     console.log(error);
   }
-}
-
+};
 
 //Creo un objeto que voy a exportar para usarlo desde el index.js
 //Adentro voy a tener todos los metodos de llamar a la base
