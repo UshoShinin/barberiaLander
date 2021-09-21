@@ -36,6 +36,10 @@ const FormularioAgenda = (props) => {
   const authCtx = useContext(AuthContext);
   const [diasMostrar, setDiasMostrar] = useState(null);
   const calendarioHandler = (horarios) => {
+    let timeNeed = calcularTiempo(
+      getElementById(inputState.HorariosFiltrados, inputState.Employee.value),
+      inputState.servicios
+    );
     let misHorarios = [];
     let i = 1;
     if (horarios.value.length > 0) {
@@ -51,7 +55,7 @@ const FormularioAgenda = (props) => {
         inputState.HorariosFiltrados,
         inputState.Employee.value
       );
-      misHorarios = [...cargarHorariosEnMinutos(horarios.dia, Employee)];
+      misHorarios = [...cargarHorariosEnMinutos(horarios.dia, Employee,timeNeed)];
     }
     dispatchInput({
       type: "CALENDARIO",

@@ -94,10 +94,6 @@ export const horariosAgendarDisponibles = (
   entrada,
   salida
 ) => {
-  console.log(horarios,
-    timeNeed,
-    entrada,
-    salida);
   let hora = entrada;
   const horaCierre = salida;
   let horariosDisponibles = [];
@@ -154,7 +150,7 @@ export const cargarHorarios = (inicio, fin) => {
   }
   return lista;
 };
-export const cargarHorariosEnMinutos = (dia, Employee) => {
+export const cargarHorariosEnMinutos = (dia, Employee,tiempo) => {
   let misHorarios = [];
   const d = dia.d;
   const m = dia.m;
@@ -168,8 +164,9 @@ export const cargarHorariosEnMinutos = (dia, Employee) => {
   const salida = transformStringNumber(jornada.salida);
   let H = entrada.h;
   let M = entrada.m;
+  let nuevaSalida = minutosAHorarios(horarioEnMinutos(salida)-tiempo);
   let i = 1;
-  while (H < salida.h || M < salida.m) {
+  while (H !== nuevaSalida.h || M !== nuevaSalida.m) {
     misHorarios.push({
       id: i,
       title: `${H}:${M < 10 ? "0" + M : M}`,
@@ -181,6 +178,11 @@ export const cargarHorariosEnMinutos = (dia, Employee) => {
     }
     i++;
   }
+  misHorarios.push({
+    id: i,
+    title: `${H}:${M < 10 ? "0" + M : M}`,
+  });
+
   return misHorarios;
 };
 
