@@ -5,9 +5,7 @@ import AuthContext from "../../store/AuthContext";
 import Menu from "./Menu/Menu";
 import NavButton from "./NavButton/NavButton";
 import LogoAzulH from "../../recursos/LogoChiquitoAzulHerramientas.png";
-import LogoAzul from "../../recursos/LogoChiquitoAzul2test2.png";
-import LogoRojo from "../../recursos/LogoChiquitoRojo2test2.png";
-import Logo from "../../recursos/LogoChiquitoBlanco2.png";
+import Logo from './Logo/Logo';
 
 const NavLinks = (props) => {
   const initialState = { place: -1, active: -1 };
@@ -29,6 +27,7 @@ const NavLinks = (props) => {
 
   const authCtx = useContext(AuthContext);
   const isLoggedIn = authCtx.isLoggedIn;
+  const mobile = document.getElementById('root').clientWidth<900;
   const [state, dispatch] = useReducer(reducer, initialState);
   const Menus = [
     {
@@ -51,11 +50,9 @@ const NavLinks = (props) => {
   return (
     <ul className={classes.navbarUl}>
       {/* <li><Link to="/" className="navbar-brand">Lander</Link></li>  */}
-      <li className={classes.Logo}>
-        <img className={classes.base} src={LogoAzulH} />
-        <img className={classes.blur} src={LogoAzulH} />
-        <img className={classes.brillo} src={LogoAzulH} />
-      </li>
+      {!mobile&&<li>
+        <Logo Logo={LogoAzulH}/>
+      </li>}
       <li>
         <NavLink
           onClick={NavOnClick}
@@ -66,18 +63,7 @@ const NavLinks = (props) => {
           <span data="Inicio">Inicio</span>
         </NavLink>
       </li>
-      {/* <li>
-        <NavLink 
-          onClick={NavOnClick}
-          exact
-          activeClassName={classes.active}
-          
-          to="/caja/historial"
-        >
-          <span data="Historial de Cajas">Historial de Cajas</span>
-        </NavLink>{" "}
-      </li> */}
-      {authCtx.user !== null &&
+      {!mobile &&authCtx.user !== null &&
         (authCtx.user.rol === "Administrador" ||
           authCtx.user.rol === "Encargado") && (
           <li>

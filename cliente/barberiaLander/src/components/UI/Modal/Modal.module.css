@@ -79,3 +79,10 @@
 .BackdropClose {
   display: none;
 }
+
+@media (max-width:900px) {
+  .Modal {
+    left: 10%;
+    width: 80%;
+  }
+}

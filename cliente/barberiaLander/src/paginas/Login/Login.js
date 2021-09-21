@@ -83,7 +83,7 @@ const Login = (props) => {
   }
 
   return (<>
-    <Modal show={loginState.modal} closed={()=>{}}>
+    <Modal className={classes.agrandar} show={loginState.modal} closed={()=>{}}>
       <h1>Reseteo de contraseña</h1>
       <form onSubmit={submitCambiar} className={classes.menuReset}>
         <div>

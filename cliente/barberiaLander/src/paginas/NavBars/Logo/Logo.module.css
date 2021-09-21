@@ -1,0 +1,22 @@
+.Logo {
+  width: 50px; /*63 sin herramientas 50 para otros logos */
+  position: absolute;
+  left: 1.5%;
+  margin-top: 5px;
+}
+.Logo > img {
+  position: absolute;
+  width: 100%;
+}
+
+.base {
+  z-index: 999;
+}
+.blur {
+  /* filter: blur(1px); */
+  z-index: 999;
+}
+.brillo {
+  filter: blur(1px);
+  z-index: 998;
+}
