@@ -3044,11 +3044,9 @@ const updateContra = async (cedula, contra, identificadorUsu) => {
     let queryUpdate = "";
     if (identificadorUsu === 1) {
       //Armo la query que voy a hacer
-      queryUpdate =
-        "update Empleado set Contra = @contra where Cedula = @cedula";
+      queryUpdate = "update Empleado set Contra = @contra where Cedula = @cedula";
     } else if (identificadorUsu === 2) {
-      queryUpdate =
-        "update Cliente set Contra = @contra where Cedula = @cedula";
+      queryUpdate = "update Cliente set Contra = @contra where Cedula = @cedula";
     }
     //Creo la conexion
     let pool = await sql.connect(conexion);
@@ -3833,6 +3831,7 @@ const getSalidasDineroEmpleados = async (idCaja) => {
     console.log(error);
   }
 }
+
 
 //Creo un objeto que voy a exportar para usarlo desde el index.js
 //Adentro voy a tener todos los metodos de llamar a la base

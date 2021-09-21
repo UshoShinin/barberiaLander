@@ -399,13 +399,10 @@ app.post("/reestablecerContra", (req, res) => {
 });
 
 app.post("/nuevaContra", (req, res) => {
-  console.log(req.body.cedula,
-    req.body.contra,
-    req.body.indentificador);
   const ret = interfaz.nuevaContra(
     req.body.cedula,
     req.body.contra,
-    req.body.indentificador
+    req.body.identificador
   );
   ret.then((resultado) => {
     res.json({
