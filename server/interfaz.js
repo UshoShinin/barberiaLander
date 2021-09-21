@@ -2671,6 +2671,39 @@ const updateStockProducto = async (idProducto, nuevaCantidad) => {
   }
 };
 
+//Metodo para modificar el producto entero
+const updateProducto = async (idProducto, nombre, stock, precio, discontinuado) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el update
+    const resultado = await pool
+      .request()
+      .input("idProducto", sql.Int, idProducto)
+      .input("nombre", sql.VarChar, nombre)
+      .input("stock", sql.Int, stock)
+      .input("precio", sql.Int, precio)
+      .input("discontinuado", sql.Bit, discontinuado)
+      .query(
+        "update Producto set Stock = @nuevaCantidad, Nombre = @nombre, Precio = @precio, Discontinuado = @discontinuado  where IdProducto = @idProducto"
+      );
+    if (resultado.rowsAffected[0] < 1) {
+      return {
+        codigo: 400,
+        mensaje: "Error al modificar producto",
+      };
+    }else{
+      return {
+        codigo: 200,
+        mensaje: "Producto modificado correctamente",
+        filasAfectadas: resultado.rowsAffected[0],
+      };
+    }
+  } catch (error) {
+    console.log();
+  }
+};
+
 //Metodo para controlar cosas antes de la entrada de dinero
 //Se va a verificar que la agenda a eliminar exista, que haya saldo suficiente en la cuponera y haya stock suficiente de los articulos
 //El listado de productos tiene id del producto y cantidad
@@ -3860,7 +3893,7 @@ const interfaz = {
   updateManejarAgenda,
   verificarHorario,
   verificacionEntradaCaja,
-  updateStockProducto,
+  updateProducto,
   cierreCaja,
   realizarEntradaDinero,
   getListadoProductos,

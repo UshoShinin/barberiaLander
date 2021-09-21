@@ -271,11 +271,10 @@ app.use("/manejoDeAgendas", (req, res) => {
   });
 });
 
-app.post("/modificarStockProducto", (req, res) => {
-  const ret = interfaz.updateStockProducto(
-    req.body.idProducto,
-    req.body.cantidad
-  );
+
+app.use("/cierreCaja", (req, res) => {
+  let valor = req.query.idCaja;
+  let ret = interfaz.cierreCaja(valor);
   ret.then((resultado) => {
     res.json({
       mensaje: resultado,
@@ -283,9 +282,14 @@ app.post("/modificarStockProducto", (req, res) => {
   });
 });
 
-app.use("/cierreCaja", (req, res) => {
-  let valor = req.query.idCaja;
-  let ret = interfaz.cierreCaja(valor);
+app.post("/modificarProducto", (req, res) => {
+  const ret = interfaz.updateProducto(
+    req.body.idProducto,
+    req.body.nombre,
+    req.body.stock,
+    req.body.precio,
+    req.body.discontinuado
+  );
   ret.then((resultado) => {
     res.json({
       mensaje: resultado,
