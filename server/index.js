@@ -271,7 +271,6 @@ app.use("/manejoDeAgendas", (req, res) => {
   });
 });
 
-
 app.use("/cierreCaja", (req, res) => {
   let valor = req.query.idCaja;
   let ret = interfaz.cierreCaja(valor);
@@ -307,7 +306,12 @@ app.use("/listadoProductos", (req, res) => {
 });
 
 app.post("/crearProducto", (req, res) => {
-  const ret = interfaz.crearNuevoProducto(req.body.nombre, req.body.precio, req.body.stock);
+  const ret = interfaz.crearNuevoProducto(
+    req.body.nombre,
+    req.body.precio,
+    req.body.stock,
+    req.body.descontinuado
+  );
   ret.then((resultado) => {
     res.json({
       mensaje: resultado,
@@ -416,7 +420,11 @@ app.post("/nuevaContra", (req, res) => {
 });
 
 app.delete("/cierreTotal", (req, res) => {
-  const ret = interfaz.cierreTotal(req.body.idCaja, req.body.totalEntradas, req.body.totalSalidas);
+  const ret = interfaz.cierreTotal(
+    req.body.idCaja,
+    req.body.totalEntradas,
+    req.body.totalSalidas
+  );
   ret.then((resultado) => {
     res.json({
       mensaje: resultado,
@@ -435,7 +443,6 @@ app.put("/modificarRolEmpleado", (req, res) => {
     });
   });
 });
-
 
 // All other GET requests not handled before will return our React app
 /* app.get('*', (req, res) => {
