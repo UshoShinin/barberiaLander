@@ -2905,7 +2905,7 @@ const verificarStockListadoProductos = async (listadoProductos) => {
 
 //Metodo para crear un nuevo producto
 //Los productos nuevos se crean con stock 0 por las dudas
-const crearNuevoProducto = async (nombre, precio) => {
+const crearNuevoProducto = async (nombre, precio, stock) => {
   try {
     //Creo la conexion
     let pool = await sql.connect(conexion);
@@ -2914,8 +2914,9 @@ const crearNuevoProducto = async (nombre, precio) => {
       .request()
       .input("precio", sql.Int, precio)
       .input("nombre", sql.VarChar, nombre)
+      .input("stock", sql.Int, stock)
       .query(
-        "insert into Producto (Nombre, Stock, Precio, Discontinuado) values (@nombre, 0, @precio, 0)"
+        "insert into Producto (Nombre, Stock, Precio, Discontinuado) values (@nombre, @stock, @precio, 0)"
       );
     if (producto.rowsAffected < 1) {
       return { codigo: 400, mensaje: "Error al crear producto" };

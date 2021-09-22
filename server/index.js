@@ -307,7 +307,7 @@ app.use("/listadoProductos", (req, res) => {
 });
 
 app.post("/crearProducto", (req, res) => {
-  const ret = interfaz.crearNuevoProducto(req.body.nombre, req.body.precio);
+  const ret = interfaz.crearNuevoProducto(req.body.nombre, req.body.precio, req.body.stock);
   ret.then((resultado) => {
     res.json({
       mensaje: resultado,
