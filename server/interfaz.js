@@ -58,7 +58,6 @@ const aceptarAgenda = async (id, horario) => {
     return ret;
   }
 };
-
 //Metodo para rechazar/cancelar una agenda
 const cancelarAgenda = async (idAgenda, idHorario) => {
   try {
@@ -3743,8 +3742,16 @@ const cierreTotal = async (idCaja, totalEntradas, totalSalidas) => {
 //Metodo para dejar la caja con el total correspondiente
 const actualizarMontoCaja = async (idCaja, entradas, salidas) => {
   try {
-    //Guardo el total
-    let total = entradas + salidas;
+    //Armo el total a guardar
+    let total = 0;
+    //Verifico si el total de entradas y salidas es 0
+    //En caso de que sean 0 los 2, entonces guardo como total -1
+    if (entradas === 0 && salidas === 0) {
+      total = -1
+    }else{
+      //Guardo el total
+      total = entradas + salidas;
+    }
     //Creo la conexion
     let pool = await sql.connect(conexion);
     //Hago el update
