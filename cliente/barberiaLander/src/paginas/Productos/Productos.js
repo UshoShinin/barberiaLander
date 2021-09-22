@@ -105,7 +105,18 @@ const Productos = (props) =>{
         }
     }
     const submitAgregar = () => {
-        if(!Producto.stock.isValid) refPS.current.focus();
+        /* if(!state.Agregar.stock.isValid) refPS.current.focus();
+        else{
+            modificar(
+                {
+                  url: "/modificarProducto",
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: data,
+                },
+                crearRespuesta
+            );
+        } */
     }
 
     return <>

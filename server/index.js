@@ -347,7 +347,7 @@ app.post("/habilitarEmpleado", (req, res) => {
     res.json({
       mensaje: resultado,
     });
-  });
+});
 });
 
 app.put("/discontinuarProducto", (req, res) => {
