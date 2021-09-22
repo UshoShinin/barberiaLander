@@ -424,6 +424,19 @@ app.delete("/cierreTotal", (req, res) => {
   });
 });
 
+app.put("/modificarRolEmpleado", (req, res) => {
+  const ret = interfaz.modificarRolEmpleado(
+    req.body.ciEmpleado,
+    req.body.rol //Esto espero que me llegue 1, 2 o 3 que son Administrador, Empleado, Encargado respectivamente
+  );
+  ret.then((resultado) => {
+    res.json({
+      mensaje: resultado,
+    });
+  });
+});
+
+
 // All other GET requests not handled before will return our React app
 /* app.get('*', (req, res) => {
   res.sendFile(path.resolve(__dirname, './cliente/barberiaLander/build', 'index.html'));

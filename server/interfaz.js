@@ -3983,6 +3983,27 @@ const getSalidasDineroEmpleados = async (idCaja) => {
   }
 };
 
+//Metodo para modificar el rol de un empleado
+const modificarRolEmpleado = async (ciEmpleado, rol) => {
+  try {
+    //Creo la conexion
+    let pool = await sql.connect(conexion);
+    //Hago el delete
+    const retorno = await pool
+      .request()
+      .input("ciEmpleado", sql.VarChar, ciEmpleado)
+      .input("rol", sql.Int, rol)
+      .query("update Empleado_Rol set IdRol = @rol where Cedula = @ciEmpleado");
+    if (retorno.rowsAffected < 1) {
+      return {codigo: 400, mensaje: "Error al modificar el rol del empleado"}
+    }else{
+      return {codigo: 200, mensaje: "Rol modificado correctamente"}
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 //Creo un objeto que voy a exportar para usarlo desde el index.js
 //Adentro voy a tener todos los metodos de llamar a la base
 const interfaz = {
@@ -4025,6 +4046,7 @@ const interfaz = {
   calcularJornal,
   nuevaContra,
   cierreTotal,
+  modificarRolEmpleado
 };
 
 //Exporto el objeto interfaz para que el index lo pueda usar
