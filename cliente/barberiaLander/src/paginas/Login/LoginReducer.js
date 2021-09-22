@@ -5,8 +5,8 @@ export const initialState = {
   contra2: { value: "", isValid: null },
   modal : false,
   Mensaje:{show:false,value:''},
-  problema: -1,
   identificador:0,
+  problema: -1,
   problemas: [
     { id: 1, pro: "" },
     { id: 2, pro: "" },

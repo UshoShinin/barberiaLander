@@ -39,6 +39,15 @@ export const calcularPrecio = (servicios) => {
 };
 
 export const validarMonto = (value) => {
+  let largo = value.trim().length;
+  if(value === ""||  largo=== 0|| largo > 6) return false;
+  for(let i = 0;i<largo;i++){
+    if(value.charCodeAt(i)<48||value.charCodeAt(i)>57) return false;
+  }
+  return parseInt(value,10) > 0;
+};
+export const validarMontoPermitirNulos = (value) => {
+
   return ((value !== ""&&value!==0 ? value.trim().length > 0 : null) && parseInt(value) >= 0);
 };
 

@@ -39,8 +39,27 @@ const inputs = (state, dispatch) => {
       {
         id: 3,
         type: "text",
+        value: state.Producto.stock.value,
+        placeholder: "Monto",
+        onChange: (event) => {
+          dispatch({
+            type: "USER_P_STOCK",
+            value: event.target.value,
+          });
+        },
+        onBlur: () => {
+          dispatch({ type: "BLUR_P_STOCK" });
+        },
+        onFocus: () => {
+          dispatch({ type: "FOCUS_P_STOCK" });
+        },
+      },
+      {
+        id: 4,
+        type: "text",
         value: state.Agregar.stock.value,
         placeholder: "Monto",
+        disabled:state.producto===null,
         onChange: (event) => {
           dispatch({
             type: "USER_A_STOCK",
