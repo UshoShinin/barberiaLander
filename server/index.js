@@ -287,7 +287,7 @@ app.post("/modificarProducto", (req, res) => {
     req.body.nombre,
     req.body.stock,
     req.body.precio,
-    req.body.discontinuado
+    req.body.descontinuado
   );
   ret.then((resultado) => {
     res.json({

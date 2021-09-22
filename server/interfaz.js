@@ -2726,7 +2726,7 @@ const updateProducto = async (
       .input("precio", sql.Int, precio)
       .input("discontinuado", sql.Bit, discontinuado)
       .query(
-        "update Producto set Stock = @nuevaCantidad, Nombre = @nombre, Precio = @precio, Discontinuado = @discontinuado  where IdProducto = @idProducto"
+        "update Producto set Stock = @stock, Nombre = @nombre, Precio = @precio, Discontinuado = @discontinuado  where IdProducto = @idProducto"
       );
     if (resultado.rowsAffected[0] < 1) {
       return {
