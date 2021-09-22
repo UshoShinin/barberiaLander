@@ -37,7 +37,7 @@ const NavLinks = (props) => {
         { id: 1, text: "Cuponera", to: "/cuponeras" },
         { id: 2, text: "Empleados", to: "/empleados" },
         { id: 3, text: "Reseteo contraseña", to: "/reseteo" },
-        { id: 4, text: "Listado Productos", to: "/empleados" },
+        { id: 4, text: "Productos", to: "/productos" },
       ],
     },
   ];

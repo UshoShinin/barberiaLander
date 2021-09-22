@@ -4,6 +4,7 @@ import {
 } from "../../FuncionesAuxiliares/FuncionesAuxiliares";
 import { formatDate } from "../../FuncionesAuxiliares/FuncionesAuxiliares";
 import { resetAgendaProductos } from "./AuxiliaresCaja/reseteos";
+import { validarMonto } from "../../FuncionesAuxiliares/FuncionesAuxiliares";
 export const initialState = {
   idCaja: 1,
   fecha: new Date(),
@@ -55,12 +56,6 @@ export const initialState = {
 
 const orden = (a, b) => {
   return a.id - b.id;
-};
-
-const validarMonto = (value) => {
-  return (
-    (value !== ""&&value!==0 ? value.trim().length > 0 : null) && parseInt(value) >= 0
-  );
 };
 
 const miFiltro = (lista, objetivo) => {

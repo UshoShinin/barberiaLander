@@ -7,8 +7,6 @@ import Cuponeras from "./paginas/Cuponera/Cuponeras";
 import Empleados from "./paginas/Empleados/Empleados";
 import AperturaCierre from "./paginas/Caja/AperturaCierre";
 import CalculoJornal from "./paginas/Caja/CalculoJornal";
-import Historial from "./paginas/Caja/Historial";
-import MovimientoCaja from "./paginas/Caja/MovimientoCaja";
 import CrearAgenda from "./paginas/Agenda/CrearAgenda";
 import PreAgendas from "./paginas/Agenda/PreAgendas/PreAgendas";
 import VisualAgendas from "./paginas/Agenda/VisualAgendas/VisualAgendas";
@@ -17,6 +15,7 @@ import Login from "./paginas/Login/Login";
 import NoEncontrado from "./paginas/NoEncontrado";
 import Reseteo from './paginas/ReseteoContra/ReseteoContra';
 import NavBar from './paginas/NavBars/NavBar';
+import Productos from './paginas/Productos/Productos';
 import React from "react";
 import {
   BrowserRouter as Router,
@@ -72,11 +71,8 @@ const App = () => {
             <Route path="/caja/calculojornal" exact>
               <CalculoJornal />
             </Route>
-            <Route path="/caja/historial" exact>
-              <Historial />
-            </Route>
-            <Route path="/caja/movimientocaja" exact>
-              <MovimientoCaja />
+            <Route path="/productos" exact>
+              <Productos />
             </Route>
             <Route path="*">
               <NoEncontrado />

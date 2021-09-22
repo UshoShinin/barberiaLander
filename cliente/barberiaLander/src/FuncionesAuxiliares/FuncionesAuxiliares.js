@@ -38,6 +38,10 @@ export const calcularPrecio = (servicios) => {
   return total;
 };
 
+export const validarMonto = (value) => {
+  return ((value !== ""&&value!==0 ? value.trim().length > 0 : null) && parseInt(value) >= 0);
+};
+
 /* Este metodo está obtener el equivalente en el state de un id de empleado */
 export const getElementById = (list, id) => {
   for (let i = 0; i < list.length; i++) {
